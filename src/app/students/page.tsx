@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import API_BASE_URL from "@/config/baseURL";
-import { X, Search, ChevronDown } from "lucide-react";
+import { Search } from "lucide-react";
 
 interface Student {
   _id: string;
@@ -28,7 +28,7 @@ const StudentManagement: React.FC = () => {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("pending");
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [isOpen, setIsOpen] = useState(false)
+
 
   const fetchStudents = async () => {
     try {
