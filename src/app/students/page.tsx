@@ -1,4 +1,4 @@
-"use client";
+'use client'
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import API_BASE_URL from "@/config/baseURL";
@@ -28,7 +28,7 @@ const StudentManagement: React.FC = () => {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("pending");
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [isFilterMenuOpen, setIsFilterMenuOpen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState(false)
 
   const fetchStudents = async () => {
     try {
@@ -38,10 +38,7 @@ const StudentManagement: React.FC = () => {
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
       setStudents(sortedStudents);
-      const pendingStudents = sortedStudents.filter(
-        (student) => student.status === "pending"
-      );
-      groupStudentsByIntake(pendingStudents);
+      filterStudents(activeFilter, sortedStudents);
     } catch (error) {
       console.error("Error fetching student data:", error);
       setError("Failed to load student data. Please try again later.");
@@ -68,10 +65,7 @@ const StudentManagement: React.FC = () => {
       await axios.delete(`${API_BASE_URL}/students/${id}`);
       const updatedStudents = students.filter((student) => student._id !== id);
       setStudents(updatedStudents);
-      const filteredStudents = updatedStudents.filter(
-        (student) => student.status === activeFilter
-      );
-      groupStudentsByIntake(filteredStudents);
+      filterStudents(activeFilter, updatedStudents);
       setSelectedStudent(null);
     } catch (error) {
       console.error("Error deleting student:", error);
@@ -83,14 +77,15 @@ const StudentManagement: React.FC = () => {
     setSelectedStudent(student);
   };
 
-  const handleAdmit = async (id: string) => {
+  const handleStatusChange = async (id: string, newStatus: string) => {
     try {
-      await axios.put(`${API_BASE_URL}/students/${id}`);
+      await axios.put(`${API_BASE_URL}/students/${id}`, { status: newStatus });
       await fetchStudents();
-      filterStudents(activeFilter);
     } catch (error) {
-      console.error("Error admitting student:", error);
-      setError("Failed to admit student. Please try again.");
+      console.error(`Error changing student status to ${newStatus}:`, error);
+      setError(
+        `Failed to change student status to ${newStatus}. Please try again.`
+      );
     }
   };
 
@@ -102,14 +97,16 @@ const StudentManagement: React.FC = () => {
     });
   };
 
-  const filterStudents = (status: string) => {
+  const filterStudents = (
+    status: string,
+    studentsData: Student[] = students
+  ) => {
     setActiveFilter(status);
     setSearchTerm("");
-    const filteredStudents = students.filter(
+    const filteredStudents = studentsData.filter(
       (student) => student.status === status
     );
     groupStudentsByIntake(filteredStudents);
-    setIsFilterMenuOpen(false);
   };
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,58 +122,127 @@ const StudentManagement: React.FC = () => {
     groupStudentsByIntake(filteredStudents);
   };
 
+  const renderActionButtons = (student: Student) => {
+    const commonButtons = (
+      <>
+        <button
+          onClick={() => handleView(student)}
+          className="text-indigo-600 hover:text-indigo-900 mr-3"
+        >
+          View
+        </button>
+        <button
+          onClick={() => handleDelete(student._id)}
+          className="text-red-600 hover:text-red-900"
+        >
+          Delete
+        </button>
+      </>
+    );
+
+    switch (student.status) {
+      case "pending":
+        return (
+          <>
+            {commonButtons}
+            <button
+              onClick={() => handleStatusChange(student._id, "accepted")}
+              className="text-green-600 hover:text-green-900 ml-3"
+            >
+              Admit
+            </button>
+          </>
+        );
+      case "accepted":
+        return (
+          <>
+            {commonButtons}
+            <button
+              onClick={() => handleStatusChange(student._id, "registered")}
+              className="text-blue-600 hover:text-blue-900 ml-3"
+            >
+              Register
+            </button>
+          </>
+        );
+      case "registered":
+        return (
+          <>
+            {commonButtons}
+            <button
+              onClick={() => handleStatusChange(student._id, "started")}
+              className="text-green-600 hover:text-green-900 ml-3"
+            >
+              Start
+            </button>
+          </>
+        );
+      case "started":
+        return (
+          <>
+            {commonButtons}
+            <button
+              onClick={() => handleStatusChange(student._id, "completed")}
+              className="text-green-600 hover:text-green-900 ml-3"
+            >
+              Complete
+            </button>
+            <button
+              onClick={() => handleStatusChange(student._id, "dropedout")}
+              className="text-yellow-600 hover:text-yellow-900 ml-3"
+            >
+              Dropout
+            </button>
+            <button
+              onClick={() => handleStatusChange(student._id, "dropedout")}
+              className="text-green-600 hover:text-green-900 ml-3"
+            >
+              Attend
+            </button>
+          </>
+        );
+      case "completed":
+      case "dropedout":
+        return commonButtons;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
-        <h2 className="text-2xl font-bold p-6 bg-gray-50 text-gray-900 text-center border-b">
-          Applied Candidates
-        </h2>
+        <div className=" bg-gray-50 flex justify-between shadow-md rounded-lg px-2 items-center ">
+          <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
+            Applied Candidates
+          </h2>
+          <a href="/students/register-new" className="p-2  bg-green-400 hover:bg-green-700 rounded-lg px-5 text-white font-bold  ">
+            New
+          </a>
+        </div>
         {error && <p className="text-red-600 p-4 text-center">{error}</p>}
 
         <div className="p-4 sm:p-6 space-y-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-            <div className="relative w-full sm:w-auto">
-              <button
-                onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
-                className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                {activeFilter.toUpperCase()}
-                <ChevronDown
-                  className="ml-2 -mr-1 h-5 w-5 inline-block"
-                  aria-hidden="true"
-                />
-              </button>
-              {isFilterMenuOpen && (
-                <div className="origin-top-right absolute right-0 mt-2 w-48 ml-96 text-left  rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
-                  <div
-                    className="py-2"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="options-menu"
-                  >
-                    {[
-                      "pending",
-                      "accepted",
-                      "registered",
-                      "completed",
-                      "dropedout",
-                    ].map((status) => (
-                      <button
-                        key={status}
-                        onClick={() => filterStudents(status)}
-                        className="block w-full  px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 z-50"
-                        role="menuitem"
-                      >
-                        {status === "pending"
-                          ? "CANDIDATES"
-                          : status === "registered"
-                          ? "STUDENTS"
-                          : status.toUpperCase()}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+            <div className="flex space-x-2 overflow-x-auto w-full sm:w-auto">
+              {[
+                "pending",
+                "accepted",
+                "registered",
+                "started",
+                "completed",
+                "dropedout",
+              ].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => filterStudents(status)}
+                  className={`px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                    activeFilter === status ? "bg-indigo-100" : ""
+                  }`}
+                >
+                  {status.toUpperCase()}
+                </button>
+              ))}
             </div>
             <div className="relative w-full sm:w-64">
               <input
@@ -233,24 +299,21 @@ const StudentManagement: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {intakeStudents.map((student,index) => (
+                    {intakeStudents.map((student, index) => (
                       <tr key={student._id}>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">
-                            {index+1}
+                            {index + 1}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">
+                            {student.name}
                           </div>
                           <div className="text-sm text-gray-500 sm:hidden">
                             {student.phone}
                           </div>
                         </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">
-                              {student.name}
-                            </div>
-                            <div className="text-sm text-gray-500 sm:hidden">
-                              {student.phone}
-                            </div>
-                          </td>
                         <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                           <div className="text-sm text-gray-900">
                             {student.phone}
@@ -262,26 +325,7 @@ const StudentManagement: React.FC = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button
-                            onClick={() => handleView(student)}
-                            className="text-indigo-600 hover:text-indigo-900 mr-3"
-                          >
-                            View
-                          </button>
-                          <button
-                            onClick={() => handleDelete(student._id)}
-                            className="text-red-600 hover:text-red-900 mr-3"
-                          >
-                            Delete
-                          </button>
-                          {student.status === "pending" && (
-                            <button
-                              onClick={() => handleAdmit(student._id)}
-                              className="text-green-600 hover:text-green-900"
-                            >
-                              Admit
-                            </button>
-                          )}
+                          {renderActionButtons(student)}
                         </td>
                       </tr>
                     ))}
@@ -290,50 +334,66 @@ const StudentManagement: React.FC = () => {
               </div>
             </div>
           ))}
-        </div>
-      </div>
 
-      {selectedStudent && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-bold">Student Details</h3>
-                <button
-                  onClick={() => setSelectedStudent(null)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <X size={24} />
-                </button>
-              </div>
-              <div className="space-y-2">
-                <p>
-                  <strong>Name:</strong> {selectedStudent.name}
-                </p>
-                <p>
-                  <strong>Email:</strong> {selectedStudent.email}
-                </p>
-                <p>
-                  <strong>Phone:</strong> {selectedStudent.phone}
-                </p>
-                <p>
-                  <strong>Course:</strong> {selectedStudent.selectedCourse}
-                </p>
-                <p>
-                  <strong>Shift:</strong> {selectedStudent.selectedShift}
-                </p>
-                <p>
-                  <strong>Date Applied:</strong>{" "}
-                  {formatDate(selectedStudent.createdAt)}
-                </p>
-                <p>
-                  <strong>Message:</strong> {selectedStudent.message}
-                </p>
+          {selectedStudent && (
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+              <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg ">
+                <div className="bg-gray-50 p-6 h-96 overflow-scroll">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    Student Details
+                  </h3>
+                  <div className="mt-4 space-y-2">
+                    <p>
+                      <span className="font-semibold">Name:</span>{" "}
+                      {selectedStudent.name}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Email:</span>{" "}
+                      {selectedStudent.email}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Phone:</span>{" "}
+                      {selectedStudent.phone}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Intake:</span>{" "}
+                      {selectedStudent.intake}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Course:</span>{" "}
+                      {selectedStudent.selectedCourse}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Message:</span>{" "}
+                      {selectedStudent.message}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Shift:</span>{" "}
+                      {selectedStudent.selectedShift}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Applied on:</span>{" "}
+                      {formatDate(selectedStudent.createdAt)}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Status:</span>{" "}
+                      {selectedStudent.status}
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-gray-50 p-4 flex justify-end">
+                  <button
+                    onClick={() => setSelectedStudent(null)}
+                    className="inline-flex justify-center px-4 py-2 text-sm  text-black font-extrabold hover:text-white  bg-red-300 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
