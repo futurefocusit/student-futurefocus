@@ -214,7 +214,7 @@ const StudentManagement: React.FC = () => {
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <div className=" bg-gray-50 flex justify-between shadow-md rounded-lg px-2 items-center ">
           <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
-            Applied Candidates
+            Applied Students
           </h2>
           <a href="/students/register-new" className="p-2  bg-green-400 hover:bg-green-700 rounded-lg px-5 text-white font-bold  ">
             New
@@ -240,7 +240,7 @@ const StudentManagement: React.FC = () => {
                     activeFilter === status ? "bg-indigo-100" : ""
                   }`}
                 >
-                  {status.toUpperCase()}
+                  {status==='pending'?"candidates":status}
                 </button>
               ))}
             </div>
