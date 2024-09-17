@@ -21,7 +21,7 @@ const SideBar = () => {
   const menuItems = [
     { label: "Dashboard", icon: FaTachometerAlt, href: "/" },
     { label: "Students", icon: FaUser, href: "/students" },
-    { label: "Payment", icon: FaMoneyBill, href: "#" },
+    { label: "Payment", icon: FaMoneyBill, href: "/payment" },
     { label: "Transaction", icon: FaExchangeAlt, href: "#" },
     { label: "Attendances", icon: FaCalendarCheck, href: "#" },
   ];
@@ -48,7 +48,7 @@ const SideBar = () => {
 
   return (
     <>
-      {/* Mobile menu button */}
+   
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="fixed top-4 left-4 z-40 md:hidden text-white bg-gray-800 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center"
@@ -56,7 +56,7 @@ const SideBar = () => {
         {isOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
       </button>
 
-      {/* Sidebar */}
+      
       <nav
         ref={sidebarRef}
         className={`fixed top-0 left-0 z-30 flex flex-col h-screen py-8 overflow-y-auto bg-gray-800 transition-all duration-300 ease-in-out ${

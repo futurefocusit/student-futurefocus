@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import API_BASE_URL from "@/config/baseURL";
@@ -16,6 +16,13 @@ interface Student {
   createdAt: string;
   status: string;
 }
+interface Payment {
+  studentId: string;
+  amountDue: number;
+  amountPaid: number;
+  status: string;
+  _id: string;
+}
 
 interface GroupedStudents {
   [key: string]: Student[];
@@ -23,12 +30,12 @@ interface GroupedStudents {
 
 const StudentManagement: React.FC = () => {
   const [students, setStudents] = useState<Student[]>([]);
+  const [payment, setPayment] = useState<Payment[]>([]);
   const [groupedStudents, setGroupedStudents] = useState<GroupedStudents>({});
   const [error, setError] = useState<string | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("pending");
   const [searchTerm, setSearchTerm] = useState<string>("");
-
 
   const fetchStudents = async () => {
     try {
@@ -42,6 +49,15 @@ const StudentManagement: React.FC = () => {
     } catch (error) {
       console.error("Error fetching student data:", error);
       setError("Failed to load student data. Please try again later.");
+    }
+  };
+  const fetchPayment = async () => {
+    try {
+      const response = await axios.get<Payment[]>(`${API_BASE_URL}/payment`);
+      setPayment(response.data);
+    } catch (error) {
+      console.error("Error fetching payment data:", error);
+      setError("Failed to load payment data. Please reload.");
     }
   };
 
@@ -58,6 +74,7 @@ const StudentManagement: React.FC = () => {
 
   useEffect(() => {
     fetchStudents();
+    fetchPayment();
   }, []);
 
   const handleDelete = async (id: string) => {
@@ -169,30 +186,30 @@ const StudentManagement: React.FC = () => {
         return (
           <>
             {commonButtons}
-            <button
+            {/* <button
               onClick={() => handleStatusChange(student._id, "started")}
               className="text-green-600 hover:text-green-900 ml-3"
             >
               Start
-            </button>
+            </button> */}
           </>
         );
       case "started":
         return (
           <>
             {commonButtons}
-            <button
+            {/* <button
               onClick={() => handleStatusChange(student._id, "completed")}
               className="text-green-600 hover:text-green-900 ml-3"
             >
               Complete
-            </button>
-            <button
+            </button> */}
+            {/* <button
               onClick={() => handleStatusChange(student._id, "dropedout")}
               className="text-yellow-600 hover:text-yellow-900 ml-3"
             >
               Dropout
-            </button>
+            </button> */}
             <button
               onClick={() => handleStatusChange(student._id, "dropedout")}
               className="text-green-600 hover:text-green-900 ml-3"
@@ -216,7 +233,10 @@ const StudentManagement: React.FC = () => {
           <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
             Applied Students
           </h2>
-          <a href="/students/register-new" className="p-2  bg-green-400 hover:bg-green-700 rounded-lg px-5 text-white font-bold  ">
+          <a
+            href="/students/register-new"
+            className="p-2  bg-green-400 hover:bg-green-700 rounded-lg px-5 text-white font-bold  "
+          >
             New
           </a>
         </div>
@@ -240,7 +260,7 @@ const StudentManagement: React.FC = () => {
                     activeFilter === status ? "bg-indigo-100" : ""
                   }`}
                 >
-                  {status==='pending'?"candidates":status}
+                  {status === "pending" ? "candidates" : status}
                 </button>
               ))}
             </div>
@@ -288,7 +308,7 @@ const StudentManagement: React.FC = () => {
                         scope="col"
                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell"
                       >
-                        Course
+                        Payment Status
                       </th>
                       <th
                         scope="col"
@@ -321,7 +341,23 @@ const StudentManagement: React.FC = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
                           <div className="text-sm text-gray-900">
-                            {student.selectedCourse}
+                            {payment &&
+                            payment.filter(
+                              (payment) => payment.studentId === student._id
+                            ).length === 0 ? (
+                              <div>No payment information found.</div>
+                            ) : (
+                              payment &&
+                              payment
+                                .filter(
+                                  (payment) => payment.studentId === student._id
+                                )
+                                .map((filteredPayment) => (
+                                  <div key={filteredPayment._id}>
+                                    {filteredPayment.status.toUpperCase()}
+                                  </div>
+                                ))
+                            )}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -379,6 +415,70 @@ const StudentManagement: React.FC = () => {
                       <span className="font-semibold">Status:</span>{" "}
                       {selectedStudent.status}
                     </p>
+                    {payment &&
+                    payment.filter(
+                      (payment) => payment.studentId === selectedStudent._id
+                    ).length === 0 ? (
+                      <div>No payment information found.</div>
+                    ) : (
+                      payment &&
+                      payment
+                        .filter(
+                          (payment) => payment.studentId === selectedStudent._id
+                        )
+                        .map((filteredPayment) => (
+                          <div key={filteredPayment._id}>
+                            <p>
+                              <span className="font-semibold">
+                                Payment Status:
+                              </span>{" "}
+                              <span
+                                className={`${
+                                  filteredPayment.status === "unpaid"
+                                    ? "bg-red-600"
+                                    : filteredPayment.status === "partial"
+                                    ? "bg-red-400"
+                                    : filteredPayment.status === "paid"
+                                    ? "bg-blue-700"
+                                    : "bg-green-600"
+                                } font-extrabold text-white p-2 rounded-md`}
+                              >
+                                {filteredPayment.status.toUpperCase()}
+                              </span>
+                            </p>
+                            <p>
+                              <span className="font-semibold">
+                                Total To pay:
+                              </span>{" "}
+                              <span className=" text-green-600 font-extrabold">
+                                {new Intl.NumberFormat().format(
+                                  filteredPayment.amountDue
+                                )}{" "}
+                                Frw
+                              </span>
+                            </p>
+                            <p>
+                              <span className="font-semibold">Total Paid:</span>{" "}
+                              <span className=" text-blue-600 font-extrabold">
+                                {new Intl.NumberFormat().format(
+                                  filteredPayment.amountPaid
+                                )}{" "}
+                                Frw
+                              </span>
+                            </p>
+                            <p>
+                              <span className="font-semibold">Remaining:</span>{" "}
+                              <span className=" text-red-600 font-extrabold">
+                                {new Intl.NumberFormat().format(
+                                  filteredPayment.amountDue -
+                                    filteredPayment.amountPaid
+                                )}
+                                Frw
+                              </span>
+                            </p>
+                          </div>
+                        ))
+                    )}
                   </div>
                 </div>
                 <div className="bg-gray-50 p-4 flex justify-end">
