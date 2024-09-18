@@ -91,7 +91,7 @@ const AttendancePage: React.FC = () => {
   };
 
   const filterAttendance = () => {
-    let filtered: GroupedAttendance = {};
+    const filtered: GroupedAttendance = {};
 
     Object.entries(groupedAttendance).forEach(([date, intakes]) => {
       const recordDate = new Date(date);
@@ -141,7 +141,7 @@ const AttendancePage: React.FC = () => {
         />
         <DatePicker
           selected={selectedDate}
-          //@ts-ignore
+          //@ts-expect-error error
           onChange={(date: Date) => setSelectedDate(date)}
           className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholderText="Select date"

@@ -44,7 +44,8 @@ const PaymentsPage: React.FC = () => {
         }
         const data = await response.data;
         setPayments(data);
-      } catch (error:any) {
+      } catch (error) {
+        //@ts-expect-error error
         setError(error.message);
       } finally {
         setLoading(false);
