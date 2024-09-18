@@ -22,8 +22,8 @@ const SideBar = () => {
     { label: "Dashboard", icon: FaTachometerAlt, href: "/" },
     { label: "Students", icon: FaUser, href: "/students" },
     { label: "Payment", icon: FaMoneyBill, href: "/payment" },
-    { label: "Transaction", icon: FaExchangeAlt, href: "#" },
-    { label: "Attendances", icon: FaCalendarCheck, href: "#" },
+    { label: "Transaction", icon: FaExchangeAlt, href: "/transactions" },
+    { label: "Attendances", icon: FaCalendarCheck, href: "/attendance" },
   ];
 
   useEffect(() => {

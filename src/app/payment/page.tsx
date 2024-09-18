@@ -48,6 +48,7 @@ const StudentManagement: React.FC = () => {
       [name]: value,
     }));
   };
+
   const fetchStudents = async () => {
     try {
       const response = await axios.get<Student[]>(`${API_BASE_URL}/students`);
@@ -62,6 +63,7 @@ const StudentManagement: React.FC = () => {
       setError("Failed to load student data. Please try again later.");
     }
   };
+
   const fetchPayment = async () => {
     try {
       const response = await axios.get<Payment[]>(`${API_BASE_URL}/payment`);
@@ -91,6 +93,7 @@ const StudentManagement: React.FC = () => {
   const handleView = (student: Student) => {
     setSelectedStudent(student);
   };
+
   const handlePay = async (id: string) => {
     try {
       const response = await axios.post(
@@ -98,19 +101,11 @@ const StudentManagement: React.FC = () => {
         formData
       );
       toast.success(response.data.message);
-      fetchPayment()
+      fetchPayment();
     } catch (error) {
-      toast.error("failed to pay. try again");
+      setError("Error happened! check payment and try again");
     }
   };
-
-  //   const formatDate = (dateString: string) => {
-  //     return new Date(dateString).toLocaleDateString("en-GB", {
-  //       day: "2-digit",
-  //       month: "long",
-  //       year: "numeric",
-  //     });
-  //   };
 
   const filterStudents = (
     status: string,
@@ -137,16 +132,35 @@ const StudentManagement: React.FC = () => {
     groupStudentsByIntake(filteredStudents);
   };
 
+  const calculateTotals = (intakeStudents: Student[]) => {
+    let totalPaid = 0;
+    let totalDue = 0;
+
+    intakeStudents.forEach((student) => {
+      const paymentInfo = payment.find((p) => p.studentId === student._id);
+      if (paymentInfo) {
+        totalPaid += paymentInfo.amountPaid;
+        totalDue += paymentInfo.amountDue;
+      }
+    });
+
+    return {
+      totalPaid,
+      totalDue,
+      remaining: totalDue - totalPaid,
+    };
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
-        <div className=" bg-gray-50 flex justify-between shadow-md rounded-lg px-2 items-center ">
+        <div className="bg-gray-50 flex justify-between shadow-md rounded-lg px-2 items-center">
           <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
-            Payment 
+            Payment
           </h2>
           <a
             href="/students/register-new"
-            className="p-2  bg-green-400 hover:bg-green-700 rounded-lg px-5 text-white font-bold  "
+            className="p-2 bg-green-400 hover:bg-green-700 rounded-lg px-5 text-white font-bold"
           >
             New
           </a>
@@ -156,7 +170,7 @@ const StudentManagement: React.FC = () => {
         <div className="p-4 sm:p-6 space-y-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
             <div className="flex space-x-2 overflow-x-auto w-full sm:w-auto">
-              {["registered", "started", "completed", "dropedout"].map(
+              {["registered", "started", "completed", "droppedout"].map(
                 (status) => (
                   <button
                     key={status}
@@ -185,164 +199,133 @@ const StudentManagement: React.FC = () => {
             </div>
           </div>
 
-          {Object.entries(groupedStudents).map(([intake, intakeStudents]) => (
-            <div key={intake} className="mt-8">
-              <h3 className="text-xl font-semibold mb-4">Intake: {intake}</h3>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        No
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Name
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
-                      >
-                        Amount To pay
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
-                      >
-                        Amount Paid
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
-                      >
-                        Remaining
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell"
-                      >
-                        Status
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {intakeStudents.map((student, index) => (
-                      <tr key={student._id}>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
-                            {index + 1}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
-                            {student.name}
-                          </div>
-                          <div className="text-sm text-gray-500 sm:hidden">
-                            {payment
-                              .filter(
-                                (payment) => payment.studentId === student._id
-                              )
-                              .map((filteredPayment) => (
-                                <div key={filteredPayment._id}>
-                                  {filteredPayment.status.toUpperCase()}
-                                </div>
-                              ))}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
-                          <div className="text-sm text-gray-900">
-                            {payment
-                              .filter(
-                                (payment) => payment.studentId === student._id
-                              )
-                              .map((filteredPayment) => (
-                                <div key={filteredPayment._id}>
-                                  {new Intl.NumberFormat().format(
-                                    filteredPayment.amountDue
-                                  )}{" "}
-                                  Frw
-                                </div>
-                              ))}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
-                          <div className="text-sm text-gray-900">
-                            {payment
-                              .filter(
-                                (payment) => payment.studentId === student._id
-                              )
-                              .map((filteredPayment) => (
-                                <div key={filteredPayment._id}>
-                                  {new Intl.NumberFormat().format(
-                                    filteredPayment.amountPaid
-                                  )}{" "}
-                                  Frw
-                                </div>
-                              ))}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
-                          {payment
-                            .filter(
-                              (payment) => payment.studentId === student._id
-                            )
-                            .map((filteredPayment) => (
-                              <div key={filteredPayment._id}>
-                                {new Intl.NumberFormat().format(
-                                  filteredPayment.amountDue -
-                                    filteredPayment.amountPaid
-                                )}{" "}
-                                Frw
-                              </div>
-                            ))}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
-                          {payment
-                            .filter(
-                              (payment) => payment.studentId === student._id
-                            )
-                            .map((filteredPayment) => (
-                              <div key={filteredPayment._id}>
-                                {filteredPayment.status.toUpperCase()}
-                              </div>
-                            ))}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button
-                            onClick={() => handleView(student)}
-                            className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900 "
-                          >
-                            Pay
-                          </button>
-                        </td>
+          {Object.entries(groupedStudents).map(([intake, intakeStudents]) => {
+            const { totalPaid, totalDue, remaining } =
+              calculateTotals(intakeStudents);
+
+            return (
+              <div key={intake} className="mt-8">
+                <h3 className="text-xl font-semibold mb-4">Intake: {intake}</h3>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          No
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Name
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                          Amount To Pay
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                          Amount Paid
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                          Remaining
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {intakeStudents.map((student, index) => (
+                        <tr key={student._id}>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-900">
+                              {index + 1}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-900">
+                              {student.name}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
+                            <div className="text-sm text-gray-900">
+                              {payment
+                                .filter((p) => p.studentId === student._id)
+                                .map((p) => (
+                                  <div key={p._id}>
+                                    {new Intl.NumberFormat().format(
+                                      p.amountDue
+                                    )}{" "}
+                                    Frw
+                                  </div>
+                                ))}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
+                            <div className="text-sm text-gray-900">
+                              {payment
+                                .filter((p) => p.studentId === student._id)
+                                .map((p) => (
+                                  <div key={p._id}>
+                                    {new Intl.NumberFormat().format(
+                                      p.amountPaid
+                                    )}{" "}
+                                    Frw
+                                  </div>
+                                ))}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
+                            {payment
+                              .filter((p) => p.studentId === student._id)
+                              .map((p) => (
+                                <div key={p._id}>
+                                  {new Intl.NumberFormat().format(
+                                    p.amountDue - p.amountPaid
+                                  )}{" "}
+                                  Frw
+                                </div>
+                              ))}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button
+                              onClick={() => handleView(student)}
+                              className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
+                            >
+                              Pay
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot className="bg-gray-100">
+                      <tr>
+                        <td className="px-6 py-4 font-bold" colSpan={2}>
+                          Totals:
+                        </td>
+                        <td className="px-6 py-4 font-bold">
+                          {new Intl.NumberFormat().format(totalDue)} Frw
+                        </td>
+                        <td className="px-6 py-4 font-bold">
+                          {new Intl.NumberFormat().format(totalPaid)} Frw
+                        </td>
+                        <td className="px-6 py-4 font-bold">
+                          {new Intl.NumberFormat().format(remaining)} Frw
+                        </td>
+                        <td className="px-6 py-4"></td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {selectedStudent && (
             <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-              <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg ">
-                <div className="bg-gray-50 p-6 h-72 overflow-scroll">
-                  <h3 className="text-lg font-medium text-gray-900 ">
+              <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg">
+                <div className="bg-gray-50 h-32 overflow-scroll">
+                  <h3 className="text-lg text-center bg-blue-600 text-white font-extrabold">
                     Pay School Fees
                   </h3>
-                  <div className=" mt-4 flex flex-col gap-5">
-                    <span className="flex gap-10 items-center mx-auto  mb-3">
+                  <div className="mt-4 flex flex-col gap-5">
+                    <span className="flex gap-10 items-center mx-auto mb-3">
                       <label className="font-extrabold" htmlFor="amount">
                         Amount:
                       </label>
@@ -351,22 +334,21 @@ const StudentManagement: React.FC = () => {
                         type="number"
                         onChange={handleFormData}
                         placeholder="Amount in Frw"
-                        className="border-2 p-2 rounded-md border-blue-700   "
+                        className="border-2 p-2 rounded-md border-blue-700"
                       />
                     </span>
-                    
                   </div>
                 </div>
                 <div className="bg-gray-50 p-4 flex justify-around">
                   <button
                     onClick={() => handlePay(selectedStudent._id)}
-                    className=" px-4 py-2 text-sm    text-black font-extrabold hover:text-white  bg-green-300 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
+                    className="px-4 py-2 text-sm text-black font-extrabold hover:text-white bg-green-300 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
                   >
                     Pay
                   </button>
                   <button
                     onClick={() => setSelectedStudent(null)}
-                    className="  px-4 py-2 text-sm  text-black font-extrabold hover:text-white  bg-red-300 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
+                    className="px-4 py-2 text-sm text-black font-extrabold hover:text-white bg-red-300 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
                   >
                     Close
                   </button>
