@@ -35,7 +35,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/login`,
+        `${API_BASE_URL}/admin/login`,
         userData,
         { withCredentials: true }
       );
