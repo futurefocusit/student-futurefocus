@@ -35,14 +35,14 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/admin/login`,
+        `${API_BASE_URL}/login`,
         userData,
         { withCredentials: true }
       );
       setLoggedUser(response.data);
       toast.success("Login successful");
       localStorage.setItem("ffa-admin", response.data.token);
-      window.location.href = "/admin";
+      window.location.href = "/";
     } catch (error) {
       handleAxiosError(error);
     } finally {
