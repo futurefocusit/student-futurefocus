@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import API_BASE_URL from "@/config/baseURL";
 import { Search } from "lucide-react";
+import SideBar from "@/components/SideBar";
+import withAdminAuth from "@/components/withAdminAuth";
 
 interface Student {
   _id: string;
@@ -228,6 +230,8 @@ const StudentManagement: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
+      <SideBar />
+
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <div className=" bg-gray-50 flex justify-between shadow-md rounded-lg px-2 items-center ">
           <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
@@ -498,4 +502,4 @@ const StudentManagement: React.FC = () => {
   );
 };
 
-export default StudentManagement;
+export default withAdminAuth(StudentManagement);

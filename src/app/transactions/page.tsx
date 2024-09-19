@@ -1,4 +1,6 @@
 'use client'
+import SideBar from "@/components/SideBar";
+import withAdminAuth from "@/components/withAdminAuth";
 import API_BASE_URL from "@/config/baseURL";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -65,6 +67,8 @@ const PaymentsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
+      <SideBar />
+
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
           Transactions
@@ -87,7 +91,7 @@ const PaymentsPage: React.FC = () => {
                     Reason
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                   Date of payment
+                    Date of payment
                   </th>
                 </tr>
               </thead>
@@ -130,4 +134,4 @@ const PaymentsPage: React.FC = () => {
   );
 };
 
-export default PaymentsPage;
+export default withAdminAuth(PaymentsPage);

@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import API_BASE_URL from "@/config/baseURL";
+import SideBar from "@/components/SideBar";
+import withAdminAuth from "@/components/withAdminAuth";
 
 interface Course {
   title: string;
@@ -146,6 +148,7 @@ const Registration: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto p-6 my-32 pl-32 lg:pl-6 my bg-white shadow-md rounded-lg ">
+      <SideBar />
       <a
         href="/students"
         className="p-2 fixed top-3 left-52 bg-blue-600 text-white hover:bg-blue-500 rounded-md"
@@ -278,4 +281,4 @@ const Registration: React.FC = () => {
   );
 };
 
-export default Registration;
+export default withAdminAuth(Registration);

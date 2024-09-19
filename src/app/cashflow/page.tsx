@@ -5,6 +5,8 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import SideBar from "@/components/SideBar";
+import withAdminAuth from "@/components/withAdminAuth";
 
 export interface CashflowType {
   type: string;
@@ -38,7 +40,8 @@ const PaymentsPage: React.FC = () => {
       }
       const data = await response.data;
       setCashflows(data);
-    } catch (error:any) {
+    } catch (error) {
+      //@ts-expect-error ignore error
       setError(error.message);
     } finally {
       setLoading(false);
@@ -127,6 +130,7 @@ const PaymentsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
+      <SideBar />
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
           Transactions
@@ -322,4 +326,4 @@ const PaymentsPage: React.FC = () => {
   );
 };
 
-export default PaymentsPage;
+export default withAdminAuth(PaymentsPage);

@@ -1,4 +1,6 @@
 "use client";
+import SideBar from "@/components/SideBar";
+import withAdminAuth from "@/components/withAdminAuth";
 import API_BASE_URL from "@/config/baseURL";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -130,6 +132,7 @@ const AttendancePage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4">
+      <SideBar />
       <h1 className="text-3xl font-bold mb-6">Attendance Records</h1>
       <div className="mb-4 flex space-x-4">
         <input
@@ -224,7 +227,8 @@ const AttendancePage: React.FC = () => {
         </div>
       ))}
     </div>
+ 
   );
 };
 
-export default AttendancePage;
+export default withAdminAuth(AttendancePage);
