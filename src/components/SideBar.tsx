@@ -11,6 +11,7 @@ import {
   FaTimes,
   FaChevronLeft,
   FaChevronRight,
+  FaMoneyBillAlt
 } from "react-icons/fa";
 
 const SideBar = () => {
@@ -24,6 +25,7 @@ const SideBar = () => {
     { label: "Payment", icon: FaMoneyBill, href: "/payment" },
     { label: "Transaction", icon: FaExchangeAlt, href: "/transactions" },
     { label: "Attendances", icon: FaCalendarCheck, href: "/attendance" },
+    { label: "Cashflow", icon: FaMoneyBillAlt, href: "/cashflow" },
   ];
 
   useEffect(() => {
