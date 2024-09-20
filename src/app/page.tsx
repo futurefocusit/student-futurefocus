@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import API_BASE_URL from "@/config/baseURL";
 import withAdminAuth from "@/components/withAdminAuth";
+import SideBar from "@/components/SideBar";
 
 interface Dashboard {
   totalStudents: string;
@@ -66,6 +67,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col items-center p-4">
+      <SideBar/>
       <h1 className="text-3xl font-bold mb-4">Dashboard Summary</h1>
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-xl">
         <h2 className="text-2xl font-semibold mb-4">Overview</h2>
@@ -88,6 +90,7 @@ const Dashboard = () => {
         </ul>
       </div>
     </div>
+
   );
 };
 
