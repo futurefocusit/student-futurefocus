@@ -61,9 +61,16 @@ const Dashboard = () => {
     fetchSummary();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
-  //@ts-expect-error ignore error
-  if (error) return <p>Error loading summary: {error.message}</p>;
+  if (loading) return (
+    <p>
+      <SideBar />
+      Loading...
+    </p>
+  );
+  if (error) return (<p>
+  <SideBar/>
+    {/* @ts-expect-error ignore error */}
+    Error loading summary: {error.message}</p>)
 
   return (
     <div className="flex flex-col items-center p-4">

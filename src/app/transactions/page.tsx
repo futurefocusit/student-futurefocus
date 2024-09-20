@@ -58,11 +58,21 @@ const PaymentsPage: React.FC = () => {
   }, []);
 
   if (loading) {
-    return <div className="text-center mt-20">Loading...</div>;
+    return (
+      <div className="text-center mt-20">
+        <SideBar />
+        Loading...
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center mt-20 text-red-500">Error: {error}</div>;
+    return (
+      <div className="text-center mt-20 text-red-500">
+        <SideBar />
+        Error: {error}
+      </div>
+    );
   }
 
   return (

@@ -139,11 +139,21 @@ const Registration: React.FC = () => {
   };
 
   if (loading) {
-    return <div>Loading courses...</div>;
+    return (
+      <div>
+        <SideBar />
+        Loading courses...
+      </div>
+    );
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div>
+        <SideBar />
+        Error: {error}
+      </div>
+    );
   }
 
   return (
