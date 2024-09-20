@@ -1,10 +1,11 @@
+'use client'
 import axios from "axios";
 import { createContext, ReactNode, useContext, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import API_BASE_URL from "@/config/baseURL";
 
-interface Admin {
+export interface Admin {
   email: string;
   password: string;
   isSuperAdmin: boolean;

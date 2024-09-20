@@ -1,10 +1,10 @@
 "use client";
-import { useAuth } from "@/context/AuthContext";
+import { Admin, useAuth } from "@/context/AuthContext";
 import React, { FormEvent, useState } from "react";
 
 const LoginForm = () => {
   const { login, isLoading } = useAuth();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Admin>({
     email: "",
     password: "",
     isSuperAdmin: false,
