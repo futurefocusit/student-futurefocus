@@ -109,10 +109,10 @@ const SideBar = () => {
             </Link>
           ))}
         </nav>
-        <button onClick={handleLogout}>
+        {/* <button onClick={handleLogout}>
           <FaRightFromBracket/>
           <p>Logout</p>
-        </button>
+        </button> */}
       </div>
     </>
   );
