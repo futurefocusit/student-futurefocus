@@ -14,6 +14,7 @@ import {
   FaMoneyBillAlt
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
+import { FaRightFromBracket } from "react-icons/fa6";
 
 const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -109,7 +110,7 @@ const SideBar = () => {
           ))}
         </nav>
         <button onClick={handleLogout}>
-          {/* <FaLogout/> */}
+          <FaRightFromBracket/>
           <p>Logout</p>
         </button>
       </div>
