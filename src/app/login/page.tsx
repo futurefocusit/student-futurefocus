@@ -29,7 +29,6 @@ const LoginForm = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      
       <div className="bg-white p-8 rounded-lg shadow-lg w-96">
         <div className="text-center mb-6">
           <img src="/logo.png" alt="Logo" className="w-24 h-24 mx-auto" />
@@ -85,7 +84,7 @@ const LoginForm = () => {
               </label>
             </div>
             <a
-              href="/admin/forgot-password"
+              href="https://futurefocus.co.rw/admin/forgot-password"
               className="text-blue-600 hover:text-blue-800 text-sm"
             >
               Forgot password?
