@@ -13,14 +13,14 @@ import {
   FaChevronRight,
   FaMoneyBillAlt
 } from "react-icons/fa";
-// import { useAuth } from "@/context/AuthContext";
-// import { FaRightFromBracket } from "react-icons/fa6";
+import { useAuth } from "@/context/AuthContext";
+import { FaRightFromBracket } from "react-icons/fa6";
 
 const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  // const {logout} = useAuth()
+  const {logout} = useAuth()
 
   const menuItems = [
     { label: "Dashboard", icon: FaTachometerAlt, href: "/" },
@@ -47,10 +47,10 @@ const SideBar = () => {
     };
   }, []);
 
-  // const handleLogout =async()=>{
+  const handleLogout =async()=>{
 
-  //   await logout()
-  // }
+    await logout()
+  }
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
@@ -64,10 +64,10 @@ const SideBar = () => {
         {isOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
       </button>
 
-      <div className="flex flex-col justify-between ">
+      <div className="flex flex-col fixed top-0 left-0  bg-gray-800 z-30 justify-between  h-full">
         <nav
           ref={sidebarRef}
-          className={`fixed top-0 left-0 z-30 flex flex-col h-screen py-8 overflow-y-auto bg-gray-800 transition-all duration-300 ease-in-out ${
+          className={` flex flex-col h-screen py-8 overflow-y-auto transition-all duration-300 ease-in-out ${
             isOpen ? "translate-x-0" : "-translate-x-full"
           } md:translate-x-0 ${isExpanded ? "w-64" : "w-20"}`}
         >
@@ -109,10 +109,17 @@ const SideBar = () => {
             </Link>
           ))}
         </nav>
-        {/* <button onClick={handleLogout}>
-          <FaRightFromBracket/>
-          <p>Logout</p>
-        </button> */}
+        <button
+          className={`flex items-center px-4 py-2 mb-10 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white ${
+            isExpanded ? "" : "justify-center"
+          }`}
+          onClick={handleLogout}
+        >
+          <FaRightFromBracket size={30} />
+          <p className={`mx-4 font-medium ${isExpanded ? "" : "hidden"}`}>
+            Logout
+          </p>
+        </button>
       </div>
     </>
   );

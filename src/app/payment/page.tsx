@@ -160,7 +160,7 @@ const StudentManagement: React.FC = () => {
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <div className="bg-gray-50 flex justify-between shadow-md rounded-lg px-2 items-center">
           <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
-            Payment
+           Student  Payment
           </h2>
           <a
             href="/students/register-new"

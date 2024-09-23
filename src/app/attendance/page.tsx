@@ -23,7 +23,7 @@ interface Student {
 
 interface AttendanceRecord {
   _id: string;
-  studentId: Student;
+  studentId: Student | null; // Allow for null values
   status: "present" | "absent";
   createdAt: string;
   updatedAt: string;
@@ -52,7 +52,8 @@ const AttendancePage: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/students/attendance`);
-        const data: AttendanceRecord[] = await response.data;
+        const data: AttendanceRecord[] = response.data;
+        console.log("Fetched Data:", data); // Log the fetched data
         groupAttendanceData(data);
       } catch (error) {
         console.error("Failed to fetch attendance data:", error);
@@ -69,12 +70,16 @@ const AttendancePage: React.FC = () => {
   const groupAttendanceData = (data: AttendanceRecord[]) => {
     const grouped = data.reduce<GroupedAttendance>((acc, record) => {
       const date = new Date(record.createdAt).toLocaleDateString();
-      const intake = record.studentId.intake;
-      const shift = record.studentId.selectedShift;
+      const intake = record.studentId
+        ? record.studentId.intake
+        : "Unknown Intake";
+      const shift = record.studentId
+        ? record.studentId.selectedShift
+        : "Unknown Shift";
 
-      if (!acc[date]) acc[date] = {};
-      if (!acc[date][intake]) acc[date][intake] = {};
-      if (!acc[date][intake][shift]) acc[date][intake][shift] = [];
+      acc[date] = acc[date] || {};
+      acc[date][intake] = acc[date][intake] || {};
+      acc[date][intake][shift] = acc[date][intake][shift] || [];
 
       acc[date][intake][shift].push(record);
       return acc;
@@ -108,17 +113,17 @@ const AttendancePage: React.FC = () => {
         Object.entries(intakes).forEach(([intake, shifts]) => {
           Object.entries(shifts).forEach(([shift, records]) => {
             if (!selectedShift || shift === selectedShift) {
-              const filteredRecords = records.filter((record) =>
-                record.studentId.name
-                  .toLowerCase()
-                  .includes(searchTerm.toLowerCase())
+              const filteredRecords = records.filter(
+                (record) =>
+                  record.studentId &&
+                  record.studentId.name
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase())
               );
 
               if (filteredRecords.length > 0) {
-                if (!filtered[date]) filtered[date] = {};
-                if (!filtered[date][intake]) filtered[date][intake] = {};
-                if (!filtered[date][intake][shift])
-                  filtered[date][intake][shift] = [];
+                filtered[date] = filtered[date] || {};
+                filtered[date][intake] = filtered[date][intake] || {};
                 filtered[date][intake][shift] = filteredRecords;
               }
             }
@@ -144,8 +149,7 @@ const AttendancePage: React.FC = () => {
         />
         <DatePicker
           selected={selectedDate}
-          //@ts-expect-error error
-          onChange={(date: Date) => setSelectedDate(date)}
+          onChange={(date: Date | null) => setSelectedDate(date)}
           className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholderText="Select date"
         />
@@ -171,63 +175,70 @@ const AttendancePage: React.FC = () => {
           </button>
         ))}
       </div>
-      {Object.entries(filteredAttendance).map(([date, intakes]) => (
-        <div key={date} className="mb-8">
-          <h2 className="text-2xl font-semibold mb-4">{date}</h2>
-          {Object.entries(intakes).map(([intake, shifts]) => (
-            <div key={intake} className="mb-6">
-              <h3 className="text-xl font-medium mb-3">{intake}</h3>
-              {Object.entries(shifts).map(([shift, records]) => (
-                <div key={shift} className="mb-4">
-                  <h4 className="text-lg font-medium mb-2">{shift}</h4>
-                  <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Name
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Time
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {records.map((record) => (
-                          <tr key={record._id}>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {record.studentId.name}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span
-                                className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                  record.status === "present"
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-red-100 text-red-800"
-                                }`}
-                              >
-                                {record.status}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {new Date(record.createdAt).toLocaleTimeString()}
-                            </td>
+      {Object.entries(filteredAttendance).length === 0 ? (
+        <p>No attendance records found for the selected criteria.</p>
+      ) : (
+        Object.entries(filteredAttendance).map(([date, intakes]) => (
+          <div key={date} className="mb-8">
+            <h2 className="text-2xl font-semibold mb-4">{date}</h2>
+            {Object.entries(intakes).map(([intake, shifts]) => (
+              <div key={intake} className="mb-6">
+                <h3 className="text-xl font-medium mb-3">{intake}</h3>
+                {Object.entries(shifts).map(([shift, records]) => (
+                  <div key={shift} className="mb-4">
+                    <h4 className="text-lg font-medium mb-2">{shift}</h4>
+                    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Name
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Status
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Time
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {records.map((record) => (
+                            <tr key={record._id}>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                {record.studentId
+                                  ? record.studentId.name
+                                  : "Unknown Student"}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span
+                                  className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                    record.status === "present"
+                                      ? "bg-green-100 text-green-800"
+                                      : "bg-red-100 text-red-800"
+                                  }`}
+                                >
+                                  {record.status}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                {new Date(
+                                  record.createdAt
+                                ).toLocaleTimeString()}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      ))}
+                ))}
+              </div>
+            ))}
+          </div>
+        ))
+      )}
     </div>
- 
   );
 };
 

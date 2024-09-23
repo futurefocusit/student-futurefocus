@@ -143,7 +143,7 @@ const PaymentsPage: React.FC = () => {
       <SideBar />
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
-          Transactions
+          Cash Flow
         </h2>
 
         <div className="flex justify-around p-4">
@@ -301,6 +301,7 @@ const PaymentsPage: React.FC = () => {
               />
               <input
                 name="reason"
+                 maxLength={50}
                 onChange={handleFormData}
                 placeholder="Reason"
                 className="border-2 rounded px-3 "

@@ -264,7 +264,7 @@ const StudentManagement: React.FC = () => {
                     activeFilter === status ? "bg-indigo-100" : ""
                   }`}
                 >
-                  {status === "pending" ? "candidates" : status}
+                  {status === "pending" ? "Candidates" : status==="accepted"?"Admitted":status==="started"?"Active":status}
                 </button>
               ))}
             </div>
