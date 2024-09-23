@@ -13,14 +13,14 @@ import {
   FaChevronRight,
   FaMoneyBillAlt
 } from "react-icons/fa";
-import { useAuth } from "@/context/AuthContext";
-import { FaRightFromBracket } from "react-icons/fa6";
+// import { useAuth } from "@/context/AuthContext";
+// import { FaRightFromBracket } from "react-icons/fa6";
 
 const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const {logout} = useAuth()
+  // const {logout} = useAuth()
 
   const menuItems = [
     { label: "Dashboard", icon: FaTachometerAlt, href: "/" },
@@ -47,10 +47,10 @@ const SideBar = () => {
     };
   }, []);
 
-  const handleLogout =async()=>{
+  // const handleLogout =async()=>{
 
-    await logout()
-  }
+  //   await logout()
+  // }
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
