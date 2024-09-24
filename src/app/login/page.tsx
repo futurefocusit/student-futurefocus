@@ -8,6 +8,7 @@ const LoginForm = () => {
     email: "",
     password: "",
     isSuperAdmin: false,
+    name:""
   });
 
   const handleChangeFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
