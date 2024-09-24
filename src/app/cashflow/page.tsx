@@ -7,6 +7,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
+import { fetchUser } from "@/context/adminAuth";
+import { Admin } from "@/context/AuthContext";
 
 export interface CashflowType {
   type: string;
@@ -23,8 +25,9 @@ const PaymentsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"income" | "expenses">("income");
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [loggedUser, setLoggedUser]= useState<Admin>()
   const [formData, setFormData] = useState({
-    user: "",
+    user: loggedUser?.name,
     reason: "",
     type: "",
     payment: "",
@@ -34,6 +37,7 @@ const PaymentsPage: React.FC = () => {
 
   const fetchCashflows = async () => {
     try {
+        setLoggedUser(await fetchUser());
       const response = await axios.get(`${API_BASE_URL}/cashflow`);
       if (!response) {
         throw new Error("Network response was not ok");
@@ -75,6 +79,7 @@ const PaymentsPage: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
+      formData.user =loggedUser?.name
       const response = await axios.post(`${API_BASE_URL}/cashflow`, formData);
       fetchCashflows();
       toast.success(response.data.message);
@@ -286,13 +291,6 @@ const PaymentsPage: React.FC = () => {
                 <option value="expenses">Expenses</option>
               </select>
               <input
-                name="user"
-                onChange={handleFormData}
-                placeholder="User"
-                className="border-2 rounded px-3 "
-                type="text"
-              />
-              <input
                 name="amount"
                 onChange={handleFormData}
                 placeholder="Amount"
@@ -301,7 +299,7 @@ const PaymentsPage: React.FC = () => {
               />
               <input
                 name="reason"
-                 maxLength={50}
+                maxLength={50}
                 onChange={handleFormData}
                 placeholder="Reason"
                 className="border-2 rounded px-3 "

@@ -7,6 +7,7 @@ import API_BASE_URL from "@/config/baseURL";
 
 export interface Admin {
   email: string;
+  name:string
   password: string;
   isSuperAdmin: boolean;
 }
