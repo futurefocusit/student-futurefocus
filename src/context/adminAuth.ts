@@ -1,7 +1,8 @@
 import API_BASE_URL from "@/config/baseURL";
+import { IUser } from "@/types/types";
 import axios from "axios";
 
-let loggedUserData: any = null;
+let loggedUserData:IUser ;
 
 export const fetchUser = async () => {
   try {
@@ -19,9 +20,10 @@ export const fetchUser = async () => {
 
     loggedUserData = response.data;
     return loggedUserData;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching user data:", error);
     throw new Error(
+      //@ts-expect-error ignore
       error.response?.data?.message || "Failed to fetch user data"
     );
   }

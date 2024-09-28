@@ -8,7 +8,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
 import { fetchUser } from "@/context/adminAuth";
-import { Admin } from "@/context/AuthContext";
 import { hasPermission } from "@/libs/hasPermission";
 import { IUser } from "@/types/types";
 
