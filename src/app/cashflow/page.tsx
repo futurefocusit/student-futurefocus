@@ -9,6 +9,8 @@ import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
 import { fetchUser } from "@/context/adminAuth";
 import { Admin } from "@/context/AuthContext";
+import { hasPermission } from "@/libs/hasPermission";
+import { IUser } from "@/types/types";
 
 export interface CashflowType {
   type: string;
@@ -25,7 +27,7 @@ const PaymentsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"income" | "expenses">("income");
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [loggedUser, setLoggedUser]= useState<Admin>()
+  const [loggedUser, setLoggedUser]= useState<IUser>()
   const [formData, setFormData] = useState({
     user: loggedUser?.name,
     reason: "",
@@ -181,12 +183,12 @@ const PaymentsPage: React.FC = () => {
               Expenses
             </button>
           </div>
-          <button
+         { hasPermission(loggedUser as IUser, 'cashflow', 'add')?<button
             onClick={() => setShowModal(true)}
             className="ml-4 px-4 py-2 bg-green-500 text-white font-semibold rounded"
           >
             Add Transaction
-          </button>
+          </button>:""}
         </div>
 
         <div className="p-4">

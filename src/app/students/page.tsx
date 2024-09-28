@@ -5,6 +5,9 @@ import API_BASE_URL from "@/config/baseURL";
 import { Search } from "lucide-react";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
+import { IUser } from "@/types/types";
+import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
+import { hasPermission } from "@/libs/hasPermission";
 
 interface Student {
   _id: string;
@@ -38,10 +41,12 @@ const StudentManagement: React.FC = () => {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("pending");
   const [searchTerm, setSearchTerm] = useState<string>("");
-
+ const [userData ,setUserData]= useState<IUser>()
   const fetchStudents = async () => {
     try {
       const response = await axios.get<Student[]>(`${API_BASE_URL}/students`);
+      await fetchUser()
+      setUserData(await getLoggedUserData())
       const sortedStudents = response.data.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -150,38 +155,52 @@ const StudentManagement: React.FC = () => {
         >
           View
         </button>
-        <button
-          onClick={() => handleDelete(student._id)}
-          className="text-red-600 hover:text-red-900"
-        >
-          Delete
-        </button>
       </>
     );
-
+  
     switch (student.status) {
       case "pending":
         return (
           <>
             {commonButtons}
-            <button
+           { hasPermission(userData as IUser, "students", "admit")? <button
               onClick={() => handleStatusChange(student._id, "accepted")}
               className="text-green-600 hover:text-green-900 ml-3"
             >
               Admit
-            </button>
+            </button>:""}
+           { hasPermission(userData as IUser, "students", "delete")? <button
+              onClick={() => handleDelete(student._id)}
+              className="text-red-600 ml-3 hover:text-red-900"
+            >
+              Delete
+            </button>:""}
           </>
         );
       case "accepted":
         return (
           <>
             {commonButtons}
-            <button
-              onClick={() => handleStatusChange(student._id, "registered")}
-              className="text-blue-600 hover:text-blue-900 ml-3"
-            >
-              Register
-            </button>
+            {hasPermission(userData as IUser, "students", "register") ? (
+              <button
+                onClick={() => handleStatusChange(student._id, "registered")}
+                className="text-blue-600 hover:text-blue-900 ml-3"
+              >
+                Register
+              </button>
+            ) : (
+              ""
+            )}
+            {hasPermission(userData as IUser, "students", "delete") ? (
+              <button
+                onClick={() => handleDelete(student._id)}
+                className="text-red-600 ml-3 hover:text-red-900"
+              >
+                Delete
+              </button>
+            ) : (
+              ""
+            )}
           </>
         );
       case "registered":
@@ -212,12 +231,12 @@ const StudentManagement: React.FC = () => {
             >
               Dropout
             </button> */}
-            <button
+            {hasPermission(userData as IUser, "students", "attend")?<button
               onClick={() => handleStatusChange(student._id, "dropedout")}
               className="text-green-600 hover:text-green-900 ml-3"
             >
               Attend
-            </button>
+            </button>:""}
           </>
         );
       case "completed":
@@ -237,12 +256,12 @@ const StudentManagement: React.FC = () => {
           <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
             Applied Students
           </h2>
-          <a
+         {hasPermission(userData as IUser, "students", "register") ? <a
             href="/students/register-new"
             className="p-2  bg-green-400 hover:bg-green-700 rounded-lg px-5 text-white font-bold  "
           >
             New
-          </a>
+          </a>:""}
         </div>
         {error && <p className="text-red-600 p-4 text-center">{error}</p>}
 

@@ -4,13 +4,14 @@ import axios from "axios";
 import API_BASE_URL from "@/config/baseURL";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
-
+import { IUser } from "@/types/types";
+import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
+import { hasPermission } from "@/libs/hasPermission";
 
 interface Course {
   title: string;
   shifts: string[];
 }
-
 
 interface registrationData {
   name: string;
@@ -37,10 +38,14 @@ const Registration: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [intakes, setIntakes] = useState<{ _id: string; intake: string }[]>([]);
   const [submissionResult, setSubmissionResult] = useState<string | null>(null);
+ const [userData, setUserData] = useState<IUser>();
+
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/course`);
+            await fetchUser();
+            setUserData(await getLoggedUserData());
         setCourses(response.data);
 
         if (response.data.length > 0) {
@@ -202,7 +207,7 @@ const Registration: React.FC = () => {
             <input
               type="email"
               name="email"
-              defaultValue="academic@futurefocus.rw" 
+              defaultValue="academic@futurefocus.rw"
               value={formData.email}
               onChange={handleChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
@@ -280,12 +285,13 @@ const Registration: React.FC = () => {
           </select>
         </div>
         <div className="text-center">
+          {hasPermission(userData as IUser,'students', 'register')?
           <button
             type="submit"
             className="inline-flex justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Submit
-          </button>
+          </button>:""}
         </div>
       </form>
     </div>

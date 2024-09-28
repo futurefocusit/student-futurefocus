@@ -6,6 +6,9 @@ import { Search } from "lucide-react";
 import { toast } from "react-toastify";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
+import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
+import { IUser } from "@/types/types";
+import { hasPermission } from "@/libs/hasPermission";
 
 interface Student {
   _id: string;
@@ -24,6 +27,8 @@ interface Payment {
   amountDue: number;
   amountPaid: number;
   status: string;
+  amountDiscounted: number;
+  extraAmount: number;
   _id: string;
 }
 
@@ -39,6 +44,8 @@ const StudentManagement: React.FC = () => {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("registered");
   const [searchTerm, setSearchTerm] = useState<string>("");
+ const [userData, setUserData] = useState<IUser>();
+
   const [formData, setFormData] = useState({
     amount: "",
   });
@@ -54,6 +61,8 @@ const StudentManagement: React.FC = () => {
   const fetchStudents = async () => {
     try {
       const response = await axios.get<Student[]>(`${API_BASE_URL}/students`);
+        await fetchUser();
+        setUserData(await getLoggedUserData());
       const sortedStudents = response.data.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -136,18 +145,24 @@ const StudentManagement: React.FC = () => {
 
   const calculateTotals = (intakeStudents: Student[]) => {
     let totalPaid = 0;
+    let totalDiscounted = 0;
+    let totalExtras = 0;
     let totalDue = 0;
 
     intakeStudents.forEach((student) => {
       const paymentInfo = payment.find((p) => p.studentId === student._id);
       if (paymentInfo) {
         totalPaid += paymentInfo.amountPaid;
+        totalDiscounted += paymentInfo.amountDiscounted;
+        totalExtras += paymentInfo.extraAmount;
         totalDue += paymentInfo.amountDue;
       }
     });
 
     return {
       totalPaid,
+      totalDiscounted,
+      totalExtras,
       totalDue,
       remaining: totalDue - totalPaid,
     };
@@ -162,12 +177,12 @@ const StudentManagement: React.FC = () => {
           <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
            Student  Payment
           </h2>
-          <a
+         {hasPermission(userData as IUser, 'students','register')? <a
             href="/students/register-new"
             className="p-2 bg-green-400 hover:bg-green-700 rounded-lg px-5 text-white font-bold"
           >
             New
-          </a>
+          </a>:""}
         </div>
         {error && <p className="text-red-600 p-4 text-center">{error}</p>}
 
@@ -204,7 +219,7 @@ const StudentManagement: React.FC = () => {
           </div>
 
           {Object.entries(groupedStudents).map(([intake, intakeStudents]) => {
-            const { totalPaid, totalDue, remaining } =
+            const { totalPaid, totalDue, remaining,totalDiscounted,totalExtras } =
               calculateTotals(intakeStudents);
 
             return (
@@ -225,6 +240,12 @@ const StudentManagement: React.FC = () => {
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                           Amount Paid
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                          Amount Discounted
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                          Extra mount
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                           Remaining
@@ -275,6 +296,34 @@ const StudentManagement: React.FC = () => {
                                 ))}
                             </div>
                           </td>
+                          <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
+                            <div className="text-sm text-gray-900">
+                              {payment
+                                .filter((p) => p.studentId === student._id)
+                                .map((p) => (
+                                  <div key={p._id}>
+                                    {new Intl.NumberFormat().format(
+                                      p.amountDiscounted
+                                    )}{" "}
+                                    Frw
+                                  </div>
+                                ))}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
+                            <div className="text-sm text-gray-900">
+                              {payment
+                                .filter((p) => p.studentId === student._id)
+                                .map((p) => (
+                                  <div key={p._id}>
+                                    {new Intl.NumberFormat().format(
+                                      p.extraAmount
+                                    )}{" "}
+                                    Frw
+                                  </div>
+                                ))}
+                            </div>
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
                             {payment
                               .filter((p) => p.studentId === student._id)
@@ -287,13 +336,25 @@ const StudentManagement: React.FC = () => {
                                 </div>
                               ))}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button
+                          <td className="px-6 py-4 whitespace-nowrap gap-1 flex text-sm font-medium">
+                           { hasPermission(userData as IUser,'payment','pay')?<button
                               onClick={() => handleView(student)}
                               className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
                             >
                               Pay
-                            </button>
+                            </button>:""}
+                           {hasPermission(userData as IUser,'payment','discount')? <button
+                              onClick={() => handleView(student)}
+                              className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
+                            >
+                              +
+                            </button>:""}
+                           {hasPermission(userData as IUser,'payment','add-extra')? <button
+                              onClick={() => handleView(student)}
+                              className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
+                            >
+                              -
+                            </button>:""}
                           </td>
                         </tr>
                       ))}
@@ -308,6 +369,13 @@ const StudentManagement: React.FC = () => {
                         </td>
                         <td className="px-6 py-4 font-bold">
                           {new Intl.NumberFormat().format(totalPaid)} Frw
+                        </td>
+                        <td className="px-6 py-4 font-bold">
+                          
+                          {new Intl.NumberFormat().format(totalDiscounted)} Frw
+                        </td>
+                        <td className="px-6 py-4 font-bold">
+                          {new Intl.NumberFormat().format(totalExtras)} Frw
                         </td>
                         <td className="px-6 py-4 font-bold">
                           {new Intl.NumberFormat().format(remaining)} Frw
