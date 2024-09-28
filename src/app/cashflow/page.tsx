@@ -214,6 +214,9 @@ const PaymentsPage: React.FC = () => {
                           Amount
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          payment method
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Reason
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -238,6 +241,12 @@ const PaymentsPage: React.FC = () => {
                             <div className="text-sm text-gray-900">
                               {new Intl.NumberFormat().format(cashflow.amount)}{" "}
                               Frw
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">
+                            
+                             {cashflow.payment}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
