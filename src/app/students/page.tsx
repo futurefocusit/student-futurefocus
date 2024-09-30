@@ -155,6 +155,16 @@ const StudentManagement: React.FC = () => {
         >
           View
         </button>
+        {hasPermission(userData as IUser, "students", "delete") ? (
+          <button
+            onClick={() => handleDelete(student._id)}
+            className="text-red-600 ml-3 hover:text-red-900"
+          >
+            Delete
+          </button>
+        ) : (
+          ""
+        )}
       </>
     );
   
@@ -169,12 +179,7 @@ const StudentManagement: React.FC = () => {
             >
               Admit
             </button>:""}
-           { hasPermission(userData as IUser, "students", "delete")? <button
-              onClick={() => handleDelete(student._id)}
-              className="text-red-600 ml-3 hover:text-red-900"
-            >
-              Delete
-            </button>:""}
+          
           </>
         );
       case "accepted":

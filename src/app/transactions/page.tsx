@@ -2,8 +2,12 @@
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
 import API_BASE_URL from "@/config/baseURL";
+import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
+import { hasPermission } from "@/libs/hasPermission";
+import { IUser } from "@/types/types";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 interface Student {
   _id: string;
@@ -35,34 +39,53 @@ const PaymentsPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [userData, setUserData] = useState<IUser>()
+  const fetchPayments = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/payment/transaction`);
+        await fetchUser();
+        setUserData(await getLoggedUserData());
 
-  useEffect(() => {
-    const fetchPayments = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/payment/transaction`);
-        if (!response) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.data;
-        setPayments(data);
-      } catch (error) {
-        //@ts-expect-error error
-        setError(error.message);
-      } finally {
-        setLoading(false);
+      if (!response) {
+        throw new Error("Network response was not ok");
       }
-    };
-
+      const data = await response.data;
+      setPayments(data);
+    } catch (error) {
+      //@ts-expect-error error
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchPayments();
   }, []);
-
-  const filteredPayments = payments.filter(
-    (payment) =>
-      payment.studentId?.name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      payment.reason.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await axios.delete(
+        `${API_BASE_URL}/payment/transaction/${id}`
+      );
+      toast.success(response.data.message);
+      await fetchPayments();
+    } catch (error) {
+      toast.error("failed to delete data");
+      //@ts-expect-error error
+      throw new Error(error);
+    }
+  };
+  const filteredPayments = payments
+    .filter(
+      (payment) =>
+        payment.studentId?.name
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        payment.reason.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
 
   if (loading) {
     return (
@@ -120,6 +143,9 @@ const PaymentsPage: React.FC = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Time
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -156,6 +182,14 @@ const PaymentsPage: React.FC = () => {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-red-700 hover:text-red-900">
+                        {hasPermission(userData as IUser,'transaction','delete')?
+                        <button onClick={() => handleDelete(payment._id)}>
+                          delete
+                        </button>:""}
                       </div>
                     </td>
                   </tr>

@@ -13,6 +13,7 @@ import { IUser } from "@/types/types";
 
 export interface CashflowType {
   type: string;
+  _id:string
   user: string;
   amount: number;
   reason: string;
@@ -26,7 +27,7 @@ const PaymentsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"income" | "expenses">("income");
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [loggedUser, setLoggedUser]= useState<IUser>()
+  const [loggedUser, setLoggedUser] = useState<IUser>();
   const [formData, setFormData] = useState({
     user: loggedUser?.name,
     reason: "",
@@ -38,7 +39,7 @@ const PaymentsPage: React.FC = () => {
 
   const fetchCashflows = async () => {
     try {
-        setLoggedUser(await fetchUser());
+      setLoggedUser(await fetchUser());
       const response = await axios.get(`${API_BASE_URL}/cashflow`);
       if (!response) {
         throw new Error("Network response was not ok");
@@ -57,16 +58,21 @@ const PaymentsPage: React.FC = () => {
     fetchCashflows();
   }, []);
 
-  const filteredCashflows = cashflows.filter((cashflow) => {
-    const cashflowDate = new Date(cashflow.createdAt);
-    return (
-      cashflow.type === filter &&
-      cashflowDate.getMonth() ===
-        (selectedDate ? selectedDate.getMonth() : new Date().getMonth()) &&
-      cashflowDate.getFullYear() ===
-        (selectedDate ? selectedDate.getFullYear() : new Date().getFullYear())
+  const filteredCashflows = cashflows
+    .filter((cashflow) => {
+      const cashflowDate = new Date(cashflow.createdAt);
+      return (
+        cashflow.type === filter &&
+        cashflowDate.getMonth() ===
+          (selectedDate ? selectedDate.getMonth() : new Date().getMonth()) &&
+        cashflowDate.getFullYear() ===
+          (selectedDate ? selectedDate.getFullYear() : new Date().getFullYear())
+      );
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
-  });
 
   const handleFormData = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -80,7 +86,7 @@ const PaymentsPage: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      formData.user =loggedUser?.name
+      formData.user = loggedUser?.name;
       const response = await axios.post(`${API_BASE_URL}/cashflow`, formData);
       fetchCashflows();
       toast.success(response.data.message);
@@ -88,7 +94,18 @@ const PaymentsPage: React.FC = () => {
       toast.error("Failed to add transaction");
     }
   };
+const handleDelete = async(id:string)=>{
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/cashflow/${id}`)
+    toast.success(response.data.message)
+      await fetchCashflows();
 
+  } catch (error) {
+    toast.error('failed to delete data')
+    //@ts-expect-error error
+    throw new Error(error);
+  }
+}
   const groupByDate = (data: CashflowType[]) => {
     return data.reduce((groups, cashflow) => {
       const date = new Date(cashflow.createdAt);
@@ -182,12 +199,16 @@ const PaymentsPage: React.FC = () => {
               Expenses
             </button>
           </div>
-         { hasPermission(loggedUser as IUser, 'cashflow', 'add')?<button
-            onClick={() => setShowModal(true)}
-            className="ml-4 px-4 py-2 bg-green-500 text-white font-semibold rounded"
-          >
-            Add Transaction
-          </button>:""}
+          {hasPermission(loggedUser as IUser, "cashflow", "add") ? (
+            <button
+              onClick={() => setShowModal(true)}
+              className="ml-4 px-4 py-2 bg-green-500 text-white font-semibold rounded"
+            >
+              Add Transaction
+            </button>
+          ) : (
+            ""
+          )}
         </div>
 
         <div className="p-4">
@@ -213,13 +234,16 @@ const PaymentsPage: React.FC = () => {
                           Amount
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          payment method
+                          Payment Method
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Reason
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Time
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          actions
                         </th>
                       </tr>
                     </thead>
@@ -244,8 +268,7 @@ const PaymentsPage: React.FC = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">
-                            
-                             {cashflow.payment}
+                              {cashflow.payment}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -260,6 +283,13 @@ const PaymentsPage: React.FC = () => {
                                 { hour: "2-digit", minute: "2-digit" }
                               )}
                             </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            
+                              <div className="text-sm font-bold text-red-500 hover:text-red-900">
+                               {hasPermission(loggedUser as IUser, 'cashflow', 'delete')? <button onClick={()=>handleDelete(cashflow._id)}>delete</button>:""}
+                              </div>
+                            
                           </td>
                         </tr>
                       ))}
