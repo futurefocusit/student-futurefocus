@@ -20,6 +20,7 @@ interface Student {
   selectedShift: string;
   createdAt: string;
   status: string;
+  comment:string
 }
 interface Payment {
   studentId: string;
@@ -42,6 +43,10 @@ const StudentManagement: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>("pending");
   const [searchTerm, setSearchTerm] = useState<string>("");
  const [userData ,setUserData]= useState<IUser>()
+ const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
+ const [commentText, setCommentText] = useState("");
+ const [commentStudent, setCommentStudent] = useState<Student | null>(null);
+
   const fetchStudents = async () => {
     try {
       const response = await axios.get<Student[]>(`${API_BASE_URL}/students`);
@@ -145,6 +150,40 @@ const StudentManagement: React.FC = () => {
     );
     groupStudentsByIntake(filteredStudents);
   };
+   const handleComment = (studentId: string) => {
+     const student = students.find((s) => s._id === studentId);
+     if (student) {
+       setCommentStudent(student);
+       setCommentText(student.comment || "");
+       setIsCommentModalOpen(true);
+     }
+   };
+
+   const handleSaveComment = async () => {
+     if (!commentStudent) return;
+
+     try {
+       await axios.put(`${API_BASE_URL}/students/comment/${commentStudent._id}`, {
+         comment: commentText,
+       });
+
+       // Update the local state
+       const updatedStudents = students.map((student) =>
+         student._id === commentStudent._id
+           ? { ...student, comment: commentText }
+           : student
+       );
+       setStudents(updatedStudents);
+       filterStudents(activeFilter, updatedStudents);
+
+       setIsCommentModalOpen(false);
+       setCommentStudent(null);
+       setCommentText("");
+     } catch (error) {
+       console.error("Error saving comment:", error);
+       setError("Failed to save comment. Please try again.");
+     }
+   };
 
   const renderActionButtons = (student: Student) => {
     const commonButtons = (
@@ -173,13 +212,26 @@ const StudentManagement: React.FC = () => {
         return (
           <>
             {commonButtons}
-           { hasPermission(userData as IUser, "students", "admit")? <button
-              onClick={() => handleStatusChange(student._id, "accepted")}
-              className="text-green-600 hover:text-green-900 ml-3"
-            >
-              Admit
-            </button>:""}
-          
+            {hasPermission(userData as IUser, "students", "admit") ? (
+              <button
+                onClick={() => handleStatusChange(student._id, "accepted")}
+                className="text-green-600 hover:text-green-900 ml-3"
+              >
+                Admit
+              </button>
+            ) : (
+              ""
+            )}
+            {hasPermission(userData as IUser, "students", "delete") ? (
+              <button
+                onClick={() => handleComment(student._id)}
+                className="text-blue-600 ml-3 hover:text-blue-900"
+              >
+                comment
+              </button>
+            ) : (
+              ""
+            )}
           </>
         );
       case "accepted":
@@ -196,16 +248,7 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
-            {hasPermission(userData as IUser, "students", "delete") ? (
-              <button
-                onClick={() => handleDelete(student._id)}
-                className="text-red-600 ml-3 hover:text-red-900"
-              >
-                Delete
-              </button>
-            ) : (
-              ""
-            )}
+            
           </>
         );
       case "registered":
@@ -261,12 +304,16 @@ const StudentManagement: React.FC = () => {
           <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
             Applied Students
           </h2>
-         {hasPermission(userData as IUser, "students", "register") ? <a
-            href="/students/register-new"
-            className="p-2  bg-green-400 hover:bg-green-700 rounded-lg px-5 text-white font-bold  "
-          >
-            New
-          </a>:""}
+          {hasPermission(userData as IUser, "students", "register") ? (
+            <a
+              href="/students/register-new"
+              className="p-2  bg-green-400 hover:bg-green-700 rounded-lg px-5 text-white font-bold  "
+            >
+              New
+            </a>
+          ) : (
+            ""
+          )}
         </div>
         {error && <p className="text-red-600 p-4 text-center">{error}</p>}
 
@@ -288,7 +335,13 @@ const StudentManagement: React.FC = () => {
                     activeFilter === status ? "bg-indigo-100" : ""
                   }`}
                 >
-                  {status === "pending" ? "Candidates" : status==="accepted"?"Admitted":status==="started"?"Active":status}
+                  {status === "pending"
+                    ? "Candidates"
+                    : status === "accepted"
+                    ? "Admitted"
+                    : status === "started"
+                    ? "Active"
+                    : status}
                 </button>
               ))}
             </div>
@@ -398,6 +451,45 @@ const StudentManagement: React.FC = () => {
               </div>
             </div>
           ))}
+
+          {isCommentModalOpen && (
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+              <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg">
+                <div className="bg-gray-50 p-6">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    {commentStudent?.comment ? "Edit Comment" : "Add Comment"}
+                  </h3>
+                  <div className="mt-4">
+                    <textarea
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                      rows={4}
+                      placeholder="Enter your comment here..."
+                    />
+                  </div>
+                </div>
+                <div className="bg-gray-50 p-4 flex justify-end space-x-3">
+                  <button
+                    onClick={() => {
+                      setIsCommentModalOpen(false);
+                      setCommentStudent(null);
+                      setCommentText("");
+                    }}
+                    className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900 font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveComment}
+                    className="px-4 py-2 text-sm text-white font-medium bg-indigo-600 hover:bg-indigo-700 rounded-md"
+                  >
+                    Save Comment
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {selectedStudent && (
             <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">

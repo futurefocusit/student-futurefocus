@@ -49,6 +49,8 @@ const StudentManagement: React.FC = () => {
 
   const [formData, setFormData] = useState({
     amount: "",
+    user:userData?.name,
+    method:""
   });
 
   const handleFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,6 +111,7 @@ const StudentManagement: React.FC = () => {
 
   const handlePay = async (id: string) => {
     try {
+      formData.user = userData?.name;
       const response = await axios.post(
         `${API_BASE_URL}/payment/pay/${id}`,
         formData
@@ -489,6 +492,18 @@ const StudentManagement: React.FC = () => {
                       <input
                         name="amount"
                         type="number"
+                        onChange={handleFormData}
+                        placeholder="Amount in Frw"
+                        className="border-2 p-2 rounded-md border-blue-700"
+                      />
+                    </span>
+                    <span className="flex gap-10 items-center mx-auto mb-3">
+                      <label className="font-extrabold" htmlFor="amount">
+                        method of payment:
+                      </label>
+                      <input
+                        name="method"
+                        type="text"
                         onChange={handleFormData}
                         placeholder="Amount in Frw"
                         className="border-2 p-2 rounded-md border-blue-700"
