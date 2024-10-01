@@ -248,7 +248,16 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
-            
+            {hasPermission(userData as IUser, "students", "delete") ? (
+              <button
+                onClick={() => handleComment(student._id)}
+                className="text-blue-600 ml-3 hover:text-blue-900"
+              >
+                comment
+              </button>
+            ) : (
+              ""
+            )}
           </>
         );
       case "registered":
