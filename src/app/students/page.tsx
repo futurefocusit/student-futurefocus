@@ -117,6 +117,17 @@ const StudentManagement: React.FC = () => {
       );
     }
   };
+  const handleAttend = async (id: string) => {
+    try {
+      await axios.put(`${API_BASE_URL}/students/attend/${id}`)
+      await fetchStudents();
+    
+    } catch (error) {
+      setError(
+        `Failed to attend student. Please try again.`
+      );
+    }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-GB", {
@@ -289,7 +300,7 @@ const StudentManagement: React.FC = () => {
               Dropout
             </button> */}
             {hasPermission(userData as IUser, "students", "attend")?<button
-              onClick={() => handleStatusChange(student._id, "dropedout")}
+              onClick={() => handleAttend(student._id)}
               className="text-green-600 hover:text-green-900 ml-3"
             >
               Attend
