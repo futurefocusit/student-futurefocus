@@ -316,30 +316,28 @@ const StudentManagement: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gray-100 p-2 sm:p-4 lg:p-6">
       <SideBar />
 
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
-        <div className=" bg-gray-50 flex justify-between shadow-md rounded-lg px-2 items-center ">
-          <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
+        <div className="bg-gray-50 flex flex-col sm:flex-row justify-between items-center shadow-md rounded-lg p-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
             Applied Students
           </h2>
-          {hasPermission(userData as IUser, "students", "register") ? (
+          {hasPermission(userData as IUser, "students", "register") && (
             <a
               href="/students/register-new"
-              className="p-2  bg-green-400 hover:bg-green-700 rounded-lg px-5 text-white font-bold  "
+              className="px-4 py-2 bg-green-400 hover:bg-green-700 rounded-lg text-white font-bold"
             >
               New
             </a>
-          ) : (
-            ""
           )}
         </div>
         {error && <p className="text-red-600 p-4 text-center">{error}</p>}
 
-        <div className="p-4 sm:p-6 space-y-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-            <div className="flex space-x-2 overflow-x-auto w-full sm:w-auto">
+        <div className="p-4 space-y-4">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
+            <div className="flex flex-wrap gap-2">
               {[
                 "pending",
                 "accepted",
@@ -351,7 +349,7 @@ const StudentManagement: React.FC = () => {
                 <button
                   key={status}
                   onClick={() => filterStudents(status)}
-                  className={`px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                  className={`px-3 py-1 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
                     activeFilter === status ? "bg-indigo-100" : ""
                   }`}
                 >
@@ -361,7 +359,7 @@ const StudentManagement: React.FC = () => {
                     ? "Admitted"
                     : status === "started"
                     ? "Active"
-                    : status}
+                    : status.charAt(0).toUpperCase() + status.slice(1)}
                 </button>
               ))}
             </div>
@@ -382,38 +380,40 @@ const StudentManagement: React.FC = () => {
 
           {Object.entries(groupedStudents).map(([intake, intakeStudents]) => (
             <div key={intake} className="mt-8">
-              <h3 className="text-xl font-semibold mb-4">Intake: {intake}</h3>
+              <h3 className="text-lg sm:text-xl font-semibold mb-4">
+                Intake: {intake}
+              </h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
                       <th
                         scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                       >
                         No
                       </th>
                       <th
                         scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                       >
                         Name
                       </th>
                       <th
                         scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
+                        className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
                       >
                         Phone
                       </th>
                       <th
                         scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell"
+                        className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell"
                       >
                         Payment Status
                       </th>
                       <th
                         scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                       >
                         Actions
                       </th>
@@ -422,31 +422,31 @@ const StudentManagement: React.FC = () => {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {intakeStudents.map((student, index) => (
                       <tr key={student._id}>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">
                             {index + 1}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">
                             {student.name}
                           </div>
-                          <div className="text-sm text-gray-500 sm:hidden">
+                          <div className="text-xs text-gray-500 sm:hidden">
                             {student.phone}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
+                        <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
                           <div className="text-sm text-gray-900">
                             {student.phone}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
+                        <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden md:table-cell">
                           <div className="text-sm text-gray-900">
                             {payment &&
                             payment.filter(
                               (payment) => payment.studentId === student._id
                             ).length === 0 ? (
-                              <div>No payment information found.</div>
+                              <div>No payment info</div>
                             ) : (
                               payment &&
                               payment
@@ -461,8 +461,10 @@ const StudentManagement: React.FC = () => {
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          {renderActionButtons(student)}
+                        <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex flex-wrap gap-2">
+                            {renderActionButtons(student)}
+                          </div>
                         </td>
                       </tr>
                     ))}
