@@ -308,7 +308,7 @@ const StudentManagement: React.FC = () => {
         return (
           <>
             {commonButtons}
-            {hasPermission(userData as IUser, "students", "attend") ? (
+            {hasPermission(userData as IUser, "students", "update") ? (
               <button
                 onClick={() => handleUpdateStudent(student)}
                 className="text-green-600 hover:text-green-900 ml-3"
@@ -380,7 +380,7 @@ const StudentManagement: React.FC = () => {
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <div className="bg-gray-50 flex flex-col sm:flex-row justify-between items-center shadow-md rounded-lg p-4">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
-            Applied Students
+             Students
           </h2>
           {hasPermission(userData as IUser, "students", "register") && (
             <a
