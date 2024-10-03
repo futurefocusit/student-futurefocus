@@ -474,9 +474,9 @@ const StudentManagement: React.FC = () => {
           })}
 
           {selectedStudent && type && (
-            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-              <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg">
-                <div className="bg-gray-50 h-32 overflow-scroll">
+            <div className="fixed inset-0 flex  items-center justify-center bg-gray-800 bg-opacity-75">
+              <div className="bg-white rounded-lg overflow-hidden h-64 shadow-xl transform transition-all sm:w-full sm:max-w-lg">
+                <div className="bg-gray-50  overflow-scroll">
                   <h3 className="text-lg text-center bg-blue-600 text-white font-extrabold">
                     {type === "pay"
                       ? "Pay School Fees"
@@ -484,7 +484,7 @@ const StudentManagement: React.FC = () => {
                       ? "Add Discount"
                       : "Add Extra"}
                   </h3>
-                  <div className="mt-4 flex flex-col gap-5">
+                  <div className="mt-4 flex  flex-col gap-5">
                     <span className="flex gap-10 items-center mx-auto mb-3">
                       <label className="font-extrabold" htmlFor="amount">
                         Amount:
@@ -505,7 +505,7 @@ const StudentManagement: React.FC = () => {
                         name="method"
                         type="text"
                         onChange={handleFormData}
-                        placeholder="Amount in Frw"
+                        placeholder="type Method"
                         className="border-2 p-2 rounded-md border-blue-700"
                       />
                     </span>
