@@ -43,10 +43,10 @@ const StudentManagement: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>("pending");
   const [searchTerm, setSearchTerm] = useState<string>("");
  const [userData ,setUserData]= useState<IUser>()
- const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
- const [commentText, setCommentText] = useState("");
- const [commentStudent, setCommentStudent] = useState<Student | null>(null);
-
+ const [commentText, setComment] = useState({comment:""});
+  const setCommentText = (value:string) => {
+    setComment((prev) => ({ ...prev, comment: value }));
+  };
   const fetchStudents = async () => {
     try {
       const response = await axios.get<Student[]>(`${API_BASE_URL}/students`);
@@ -161,35 +161,13 @@ const StudentManagement: React.FC = () => {
     );
     groupStudentsByIntake(filteredStudents);
   };
-   const handleComment = (studentId: string) => {
-     const student = students.find((s) => s._id === studentId);
-     if (student) {
-       setCommentStudent(student);
-       setCommentText(student.comment || "");
-       setIsCommentModalOpen(true);
-     }
-   };
 
-   const handleSaveComment = async () => {
-     if (!commentStudent) return;
-
+   const handleSaveComment = async (studentId:string) => {
      try {
-       await axios.put(`${API_BASE_URL}/students/comment/${commentStudent._id}`, {
-         comment: commentText,
+       await axios.put(`${API_BASE_URL}/students/comment/${studentId}`, {
+         comment: commentText.comment,
        });
 
-       // Update the local state
-       const updatedStudents = students.map((student) =>
-         student._id === commentStudent._id
-           ? { ...student, comment: commentText }
-           : student
-       );
-       setStudents(updatedStudents);
-       filterStudents(activeFilter, updatedStudents);
-
-       setIsCommentModalOpen(false);
-       setCommentStudent(null);
-       setCommentText("");
      } catch (error) {
        console.error("Error saving comment:", error);
        setError("Failed to save comment. Please try again.");
@@ -234,12 +212,21 @@ const StudentManagement: React.FC = () => {
               ""
             )}
             {hasPermission(userData as IUser, "students", "comment") ? (
-              <button
-                onClick={() => handleComment(student._id)}
-                className="text-blue-600 ml-3 hover:text-blue-900"
-              >
-                comment
-              </button>
+              <div className="">
+                <input
+                  className="p-1 bg-gray-200 border-2 border-gray-500 rounded-md"
+                  type="text"
+                  placeholder="type message..."
+                  value={student.comment}
+                  onChange={(event) => setCommentText(event.target.value)}
+                />
+                <button
+                  onClick={() => handleSaveComment(student._id)}
+                  className="text-blue-600 ml-3 hover:text-blue-900"
+                >
+                  save
+                </button>
+              </div>
             ) : (
               ""
             )}
@@ -260,12 +247,21 @@ const StudentManagement: React.FC = () => {
               ""
             )}
             {hasPermission(userData as IUser, "students", "comment") ? (
-              <button
-                onClick={() => handleComment(student._id)}
-                className="text-blue-600 ml-3 hover:text-blue-900"
-              >
-                comment
-              </button>
+              <div className="">
+                <input
+                  className="p-1 bg-gray-200 border-2 border-gray-500 rounded-md"
+                  type="text"
+                  placeholder="type message..."
+                  defaultValue={student.comment}
+                  onChange={(event) => setCommentText(event.target.value)}
+                />
+                <button
+                  onClick={() => handleSaveComment(student._id)}
+                  className="text-blue-600 ml-3 hover:text-blue-900"
+                >
+                  save
+                </button>
+              </div>
             ) : (
               ""
             )}
@@ -474,44 +470,7 @@ const StudentManagement: React.FC = () => {
             </div>
           ))}
 
-          {isCommentModalOpen && (
-            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-              <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg">
-                <div className="bg-gray-50 p-6">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    {commentStudent?.comment ? "Edit Comment" : "Add Comment"}
-                  </h3>
-                  <div className="mt-4">
-                    <textarea
-                      value={commentText}
-                      onChange={(e) => setCommentText(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                      rows={4}
-                      placeholder="Enter your comment here..."
-                    />
-                  </div>
-                </div>
-                <div className="bg-gray-50 p-4 flex justify-end space-x-3">
-                  <button
-                    onClick={() => {
-                      setIsCommentModalOpen(false);
-                      setCommentStudent(null);
-                      setCommentText("");
-                    }}
-                    className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900 font-medium"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSaveComment}
-                    className="px-4 py-2 text-sm text-white font-medium bg-indigo-600 hover:bg-indigo-700 rounded-md"
-                  >
-                    Save Comment
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          
 
           {selectedStudent && (
             <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
