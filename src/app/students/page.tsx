@@ -1,4 +1,4 @@
-"use client";
+'use client'
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import API_BASE_URL from "@/config/baseURL";
@@ -20,14 +20,20 @@ interface Student {
   selectedShift: string;
   createdAt: string;
   status: string;
-  comment:string
+  comment: string;
 }
+
 interface Payment {
   studentId: string;
   amountDue: number;
   amountPaid: number;
   status: string;
   _id: string;
+}
+
+interface Course {
+  title: string;
+  shifts: string[];
 }
 
 interface GroupedStudents {
@@ -42,16 +48,19 @@ const StudentManagement: React.FC = () => {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("pending");
   const [searchTerm, setSearchTerm] = useState<string>("");
- const [userData ,setUserData]= useState<IUser>()
- const [commentText, setComment] = useState({comment:""});
-  const setCommentText = (value:string) => {
+  const [userData, setUserData] = useState<IUser>();
+  const [commentText, setComment] = useState({ comment: "" });
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [updateMode, setUpdateMode] = useState(false);
+
+  const setCommentText = (value: string) => {
     setComment((prev) => ({ ...prev, comment: value }));
   };
   const fetchStudents = async () => {
     try {
       const response = await axios.get<Student[]>(`${API_BASE_URL}/students`);
-      await fetchUser()
-      setUserData(await getLoggedUserData())
+      await fetchUser();
+      setUserData(await getLoggedUserData());
       const sortedStudents = response.data.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -63,6 +72,37 @@ const StudentManagement: React.FC = () => {
       setError("Failed to load student data. Please try again later.");
     }
   };
+  const fetchCourses = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/course`);
+      setCourses(response.data);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+      setError("Failed to load courses. Please try again later.");
+    }
+  };
+   const handleUpdateStudent = async (student: Student) => {
+     setSelectedStudent(student);
+     setUpdateMode(true);
+   };
+
+   const handleSaveUpdate = async () => {
+     if (!selectedStudent) return;
+
+     try {
+       await axios.put(`${API_BASE_URL}/students/update/${selectedStudent._id}`, {
+         selectedCourse: selectedStudent.selectedCourse,
+         selectedShift: selectedStudent.selectedShift,
+       });
+       await fetchStudents();
+       setSelectedStudent(null);
+       setUpdateMode(false);
+     } catch (error) {
+       console.error("Error updating student:", error);
+       setError("Failed to update student. Please try again.");
+     }
+   };
+
   const fetchPayment = async () => {
     try {
       const response = await axios.get<Payment[]>(`${API_BASE_URL}/payment`);
@@ -87,6 +127,7 @@ const StudentManagement: React.FC = () => {
   useEffect(() => {
     fetchStudents();
     fetchPayment();
+    fetchCourses();
   }, []);
 
   const handleDelete = async (id: string) => {
@@ -119,13 +160,10 @@ const StudentManagement: React.FC = () => {
   };
   const handleAttend = async (id: string) => {
     try {
-      await axios.put(`${API_BASE_URL}/students/attend/${id}`)
+      await axios.put(`${API_BASE_URL}/students/attend/${id}`);
       await fetchStudents();
-    
     } catch (error) {
-      setError(
-        `Failed to attend student. Please try again.`
-      );
+      setError(`Failed to attend student. Please try again.`);
     }
   };
 
@@ -162,17 +200,16 @@ const StudentManagement: React.FC = () => {
     groupStudentsByIntake(filteredStudents);
   };
 
-   const handleSaveComment = async (studentId:string) => {
-     try {
-       await axios.put(`${API_BASE_URL}/students/comment/${studentId}`, {
-         comment: commentText.comment,
-       });
-
-     } catch (error) {
-       console.error("Error saving comment:", error);
-       setError("Failed to save comment. Please try again.");
-     }
-   };
+  const handleSaveComment = async (studentId: string) => {
+    try {
+      await axios.put(`${API_BASE_URL}/students/comment/${studentId}`, {
+        comment: commentText.comment,
+      });
+    } catch (error) {
+      console.error("Error saving comment:", error);
+      setError("Failed to save comment. Please try again.");
+    }
+  };
 
   const renderActionButtons = (student: Student) => {
     const commonButtons = (
@@ -195,7 +232,7 @@ const StudentManagement: React.FC = () => {
         )}
       </>
     );
-  
+
     switch (student.status) {
       case "pending":
         return (
@@ -271,6 +308,17 @@ const StudentManagement: React.FC = () => {
         return (
           <>
             {commonButtons}
+            {hasPermission(userData as IUser, "students", "attend") ? (
+              <button
+                onClick={() => handleUpdateStudent(student)}
+                className="text-green-600 hover:text-green-900 ml-3"
+              >
+                Update
+              </button>
+            ) : (
+              ""
+            )}
+
             {/* <button
               onClick={() => handleStatusChange(student._id, "started")}
               className="text-green-600 hover:text-green-900 ml-3"
@@ -295,12 +343,26 @@ const StudentManagement: React.FC = () => {
             >
               Dropout
             </button> */}
-            {hasPermission(userData as IUser, "students", "attend")?<button
-              onClick={() => handleAttend(student._id)}
-              className="text-green-600 hover:text-green-900 ml-3"
-            >
-              Attend
-            </button>:""}
+            {hasPermission(userData as IUser, "students", "attend") ? (
+              <button
+                onClick={() => handleUpdateStudent(student)}
+                className="text-green-600 hover:text-green-900 ml-3"
+              >
+                Update
+              </button>
+            ) : (
+              ""
+            )}
+            {hasPermission(userData as IUser, "students", "attend") ? (
+              <button
+                onClick={() => handleAttend(student._id)}
+                className="text-green-600 hover:text-green-900 ml-3"
+              >
+                Attend
+              </button>
+            ) : (
+              ""
+            )}
           </>
         );
       case "completed":
@@ -470,10 +532,61 @@ const StudentManagement: React.FC = () => {
             </div>
           ))}
 
-          
-
           {selectedStudent && (
-            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+           <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+          <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg">
+            <div className="bg-gray-50 p-6 h-96 overflow-scroll">
+              <h3 className="text-lg font-medium text-gray-900">
+                {updateMode ? "Update Student" : "Student Details"}
+              </h3>
+              <div className="mt-4 space-y-2">
+                {updateMode ? (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Select Course
+                      </label>
+                      <select
+                        value={selectedStudent.selectedCourse}
+                        onChange={(e) => setSelectedStudent({
+                          ...selectedStudent,
+                          selectedCourse: e.target.value,
+                          selectedShift: courses.find(c => c.title === e.target.value)?.shifts[0] || selectedStudent.selectedShift
+                        })}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                      >
+                        {courses.map((course) => (
+                          <option key={course.title} value={course.title}>
+                            {course.title}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Select Shift
+                      </label>
+                      <select
+                        value={selectedStudent.selectedShift}
+                        onChange={(e) => setSelectedStudent({
+                          ...selectedStudent,
+                          selectedShift: e.target.value
+                        })}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                      >
+                        {courses
+                          .find((course) => course.title === selectedStudent.selectedCourse)
+                          ?.shifts.map((shift) => (
+                            <option key={shift} value={shift}>
+                              {shift}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
               <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg ">
                 <div className="bg-gray-50 p-6 h-96 overflow-scroll">
                   <h3 className="text-lg font-medium text-gray-900">
@@ -592,11 +705,46 @@ const StudentManagement: React.FC = () => {
                 </div>
               </div>
             </div>
-          )}
+                  </>
+                )}
+              </div>
+            </div>
+            <div className="bg-gray-50 p-4 flex justify-end">
+              {updateMode ? (
+                <>
+                  <button
+                    onClick={handleSaveUpdate}
+                    className="mr-2 inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedStudent(null);
+                      setUpdateMode(false);
+                    }}
+                    className="inline-flex justify-center px-4 py-2 text-sm text-black font-medium bg-gray-200 border border-transparent rounded-md hover:bg-gray-300"
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setSelectedStudent(null)}
+                  className="inline-flex justify-center px-4 py-2 text-sm text-black font-extrabold bg-red-300 border border-transparent rounded-md hover:bg-red-700 hover:text-white"
+                >
+                  Close
+                </button>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
-  );
-};
+    </div>
+    </div>
+    
+      )}
+  
 
 export default withAdminAuth(StudentManagement);
