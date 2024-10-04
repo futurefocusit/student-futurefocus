@@ -128,11 +128,6 @@ const Dashboard = () => {
     );
 
   const shifts = summary.shiftStudents.map((ss) => ss._id);
-  const studentCountsByShift = summary.shiftStudents.map((ss) => ss.total);
-  const paymentsByShift = summary.shiftPayments.map((sp) => ({
-    paid: sp.totalPaid,
-    unpaid: sp.totalUnpaid,
-  }));
 
   const cashflowMonths = summary.monthlyCashflows.map(
     (cf) => `Month ${cf._id}`

@@ -147,9 +147,9 @@ const StudentManagement: React.FC = () => {
     setSelectedStudent(student);
   };
 
-  const handleStatusChange = async (id: string, newStatus: string) => {
+  const handleStatusChange = async (id: string, newStatus: string,user:string) => {
     try {
-      await axios.put(`${API_BASE_URL}/students/${id}`, { status: newStatus });
+      await axios.put(`${API_BASE_URL}/students/${id}`, { status: newStatus,user });
       await fetchStudents();
     } catch (error) {
       console.error(`Error changing student status to ${newStatus}:`, error);
@@ -240,7 +240,7 @@ const StudentManagement: React.FC = () => {
             {commonButtons}
             {hasPermission(userData as IUser, "students", "admit") ? (
               <button
-                onClick={() => handleStatusChange(student._id, "accepted")}
+                onClick={() => handleStatusChange(student._id, "accepted",userData?.name as string)}
                 className="text-green-600 hover:text-green-900 ml-3"
               >
                 Admit
@@ -275,7 +275,7 @@ const StudentManagement: React.FC = () => {
             {commonButtons}
             {hasPermission(userData as IUser, "students", "register") ? (
               <button
-                onClick={() => handleStatusChange(student._id, "registered")}
+                onClick={() => handleStatusChange(student._id, "registered", userData?.name as string)}
                 className="text-blue-600 hover:text-blue-900 ml-3"
               >
                 Register
