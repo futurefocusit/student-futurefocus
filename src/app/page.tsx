@@ -18,6 +18,9 @@ import {
   Filler,
 } from "chart.js";
 import Loader from "@/components/loader";
+import { hasPermission } from "@/libs/hasPermission";
+import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
+import { IUser } from "@/types/types";
 
 ChartJS.register(
   LinearScale,
@@ -93,12 +96,15 @@ const Dashboard = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userData, setUserData] = useState<IUser>();
 
   useEffect(() => {
     const fetchSummary = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/admin/dashboard`);
         setSummary(response.data);
+          await fetchUser();
+          setUserData(await getLoggedUserData());
       } catch (error) {
         //@ts-expect-error ignore error
         setError(error);
@@ -234,7 +240,6 @@ const Dashboard = () => {
     ],
   };
 
-  // Cashflows Line Graph Data
   const cashflowData = {
     labels: cashflowMonths,
     datasets: [
@@ -261,14 +266,17 @@ const Dashboard = () => {
     <div className="flex flex-col md:items-center p-4">
       <SideBar />
       <h1 className="text-3xl font-bold mb-4">Dashboard Summary</h1>
-
       {/* Overview Section with Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6  gap-4 w-full max-w-64 md:max-w-xl lg:max-w-6xl">
         {/* Student Status Cards */}
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
+
+        <a
+          href="/students"
+          className="bg-white p-6 rounded-lg shadow-md text-center"
+        >
           <h3 className="text-lg font-semibold">Total Students</h3>
           <p className="text-2xl font-bold">{summary.totalStudents}</p>
-        </div>
+        </a>
         <div className="bg-white p-6 rounded-lg shadow-md text-center">
           <h3 className="text-lg font-semibold">Candidates</h3>
           <p className="text-2xl font-bold">
@@ -306,12 +314,15 @@ const Dashboard = () => {
           </p>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
+        <a
+          href="/payment"
+          className="bg-white p-6 rounded-lg shadow-md text-center"
+        >
           <h3 className="text-lg font-semibold">Unpaid Students</h3>
           <p className="text-2xl font-bold">
             {summary.paymentStatusCounts.unpaid}
           </p>
-        </div>
+        </a>
         <div className="bg-white p-6 rounded-lg shadow-md text-center">
           <h3 className="text-lg font-semibold">Partial Paid Student</h3>
           <p className="text-2xl font-bold">
@@ -325,36 +336,46 @@ const Dashboard = () => {
           </p>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
-          <h3 className="text-lg font-semibold">Total Amount Paid</h3>
-          <p className="text-2xl font-bold">
-            ${summary.totalAmountPaid.toFixed(0)}
-          </p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
-          <h3 className="text-lg font-semibold">Total Amount To Be Paid</h3>
-          <p className="text-2xl font-bold">
-            ${summary.totalAmountToBePaid.toFixed(0)}
-          </p>
-        </div>
+        {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <h3 className="text-lg font-semibold">Total Amount To Be Paid</h3>
+            <p className="text-2xl font-bold">
+              {summary.totalAmountToBePaid.toFixed(0)}
+            </p>
+          </div>
+        ) : (
+          ""
+        )}
+        {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <h3 className="text-lg font-semibold">Total Amount Paid</h3>
+            <p className="text-2xl font-bold">
+              {summary.totalAmountPaid.toFixed(0)}
+            </p>
+          </div>
+        ) : (
+          ""
+        )}
       </div>
-
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl  mt-6">
         <h2 className="text-2xl font-semibold mb-4">Students Statistics</h2>
         {/* @ts-expect-error error */}
         <Bar data={studentsData} options={options} />
       </div>
-
-      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mt-6">
+      {hasPermission(userData as IUser, "dashboard", "view-dashboard")?<div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mt-6">
         <h2 className="text-2xl font-semibold mb-4">Payments Statistics</h2>
         {/* @ts-expect-error error */}
         <Bar data={paymentsData} options={options} />
-      </div>
-
-      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mt-6">
-        <h2 className="text-2xl font-semibold mb-4">Monthly Cash Flow</h2>
-        <Line data={cashflowData} options={{ responsive: true }} />
-      </div>
+      </div>:""}
+      
+      {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
+        <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mt-6">
+          <h2 className="text-2xl font-semibold mb-4">Monthly Cash Flow</h2>
+          <Line data={cashflowData} options={{ responsive: true }} />
+        </div>
+      ) : (
+        ""
+      )}
     </div>
   );
 };

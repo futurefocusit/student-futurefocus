@@ -15,11 +15,15 @@ import {
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import { FaRightFromBracket } from "react-icons/fa6";
+import { IUser } from "@/types/types";
+import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
 
 const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const [userData, setUserData] = useState<IUser>();
+
   const { logout } = useAuth();
 
   const menuItems = [
@@ -46,7 +50,13 @@ const SideBar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
+  useEffect(() => {
+    const fetchUserData = async () => {
+      await fetchUser();
+      setUserData(await getLoggedUserData());
+    };
+    fetchUserData();
+  }, []);
   const handleLogout = async () => {
     await logout();
   };
@@ -70,7 +80,7 @@ const SideBar = () => {
       >
         <nav
           ref={sidebarRef}
-          className={` flex flex-col h-screen py-8 overflow-y-auto transition-all duration-300 ease-in-out ${
+          className={` flex flex-col h-screen justify-between py-8 overflow-y-auto transition-all duration-300 ease-in-out ${
             isOpen ? "translate-x-0" : "-translate-x-full"
           } md:translate-x-0 ${isExpanded ? "w-64" : "w-20"}`}
         >
@@ -93,35 +103,56 @@ const SideBar = () => {
               )}
             </button>
           </div>
-
-          {menuItems.map((item, index) => (
-            <Link
-              key={index}
-              href={item.href}
-              className={`flex items-center px-4 py-2 mt-2 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white ${
-                isExpanded ? "" : "justify-center"
-              }`}
-              onClick={() => setIsOpen(false)}
-            >
-              <item.icon className="w-5 h-5" />
-              <span
-                className={`mx-4 font-medium ${isExpanded ? "" : "hidden"}`}
+          <div className="">
+            {menuItems.map((item, index) => (
+              <Link
+                key={index}
+                href={item.href}
+                className={`flex items-center px-4 py-2 mt-2 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white ${
+                  isExpanded ? "" : "justify-center"
+                }`}
+                onClick={() => setIsOpen(false)}
               >
-                {item.label}
+                <item.icon className="w-5 h-5" />
+                <span
+                  className={`mx-4 font-medium ${isExpanded ? "" : "hidden"}`}
+                >
+                  {item.label}
+                </span>
+              </Link>
+            ))}
+          </div>
+          <div className="px-4">
+            <button
+              className={`flex items-center px-4 py-2 mb-10 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white `}
+              onClick={handleLogout}
+            >
+              <FaRightFromBracket className="w-5 h-5" />
+              <p className={`mx-4 font-medium ${isExpanded ? "" : "hidden"}`}>
+                Logout
+              </p>
+            </button>
+            <div className="flex flex-row ">
+              <FaUser className="rounded-full p-2 bg-gray-600 w-10 h-10 " />
+              <span className="flex flex-col  items-center">
+                <p
+                  className={`mx-4 text-sm text-white ${
+                    isExpanded ? "" : "hidden"
+                  }`}
+                >
+                  {userData?.name}
+                </p>
+                <p
+                  className={`mx-4 font-medium text-gray-400 ${
+                    isExpanded ? "" : "hidden"
+                  }`}
+                >
+                  {userData?.role.role}
+                </p>
               </span>
-            </Link>
-          ))}
+            </div>
+          </div>
         </nav>
-        <button
-          className={`flex items-center px-4 py-2 mb-10 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white ${
-           !isExpanded? isOpen ? "" : "hidden":"" }`}
-          onClick={handleLogout}
-        >
-          <FaRightFromBracket size={30} />
-          <p className={`mx-4 font-medium ${isExpanded ? "" : "hidden"}`}>
-            Logout
-          </p>
-        </button>
       </div>
     </>
   );
