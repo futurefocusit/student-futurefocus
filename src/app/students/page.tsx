@@ -260,7 +260,7 @@ const StudentManagement: React.FC = () => {
                 <input
                   className="p-1 bg-gray-200 border-2 border-gray-500 rounded-md"
                   type="text"
-                  placeholder="type message..."
+                  placeholder="type comment..."
                   value={student.comment}
                   onChange={(event) => setCommentText(event.target.value)}
                 />
