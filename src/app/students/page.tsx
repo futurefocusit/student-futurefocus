@@ -220,16 +220,7 @@ const StudentManagement: React.FC = () => {
         >
           View
         </button>
-        {hasPermission(userData as IUser, "students", "delete") ? (
-          <button
-            onClick={() => handleDelete(student._id)}
-            className="text-red-600 ml-3 hover:text-red-900"
-          >
-            Delete
-          </button>
-        ) : (
-          ""
-        )}
+       
       </>
     );
 
@@ -238,9 +229,25 @@ const StudentManagement: React.FC = () => {
         return (
           <>
             {commonButtons}
+            {hasPermission(userData as IUser, "students", "delete") ? (
+              <button
+                onClick={() => handleDelete(student._id)}
+                className="text-red-600 ml-3 hover:text-red-900"
+              >
+                Delete
+              </button>
+            ) : (
+              ""
+            )}
             {hasPermission(userData as IUser, "students", "admit") ? (
               <button
-                onClick={() => handleStatusChange(student._id, "accepted",userData?.name as string)}
+                onClick={() =>
+                  handleStatusChange(
+                    student._id,
+                    "accepted",
+                    userData?.name as string
+                  )
+                }
                 className="text-green-600 hover:text-green-900 ml-3"
               >
                 Admit
@@ -273,9 +280,25 @@ const StudentManagement: React.FC = () => {
         return (
           <>
             {commonButtons}
+            {hasPermission(userData as IUser, "students", "delete") ? (
+              <button
+                onClick={() => handleDelete(student._id)}
+                className="text-red-600 ml-3 hover:text-red-900"
+              >
+                Delete
+              </button>
+            ) : (
+              ""
+            )}
             {hasPermission(userData as IUser, "students", "register") ? (
               <button
-                onClick={() => handleStatusChange(student._id, "registered", userData?.name as string)}
+                onClick={() =>
+                  handleStatusChange(
+                    student._id,
+                    "registered",
+                    userData?.name as string
+                  )
+                }
                 className="text-blue-600 hover:text-blue-900 ml-3"
               >
                 Register
