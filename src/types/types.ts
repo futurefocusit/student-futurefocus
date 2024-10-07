@@ -24,7 +24,9 @@ export interface IUser {
 }
 export interface IInvoice {
   student: string;
-  amount: string;
+  amount: number;
   reason: string;
   date: Date;
+  remaining:number
+  status:string
 }

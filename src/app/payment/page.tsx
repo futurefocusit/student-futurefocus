@@ -12,7 +12,7 @@ import { hasPermission } from "@/libs/hasPermission";
 import { generateStatementPdf } from "@/libs/generateInvoice";
 import { convertImageUrlToBase64 } from "@/libs/convertImage";
 import Loader from "@/components/loader";
-const imageUrl = "/logo.png";
+const imageUrl = "/futurefocuslogo.png";
 interface Student {
   _id: string;
   name: string;

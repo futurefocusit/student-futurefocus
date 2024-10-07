@@ -9,6 +9,7 @@ import { IUser } from "@/types/types";
 import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
 import { hasPermission } from "@/libs/hasPermission";
 import Loader from "@/components/loader";
+import { formatMonth } from "@/libs/formatDate";
 
 interface Student {
   _id: string;
@@ -99,6 +100,7 @@ const StudentManagement: React.FC = () => {
        await axios.put(`${API_BASE_URL}/students/update/${selectedStudent._id}`, {
          selectedCourse: selectedStudent.selectedCourse,
          selectedShift: selectedStudent.selectedShift,
+         intake:selectedStudent.intake
        });
        await fetchStudents();
        setSelectedStudent(null);
@@ -226,7 +228,25 @@ const StudentManagement: React.FC = () => {
         >
           View
         </button>
-       
+        {hasPermission(userData as IUser, "students", "comment") ? (
+          <div className="">
+            <input
+              className="p-1 bg-gray-200 border-2 border-gray-500 rounded-md"
+              type="text"
+              placeholder="type comment..."
+              value={student.comment}
+              onChange={(event) => setCommentText(event.target.value)}
+            />
+            <button
+              onClick={() => handleSaveComment(student._id)}
+              className="text-blue-600 ml-3 hover:text-blue-900"
+            >
+              save
+            </button>
+          </div>
+        ) : (
+          ""
+        )}
       </>
     );
 
@@ -261,25 +281,7 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
-            {hasPermission(userData as IUser, "students", "comment") ? (
-              <div className="">
-                <input
-                  className="p-1 bg-gray-200 border-2 border-gray-500 rounded-md"
-                  type="text"
-                  placeholder="type comment..."
-                  value={student.comment}
-                  onChange={(event) => setCommentText(event.target.value)}
-                />
-                <button
-                  onClick={() => handleSaveComment(student._id)}
-                  className="text-blue-600 ml-3 hover:text-blue-900"
-                >
-                  save
-                </button>
-              </div>
-            ) : (
-              ""
-            )}
+            
           </>
         );
       case "accepted":
@@ -312,25 +314,7 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
-            {hasPermission(userData as IUser, "students", "comment") ? (
-              <div className="">
-                <input
-                  className="p-1 bg-gray-200 border-2 border-gray-500 rounded-md"
-                  type="text"
-                  placeholder="type message..."
-                  defaultValue={student.comment}
-                  onChange={(event) => setCommentText(event.target.value)}
-                />
-                <button
-                  onClick={() => handleSaveComment(student._id)}
-                  className="text-blue-600 ml-3 hover:text-blue-900"
-                >
-                  save
-                </button>
-              </div>
-            ) : (
-              ""
-            )}
+           
           </>
         );
       case "registered":
@@ -416,7 +400,7 @@ if (loading) {
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <div className="bg-gray-50 flex flex-col sm:flex-row justify-between items-center shadow-md rounded-lg p-4">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
-             Students
+            Students
           </h2>
           {hasPermission(userData as IUser, "students", "register") && (
             <a
@@ -569,218 +553,262 @@ if (loading) {
           ))}
 
           {selectedStudent && (
-           <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-          <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg">
-            <div className="bg-gray-50 p-6 h-96 overflow-scroll">
-              <h3 className="text-lg font-medium text-gray-900">
-                {updateMode ? "Update Student" : "Student Details"}
-              </h3>
-              <div className="mt-4 space-y-2">
-                {updateMode ? (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        Select Course
-                      </label>
-                      <select
-                        value={selectedStudent.selectedCourse}
-                        onChange={(e) => setSelectedStudent({
-                          ...selectedStudent,
-                          selectedCourse: e.target.value,
-                          selectedShift: courses.find(c => c.title === e.target.value)?.shifts[0] || selectedStudent.selectedShift
-                        })}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                      >
-                        {courses.map((course) => (
-                          <option key={course.title} value={course.title}>
-                            {course.title}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        Select Shift
-                      </label>
-                      <select
-                        value={selectedStudent.selectedShift}
-                        onChange={(e) => setSelectedStudent({
-                          ...selectedStudent,
-                          selectedShift: e.target.value
-                        })}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                      >
-                        {courses
-                          .find((course) => course.title === selectedStudent.selectedCourse)
-                          ?.shifts.map((shift) => (
-                            <option key={shift} value={shift}>
-                              {shift}
-                            </option>
-                          ))}
-                      </select>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-              <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg ">
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+              <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg">
                 <div className="bg-gray-50 p-6 h-96 overflow-scroll">
                   <h3 className="text-lg font-medium text-gray-900">
-                    Student Details
+                    {updateMode ? "Update Student" : "Student Details"}
                   </h3>
                   <div className="mt-4 space-y-2">
-                    <p>
-                      <span className="font-semibold">Name:</span>{" "}
-                      {selectedStudent.name}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Email:</span>{" "}
-                      {selectedStudent.email}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Phone:</span>{" "}
-                      {selectedStudent.phone}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Intake:</span>{" "}
-                      {selectedStudent.intake}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Course:</span>{" "}
-                      {selectedStudent.selectedCourse}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Message:</span>{" "}
-                      {selectedStudent.message}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Shift:</span>{" "}
-                      {selectedStudent.selectedShift}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Applied on:</span>{" "}
-                      {formatDate(selectedStudent.createdAt)}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Status:</span>{" "}
-                      {selectedStudent.status}
-                    </p>
-                    {payment &&
-                    payment.filter(
-                      (payment) => payment.studentId === selectedStudent._id
-                    ).length === 0 ? (
-                      <div>No payment information found.</div>
+                    {updateMode ? (
+                      <>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Select Course
+                          </label>
+                          <select
+                            value={selectedStudent.selectedCourse}
+                            onChange={(e) =>
+                              setSelectedStudent({
+                                ...selectedStudent,
+                                selectedCourse: e.target.value,
+                                selectedShift:
+                                  courses.find(
+                                    (c) => c.title === e.target.value
+                                  )?.shifts[0] || selectedStudent.selectedShift,
+                              })
+                            }
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                          >
+                            {courses.map((course) => (
+                              <option key={course.title} value={course.title}>
+                                {course.title}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Select Shift
+                          </label>
+                          <select
+                            value={selectedStudent.selectedShift}
+                            onChange={(e) =>
+                              setSelectedStudent({
+                                ...selectedStudent,
+                                selectedShift: e.target.value,
+                              })
+                            }
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                          >
+                            {courses
+                              .find(
+                                (course) =>
+                                  course.title ===
+                                  selectedStudent.selectedCourse
+                              )
+                              ?.shifts.map((shift) => (
+                                <option key={shift} value={shift}>
+                                  {shift}
+                                </option>
+                              ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Select intake
+                          </label>
+                          <input
+                            type="text"
+                            disabled
+                            value={selectedStudent.intake}
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                          />
+                          <input
+                            type="month"
+                            onChange={(e) =>
+                              setSelectedStudent({
+                                ...selectedStudent,
+                                intake:formatMonth(e.target.value),
+                              })
+                            }
+                          />
+                        </div>
+                      </>
                     ) : (
-                      payment &&
-                      payment
-                        .filter(
-                          (payment) => payment.studentId === selectedStudent._id
-                        )
-                        .map((filteredPayment) => (
-                          <div key={filteredPayment._id}>
-                            <p>
-                              <span className="font-semibold">
-                                Payment Status:
-                              </span>{" "}
-                              <span
-                                className={`${
-                                  filteredPayment.status === "unpaid"
-                                    ? "bg-red-600"
-                                    : filteredPayment.status === "partial"
-                                    ? "bg-red-400"
-                                    : filteredPayment.status === "paid"
-                                    ? "bg-blue-700"
-                                    : "bg-green-600"
-                                } font-extrabold text-white p-2 rounded-md`}
-                              >
-                                {filteredPayment.status.toUpperCase()}
-                              </span>
-                            </p>
-                            <p>
-                              <span className="font-semibold">
-                                Total To pay:
-                              </span>{" "}
-                              <span className=" text-green-600 font-extrabold">
-                                {new Intl.NumberFormat().format(
-                                  filteredPayment.amountDue
-                                )}{" "}
-                                Frw
-                              </span>
-                            </p>
-                            <p>
-                              <span className="font-semibold">Total Paid:</span>{" "}
-                              <span className=" text-blue-600 font-extrabold">
-                                {new Intl.NumberFormat().format(
-                                  filteredPayment.amountPaid
-                                )}{" "}
-                                Frw
-                              </span>
-                            </p>
-                            <p>
-                              <span className="font-semibold">Remaining:</span>{" "}
-                              <span className=" text-red-600 font-extrabold">
-                                {new Intl.NumberFormat().format(
-                                  filteredPayment.amountDue -
-                                    filteredPayment.amountPaid
+                      <>
+                        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+                          <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg ">
+                            <div className="bg-gray-50 p-6 h-96 overflow-scroll">
+                              <h3 className="text-lg font-medium text-gray-900">
+                                Student Details
+                              </h3>
+                              <div className="mt-4 space-y-2">
+                                <p>
+                                  <span className="font-semibold">Name:</span>{" "}
+                                  {selectedStudent.name}
+                                </p>
+                                <p>
+                                  <span className="font-semibold">Email:</span>{" "}
+                                  {selectedStudent.email}
+                                </p>
+                                <p>
+                                  <span className="font-semibold">Phone:</span>{" "}
+                                  {selectedStudent.phone}
+                                </p>
+                                <p>
+                                  <span className="font-semibold">Intake:</span>{" "}
+                                  {selectedStudent.intake}
+                                </p>
+                                <p>
+                                  <span className="font-semibold">Course:</span>{" "}
+                                  {selectedStudent.selectedCourse}
+                                </p>
+                                <p>
+                                  <span className="font-semibold">
+                                    Message:
+                                  </span>{" "}
+                                  {selectedStudent.message}
+                                </p>
+                                <p>
+                                  <span className="font-semibold">Shift:</span>{" "}
+                                  {selectedStudent.selectedShift}
+                                </p>
+                                <p>
+                                  <span className="font-semibold">
+                                    Applied on:
+                                  </span>{" "}
+                                  {formatDate(selectedStudent.createdAt)}
+                                </p>
+                                <p>
+                                  <span className="font-semibold">Status:</span>{" "}
+                                  {selectedStudent.status}
+                                </p>
+                                {payment &&
+                                payment.filter(
+                                  (payment) =>
+                                    payment.studentId === selectedStudent._id
+                                ).length === 0 ? (
+                                  <div>No payment information found.</div>
+                                ) : (
+                                  payment &&
+                                  payment
+                                    .filter(
+                                      (payment) =>
+                                        payment.studentId ===
+                                        selectedStudent._id
+                                    )
+                                    .map((filteredPayment) => (
+                                      <div key={filteredPayment._id}>
+                                        <p>
+                                          <span className="font-semibold">
+                                            Payment Status:
+                                          </span>{" "}
+                                          <span
+                                            className={`${
+                                              filteredPayment.status ===
+                                              "unpaid"
+                                                ? "bg-red-600"
+                                                : filteredPayment.status ===
+                                                  "partial"
+                                                ? "bg-red-400"
+                                                : filteredPayment.status ===
+                                                  "paid"
+                                                ? "bg-blue-700"
+                                                : "bg-green-600"
+                                            } font-extrabold text-white p-2 rounded-md`}
+                                          >
+                                            {filteredPayment.status.toUpperCase()}
+                                          </span>
+                                        </p>
+                                        <p>
+                                          <span className="font-semibold">
+                                            Total To pay:
+                                          </span>{" "}
+                                          <span className=" text-green-600 font-extrabold">
+                                            {new Intl.NumberFormat().format(
+                                              filteredPayment.amountDue
+                                            )}{" "}
+                                            Frw
+                                          </span>
+                                        </p>
+                                        <p>
+                                          <span className="font-semibold">
+                                            Total Paid:
+                                          </span>{" "}
+                                          <span className=" text-blue-600 font-extrabold">
+                                            {new Intl.NumberFormat().format(
+                                              filteredPayment.amountPaid
+                                            )}{" "}
+                                            Frw
+                                          </span>
+                                        </p>
+                                        <p>
+                                          <span className="font-semibold">
+                                            Remaining:
+                                          </span>{" "}
+                                          <span className=" text-red-600 font-extrabold">
+                                            {new Intl.NumberFormat().format(
+                                              filteredPayment.amountDue -
+                                                filteredPayment.amountPaid
+                                            )}
+                                            Frw
+                                          </span>
+                                        </p>
+                                      </div>
+                                    ))
                                 )}
-                                Frw
-                              </span>
-                            </p>
+                              </div>
+                            </div>
+                            <div className="bg-gray-50 p-4 flex justify-end">
+                              <button
+                                onClick={() => setSelectedStudent(null)}
+                                className="inline-flex justify-center px-4 py-2 text-sm  text-black font-extrabold hover:text-white  bg-red-300 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
+                              >
+                                Close
+                              </button>
+                            </div>
                           </div>
-                        ))
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>
                 <div className="bg-gray-50 p-4 flex justify-end">
-                  <button
-                    onClick={() => setSelectedStudent(null)}
-                    className="inline-flex justify-center px-4 py-2 text-sm  text-black font-extrabold hover:text-white  bg-red-300 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
-                  >
-                    Close
-                  </button>
+                  {updateMode ? (
+                    <>
+                      <button
+                        onClick={handleSaveUpdate}
+                        className="mr-2 inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedStudent(null);
+                          setUpdateMode(false);
+                        }}
+                        className="inline-flex justify-center px-4 py-2 text-sm text-black font-medium bg-gray-200 border border-transparent rounded-md hover:bg-gray-300"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => setSelectedStudent(null)}
+                      className="inline-flex justify-center px-4 py-2 text-sm text-black font-extrabold bg-red-300 border border-transparent rounded-md hover:bg-red-700 hover:text-white"
+                    >
+                      Close
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
-                  </>
-                )}
-              </div>
-            </div>
-            <div className="bg-gray-50 p-4 flex justify-end">
-              {updateMode ? (
-                <>
-                  <button
-                    onClick={handleSaveUpdate}
-                    className="mr-2 inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedStudent(null);
-                      setUpdateMode(false);
-                    }}
-                    className="inline-flex justify-center px-4 py-2 text-sm text-black font-medium bg-gray-200 border border-transparent rounded-md hover:bg-gray-300"
-                  >
-                    Cancel
-                  </button>
-                </>
-              ) : (
-                <button
-                  onClick={() => setSelectedStudent(null)}
-                  className="inline-flex justify-center px-4 py-2 text-sm text-black font-extrabold bg-red-300 border border-transparent rounded-md hover:bg-red-700 hover:text-white"
-                >
-                  Close
-                </button>
-              )}
-            </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
-    </div>
-    </div>
-    
-      )}
+  );}
   
 
 export default withAdminAuth(StudentManagement);
