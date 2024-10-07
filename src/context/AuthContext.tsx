@@ -64,8 +64,8 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       handleAxiosError(error);
     }
   };
-
-  const handleAxiosError = (error:any) => {
+//@ts-expect-error error
+  const handleAxiosError = (error) => {
     console.log("Handling error", error);
     if (axios.isAxiosError(error)) {
       if (error.response) {
