@@ -53,7 +53,7 @@ const StudentManagement: React.FC = () => {
   const [userData, setUserData] = useState<IUser>();
   const [commentText, setComment] = useState({ comment: "" });
   const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading] = useState<boolean>(true);
   const [updateMode, setUpdateMode] = useState(false);
 
   const setCommentText = (value: string) => {
