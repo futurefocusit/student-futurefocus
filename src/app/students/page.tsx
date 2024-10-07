@@ -53,7 +53,7 @@ const StudentManagement: React.FC = () => {
   const [userData, setUserData] = useState<IUser>();
   const [commentText, setComment] = useState({ comment: "" });
   const [courses, setCourses] = useState<Course[]>([]);
-  const [loading] = useState<boolean>(true);
+  const [loading,setLoading] = useState<boolean>(true);
   const [updateMode, setUpdateMode] = useState(false);
 
   const setCommentText = (value: string) => {
@@ -74,6 +74,9 @@ const StudentManagement: React.FC = () => {
       console.error("Error fetching student data:", error);
       setError("Failed to load student data. Please try again later.");
     } 
+    finally{
+      setLoading(false)
+    }
   };
   const fetchCourses = async () => {
     try {
