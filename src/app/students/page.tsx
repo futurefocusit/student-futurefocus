@@ -73,9 +73,7 @@ const StudentManagement: React.FC = () => {
     } catch (error) {
       console.error("Error fetching student data:", error);
       setError("Failed to load student data. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
+    } 
   };
   const fetchCourses = async () => {
     try {
@@ -134,13 +132,11 @@ const StudentManagement: React.FC = () => {
   };
 
   useEffect(() => {
-    const fetchdata = async()=>{
-   setLoading(true)
-      await fetchStudents();
-    await fetchPayment();
-   await fetchCourses();
-    }
-    fetchdata()
+ 
+       fetchStudents();
+     fetchPayment();
+    fetchCourses();
+
   }, []);
 
   const handleDelete = async (id: string) => {
