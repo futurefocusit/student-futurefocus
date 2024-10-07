@@ -9,7 +9,9 @@ import withAdminAuth from "@/components/withAdminAuth";
 import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
 import { IUser } from "@/types/types";
 import { hasPermission } from "@/libs/hasPermission";
-
+import { generateStatementPdf } from "@/libs/generateInvoice";
+import { convertImageUrlToBase64 } from "@/libs/convertImage";
+const imageUrl = "/logo.png";
 interface Student {
   _id: string;
   name: string;
@@ -48,7 +50,7 @@ const StudentManagement: React.FC = () => {
  const [userData, setUserData] = useState<IUser>();
 
   const [formData, setFormData] = useState({
-    amount: "",
+    amount:0,
     user:userData?.name,
     method:""
   });
@@ -57,7 +59,7 @@ const StudentManagement: React.FC = () => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: name === "amount" ? Number(value) : value,
     }));
   };
 
@@ -111,14 +113,18 @@ const StudentManagement: React.FC = () => {
 
   const handlePay = async (id: string) => {
     try {
+
       formData.user = userData?.name;
       const response = await axios.post(
         `${API_BASE_URL}/payment/pay/${id}`,
         formData
       );
       toast.success(response.data.message);
+      const ourlogo=await convertImageUrlToBase64(imageUrl as string)
+      generateStatementPdf(response.data.data,ourlogo as string )
       fetchPayment();
     } catch (error) {
+      console.log(error)
       setError("Error happened! check payment and try again");
     }
   };

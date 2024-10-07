@@ -118,6 +118,7 @@ const Registration: React.FC = () => {
      setSubmissionResult(null);
 
      try {
+      formData.user=userData?.name
        const response = await axios.post(
          `${API_BASE_URL}/students/register`,
          formData,

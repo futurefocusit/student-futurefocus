@@ -22,3 +22,9 @@ export interface IUser {
   name: string;
   role: Role;
 }
+export interface IInvoice {
+  student: string;
+  amount: string;
+  reason: string;
+  date: Date;
+}
