@@ -63,7 +63,7 @@ export const generateStatementPdf = (data: IInvoice, imageBase64: string) => {
   services.forEach((service, index) => {
     doc.text(`• ${service}`, 10, y + 30 + index * 10);
   });
-  services.forEach((service, index) => {
+  services1.forEach((service, index) => {
     doc.text(`• ${service}`, 120 , y + 30 + index * 10);
   });
 
