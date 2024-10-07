@@ -245,7 +245,7 @@ const StudentManagement: React.FC = () => {
               className="p-1 bg-gray-200 border-2 border-gray-500 rounded-md"
               type="text"
               placeholder="type comment..."
-              value={student.comment}
+              defaultValue={student.comment}
               onChange={(event) => setCommentText(event.target.value)}
             />
             <button
