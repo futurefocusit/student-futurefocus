@@ -1,5 +1,5 @@
 export const convertImageUrlToBase64 = (url: string) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "Anonymous"; // Needed for cross-origin images
     img.src = url;
@@ -20,21 +20,22 @@ export const convertImageUrlToBase64 = (url: string) => {
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const data = imageData.data;
 
+      // Iterate through pixels to remove black pixels
       for (let i = 0; i < data.length; i += 4) {
+        // If the pixel is black, make it transparent
         if (data[i] === 0 && data[i + 1] === 0 && data[i + 2] === 0) {
-          data[i + 3] = 0; 
+          data[i + 3] = 0;
         }
       }
 
-      
       ctx.putImageData(imageData, 0, 0);
 
-      const base64String = canvas.toDataURL("image/png"); 
+      const base64String = canvas.toDataURL("image/png");
       resolve(base64String);
     };
 
     img.onerror = (error) => {
-      reject(error);
+      reject(new Error(`Image load error: ${error}`));
     };
   });
 };
