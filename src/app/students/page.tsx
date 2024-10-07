@@ -61,7 +61,6 @@ const StudentManagement: React.FC = () => {
   };
   const fetchStudents = async () => {
     try {
-      setLoading(true);
       const response = await axios.get<Student[]>(`${API_BASE_URL}/students`);
       await fetchUser();
       setUserData(await getLoggedUserData());
@@ -135,9 +134,13 @@ const StudentManagement: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchStudents();
-    fetchPayment();
-    fetchCourses();
+    const fetchdata = async()=>{
+   setLoading(true)
+      await fetchStudents();
+    await fetchPayment();
+   await fetchCourses();
+    }
+    fetchdata()
   }, []);
 
   const handleDelete = async (id: string) => {
