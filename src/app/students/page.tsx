@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import API_BASE_URL from "@/config/baseURL";
@@ -61,7 +61,7 @@ const StudentManagement: React.FC = () => {
   };
   const fetchStudents = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const response = await axios.get<Student[]>(`${API_BASE_URL}/students`);
       await fetchUser();
       setUserData(await getLoggedUserData());
@@ -74,9 +74,8 @@ const StudentManagement: React.FC = () => {
     } catch (error) {
       console.error("Error fetching student data:", error);
       setError("Failed to load student data. Please try again later.");
-    }
-    finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
   const fetchCourses = async () => {
@@ -88,28 +87,31 @@ const StudentManagement: React.FC = () => {
       setError("Failed to load courses. Please try again later.");
     }
   };
-   const handleUpdateStudent = async (student: Student) => {
-     setSelectedStudent(student);
-     setUpdateMode(true);
-   };
+  const handleUpdateStudent = async (student: Student) => {
+    setSelectedStudent(student);
+    setUpdateMode(true);
+  };
 
-   const handleSaveUpdate = async () => {
-     if (!selectedStudent) return;
+  const handleSaveUpdate = async () => {
+    if (!selectedStudent) return;
 
-     try {
-       await axios.put(`${API_BASE_URL}/students/update/${selectedStudent._id}`, {
-         selectedCourse: selectedStudent.selectedCourse,
-         selectedShift: selectedStudent.selectedShift,
-         intake:selectedStudent.intake
-       });
-       await fetchStudents();
-       setSelectedStudent(null);
-       setUpdateMode(false);
-     } catch (error) {
-       console.error("Error updating student:", error);
-       setError("Failed to update student. Please try again.");
-     }
-   };
+    try {
+      await axios.put(
+        `${API_BASE_URL}/students/update/${selectedStudent._id}`,
+        {
+          selectedCourse: selectedStudent.selectedCourse,
+          selectedShift: selectedStudent.selectedShift,
+          intake: selectedStudent.intake,
+        }
+      );
+      await fetchStudents();
+      setSelectedStudent(null);
+      setUpdateMode(false);
+    } catch (error) {
+      console.error("Error updating student:", error);
+      setError("Failed to update student. Please try again.");
+    }
+  };
 
   const fetchPayment = async () => {
     try {
@@ -155,9 +157,16 @@ const StudentManagement: React.FC = () => {
     setSelectedStudent(student);
   };
 
-  const handleStatusChange = async (id: string, newStatus: string,user:string) => {
+  const handleStatusChange = async (
+    id: string,
+    newStatus: string,
+    user: string
+  ) => {
     try {
-      await axios.put(`${API_BASE_URL}/students/${id}`, { status: newStatus,user });
+      await axios.put(`${API_BASE_URL}/students/${id}`, {
+        status: newStatus,
+        user,
+      });
       await fetchStudents();
     } catch (error) {
       console.error(`Error changing student status to ${newStatus}:`, error);
@@ -281,7 +290,6 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
-            
           </>
         );
       case "accepted":
@@ -314,7 +322,6 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
-           
           </>
         );
       case "registered":
@@ -385,14 +392,14 @@ const StudentManagement: React.FC = () => {
         return null;
     }
   };
-if (loading) {
-  return (
-    <div className="text-center mt-20">
-      <SideBar />
-      <Loader />
-    </div>
-  );
-}
+  if (loading) {
+    return (
+      <div className="text-center mt-20">
+        <SideBar />
+        <Loader />
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-gray-100 p-2 sm:p-4 lg:p-6">
       <SideBar />
@@ -629,7 +636,7 @@ if (loading) {
                             onChange={(e) =>
                               setSelectedStudent({
                                 ...selectedStudent,
-                                intake:formatMonth(e.target.value),
+                                intake: formatMonth(e.target.value),
                               })
                             }
                           />
@@ -808,7 +815,7 @@ if (loading) {
         </div>
       </div>
     </div>
-  );}
-  
+  );
+};
 
 export default withAdminAuth(StudentManagement);

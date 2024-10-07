@@ -32,6 +32,7 @@ interface Payment {
   status: string;
   amountDiscounted: number;
   extraAmount: number;
+  comment:string
   _id: string;
 }
 
@@ -46,11 +47,24 @@ const StudentManagement: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [type ,setType] = useState('')
+  const [commentText, setComment] = useState({ comment: "" });
   const [activeFilter, setActiveFilter] = useState<string>("registered");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
  const [userData, setUserData] = useState<IUser>();
-
+const setCommentText = (value: string) => {
+  setComment((prev) => ({ ...prev, comment: value }));
+};
+ const handleSaveComment = async (studentId: string) => {
+   try {
+     await axios.put(`${API_BASE_URL}/payment/comment/${studentId}`, {
+       comment: commentText.comment,
+     });
+   } catch (error) {
+     console.error("Error saving comment:", error);
+     setError("Failed to save comment. Please try again.");
+   }
+ };
   const [formData, setFormData] = useState({
     amount:0,
     user:userData?.name,
@@ -459,7 +473,39 @@ if (loading) {
                               >
                                 delete
                               </button>
-                            ):""}
+                            ) : (
+                              ""
+                            )}
+                            {hasPermission(
+                              userData as IUser,
+                              "students",
+                              "comment"
+                            ) ? (
+                              <div className="">
+                                <input
+                                  className="p-1 bg-gray-200 border-2 border-gray-500 rounded-md"
+                                  type="text"
+                                  placeholder="type comment..."
+                                  defaultValue={payment
+                                    .filter((p) => p.studentId === student._id)
+                                    .map((p) => (
+                                       p.comment
+                                       
+                                    ))}
+                                  onChange={(event) =>
+                                    setCommentText(event.target.value)
+                                  }
+                                />
+                                <button
+                                  onClick={() => handleSaveComment(student._id)}
+                                  className="text-blue-600 ml-3 hover:text-blue-900"
+                                >
+                                  save
+                                </button>
+                              </div>
+                            ) : (
+                              ""
+                            )}
                           </td>
                         </tr>
                       ))}

@@ -5,7 +5,6 @@ import { formatDate } from "./dateConverter";
 export const generateStatementPdf = (data: IInvoice, imageBase64: string) => {
   const doc = new jsPDF();
 
-  // Add the image safely
   if (imageBase64) {
     doc.addImage(imageBase64, "PNG", 50, 10, 90, 70);
   }
@@ -24,9 +23,9 @@ export const generateStatementPdf = (data: IInvoice, imageBase64: string) => {
   doc.text("Amount Paid", 10, y);
   doc.text(data.amount ? data.amount.toString() + "Frw" : "N/A", 90, y);
   y += 10;
-  doc.text("Remaining", 10, y);
+  doc.text("Remaining balance", 10, y);
   doc.setTextColor(255, 0, 0);
-  doc.text(data.remaining ? data.remaining.toString() + "Frw" : "N/A", 90, y);
+  doc.text(data.remaining ? data.remaining>=0? data.remaining.toString() + "Frw" : data.status + " " + (-data.remaining) +" Frw ": "N/A", 90, y);
   y += 10;
   doc.setTextColor(0, 0, 0);
   doc.text("Reason", 10, y);
@@ -52,6 +51,8 @@ export const generateStatementPdf = (data: IInvoice, imageBase64: string) => {
     "Graphic Design and Animation",
     "Computer Training",
     "Music and Audio Production",
+  ];
+  const services1 = [
     "Digital Marketing",
     "Piano  Lessons",
     "Software Development",
@@ -60,19 +61,22 @@ export const generateStatementPdf = (data: IInvoice, imageBase64: string) => {
   ];
 
   services.forEach((service, index) => {
-    doc.text(`• ${service}`, index > 3 ? 60 : 10, y + 30 + index * 10);
+    doc.text(`• ${service}`, 10, y + 30 + index * 10);
+  });
+  services.forEach((service, index) => {
+    doc.text(`• ${service}`, 120 , y + 30 + index * 10);
   });
 
   doc.setFontSize(13);
   doc.text(
     "Thank you for your business!",
     70,
-    doc.internal.pageSize.height - 20
+    doc.internal.pageSize.height - 40
   );
   doc.text(
     "Future Focus Academy | futurefocusacademie@gmail.com",
     50,
-    doc.internal.pageSize.height - 20
+    doc.internal.pageSize.height - 30
   );
   doc.text(
     "www.futurefocus.co.rw | +250788518845",
