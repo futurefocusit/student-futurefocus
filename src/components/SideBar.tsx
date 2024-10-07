@@ -14,7 +14,7 @@ import {
   FaMoneyBillAlt,
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
-import { FaRightFromBracket } from "react-icons/fa6";
+import { FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
 import { IUser } from "@/types/types";
 import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
 
@@ -123,6 +123,15 @@ const SideBar = () => {
             ))}
           </div>
           <div className="px-4">
+            <a
+              href="https://www.futurefocus.co.rw"
+              className={`flex items-center px-4 py-2 mb-10 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white `}
+            >
+              <FaWebAwesome className="w-5 h-5" />
+              <p className={`mx-4 font-medium ${isExpanded ? "" : "hidden"}`}>
+                Go to web
+              </p>
+            </a>
             <button
               className={`flex items-center px-4 py-2 mb-10 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white `}
               onClick={handleLogout}

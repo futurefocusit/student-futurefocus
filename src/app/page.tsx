@@ -277,42 +277,60 @@ const Dashboard = () => {
           <h3 className="text-lg font-semibold">Total Students</h3>
           <p className="text-2xl font-bold">{summary.totalStudents}</p>
         </a>
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
+        <a
+          href="/students"
+          className="bg-white p-6 rounded-lg shadow-md text-center"
+        >
           <h3 className="text-lg font-semibold">Candidates</h3>
           <p className="text-2xl font-bold">
             {summary.studentStatusCounts.pending}
           </p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
+        </a>
+        <a
+          href="/students"
+          className="bg-white p-6 rounded-lg shadow-md text-center"
+        >
           <h3 className="text-lg font-semibold">Active Students</h3>
           <p className="text-2xl font-bold">
             {summary.studentStatusCounts.started}
           </p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
+        </a>
+        <a
+          href="/students"
+          className="bg-white p-6 rounded-lg shadow-md text-center"
+        >
           <h3 className="text-lg font-semibold">Registered Students</h3>
           <p className="text-2xl font-bold">
             {summary.studentStatusCounts.registered}
           </p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
+        </a>
+        <a
+          href="/students"
+          className="bg-white p-6 rounded-lg shadow-md text-center"
+        >
           <h3 className="text-lg font-semibold">Admitted Students</h3>
           <p className="text-2xl font-bold">
             {summary.studentStatusCounts.accepted}
           </p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
+        </a>
+        <a
+          href="/students"
+          className="bg-white p-6 rounded-lg shadow-md text-center"
+        >
           <h3 className="text-lg font-semibold">Dropped Out Students</h3>
           <p className="text-2xl font-bold">
             {summary.studentStatusCounts.droppedOut || 0}
           </p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
+        </a>
+        <a
+          href="/students"
+          className="bg-white p-6 rounded-lg shadow-md text-center"
+        >
           <h3 className="text-lg font-semibold">Completed Students</h3>
           <p className="text-2xl font-bold">
             {summary.studentStatusCounts.completed || 0}
           </p>
-        </div>
+        </a>
 
         <a
           href="/payment"
@@ -323,36 +341,45 @@ const Dashboard = () => {
             {summary.paymentStatusCounts.unpaid}
           </p>
         </a>
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
+        <a
+          href="/payment"
+          className="bg-white p-6 rounded-lg shadow-md text-center"
+        >
           <h3 className="text-lg font-semibold">Partial Paid Student</h3>
           <p className="text-2xl font-bold">
             {summary.paymentStatusCounts.partial}
           </p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
+        </a>
+        <a
+          href="/payment"
+          className="bg-white p-6 rounded-lg shadow-md text-center"
+        >
           <h3 className="text-lg font-semibold">completed Payments</h3>
           <p className="text-2xl font-bold">
             {summary.paymentStatusCounts.paid}
           </p>
-        </div>
+        </a>
 
         {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
-          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+          <a
+            href="/payment"
+            className="bg-white p-6 rounded-lg shadow-md text-center"
+          >
             <h3 className="text-lg font-semibold">Total Amount To Be Paid</h3>
             <p className="text-2xl font-bold">
               {summary.totalAmountToBePaid.toFixed(0)}
             </p>
-          </div>
+          </a>
         ) : (
           ""
         )}
         {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
-          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+          <a className="bg-white p-6 rounded-lg shadow-md text-center">
             <h3 className="text-lg font-semibold">Total Amount Paid</h3>
             <p className="text-2xl font-bold">
               {summary.totalAmountPaid.toFixed(0)}
             </p>
-          </div>
+          </a>
         ) : (
           ""
         )}
@@ -362,12 +389,16 @@ const Dashboard = () => {
         {/* @ts-expect-error error */}
         <Bar data={studentsData} options={options} />
       </div>
-      {hasPermission(userData as IUser, "dashboard", "view-dashboard")?<div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mt-6">
-        <h2 className="text-2xl font-semibold mb-4">Payments Statistics</h2>
-        {/* @ts-expect-error error */}
-        <Bar data={paymentsData} options={options} />
-      </div>:""}
-      
+      {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
+        <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mt-6">
+          <h2 className="text-2xl font-semibold mb-4">Payments Statistics</h2>
+          {/* @ts-expect-error error */}
+          <Bar data={paymentsData} options={options} />
+        </div>
+      ) : (
+        ""
+      )}
+
       {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
         <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mt-6">
           <h2 className="text-2xl font-semibold mb-4">Monthly Cash Flow</h2>
