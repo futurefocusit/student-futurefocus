@@ -7,6 +7,7 @@ import withAdminAuth from "@/components/withAdminAuth";
 import { IUser } from "@/types/types";
 import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
 import { hasPermission } from "@/libs/hasPermission";
+import Loader from "@/components/loader";
 
 interface Course {
   title: string;
@@ -161,7 +162,7 @@ const Registration: React.FC = () => {
      return (
        <div>
          <SideBar />
-         Loading courses...
+         <Loader />
        </div>
      );
    }

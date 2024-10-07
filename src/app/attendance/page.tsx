@@ -1,4 +1,5 @@
 "use client";
+import Loader from "@/components/loader";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
 import API_BASE_URL from "@/config/baseURL";
@@ -47,16 +48,21 @@ const AttendancePage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedShift, setSelectedShift] = useState<string | null>(null);
   const [availableShifts, setAvailableShifts] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true)
         const response = await axios.get(`${API_BASE_URL}/students/attendance`);
         const data: AttendanceRecord[] = response.data;
-        console.log("Fetched Data:", data); // Log the fetched data
+        console.log("Fetched Data:", data); 
         groupAttendanceData(data);
       } catch (error) {
         console.error("Failed to fetch attendance data:", error);
+      }
+      finally{
+        setLoading(false)
       }
     };
 
@@ -87,7 +93,6 @@ const AttendancePage: React.FC = () => {
 
     setGroupedAttendance(grouped);
 
-    // Extract unique shifts
     const shifts = new Set<string>();
     Object.values(grouped).forEach((intakes) =>
       Object.values(intakes).forEach((shiftRecords) =>
@@ -134,7 +139,14 @@ const AttendancePage: React.FC = () => {
 
     setFilteredAttendance(filtered);
   };
-
+if (loading) {
+  return (
+    <div className="text-center mt-20">
+      <SideBar />
+      <Loader />
+    </div>
+  );
+}
   return (
     <div className="container mx-auto p-4">
       <SideBar />

@@ -1,4 +1,5 @@
 "use client";
+import Loader from "@/components/loader";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
 import API_BASE_URL from "@/config/baseURL";
@@ -91,7 +92,7 @@ const PaymentsPage: React.FC = () => {
     return (
       <div className="text-center mt-20">
         <SideBar />
-        Loading...
+        <Loader />
       </div>
     );
   }

@@ -8,6 +8,7 @@ import withAdminAuth from "@/components/withAdminAuth";
 import { IUser } from "@/types/types";
 import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
 import { hasPermission } from "@/libs/hasPermission";
+import Loader from "@/components/loader";
 
 interface Student {
   _id: string;
@@ -51,6 +52,7 @@ const StudentManagement: React.FC = () => {
   const [userData, setUserData] = useState<IUser>();
   const [commentText, setComment] = useState({ comment: "" });
   const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [updateMode, setUpdateMode] = useState(false);
 
   const setCommentText = (value: string) => {
@@ -58,6 +60,7 @@ const StudentManagement: React.FC = () => {
   };
   const fetchStudents = async () => {
     try {
+      setLoading(true)
       const response = await axios.get<Student[]>(`${API_BASE_URL}/students`);
       await fetchUser();
       setUserData(await getLoggedUserData());
@@ -70,6 +73,9 @@ const StudentManagement: React.FC = () => {
     } catch (error) {
       console.error("Error fetching student data:", error);
       setError("Failed to load student data. Please try again later.");
+    }
+    finally{
+      setLoading(false)
     }
   };
   const fetchCourses = async () => {
@@ -395,7 +401,14 @@ const StudentManagement: React.FC = () => {
         return null;
     }
   };
-
+if (loading) {
+  return (
+    <div className="text-center mt-20">
+      <SideBar />
+      <Loader />
+    </div>
+  );
+}
   return (
     <div className="min-h-screen bg-gray-100 p-2 sm:p-4 lg:p-6">
       <SideBar />

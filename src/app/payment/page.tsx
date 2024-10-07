@@ -11,6 +11,7 @@ import { IUser } from "@/types/types";
 import { hasPermission } from "@/libs/hasPermission";
 import { generateStatementPdf } from "@/libs/generateInvoice";
 import { convertImageUrlToBase64 } from "@/libs/convertImage";
+import Loader from "@/components/loader";
 const imageUrl = "/logo.png";
 interface Student {
   _id: string;
@@ -47,6 +48,7 @@ const StudentManagement: React.FC = () => {
   const [type ,setType] = useState('')
   const [activeFilter, setActiveFilter] = useState<string>("registered");
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
  const [userData, setUserData] = useState<IUser>();
 
   const [formData, setFormData] = useState({
@@ -65,6 +67,7 @@ const StudentManagement: React.FC = () => {
 
   const fetchStudents = async () => {
     try {
+      setLoading(true)
       const response = await axios.get<Student[]>(`${API_BASE_URL}/students`);
         await fetchUser();
         setUserData(await getLoggedUserData());
@@ -78,7 +81,11 @@ const StudentManagement: React.FC = () => {
       console.error("Error fetching student data:", error);
       setError("Failed to load student data. Please try again later.");
     }
+    finally{
+      setLoading(false)
+    }
   };
+  
 
   const fetchPayment = async () => {
     try {
@@ -213,7 +220,14 @@ const StudentManagement: React.FC = () => {
       remaining: totalDue - totalPaid,
     };
   };
-
+if (loading) {
+  return (
+    <div className="text-center mt-20">
+      <SideBar />
+      <Loader />
+    </div>
+  );
+}
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
       <SideBar />

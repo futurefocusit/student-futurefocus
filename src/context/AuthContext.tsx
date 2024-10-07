@@ -1,17 +1,17 @@
-'use client'
+"use client";
 import axios from "axios";
 import { createContext, ReactNode, useContext, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import API_BASE_URL from "@/config/baseURL";
+import Loader from "@/components/loader";
 
 export interface Admin {
   email: string;
-  name:string
+  name: string;
   password: string;
   isSuperAdmin: boolean;
 }
-
 
 interface AuthContextData {
   signed: boolean;
@@ -28,6 +28,9 @@ interface AuthProviderProps {
 export const AuthContext = createContext<AuthContextData>(
   {} as AuthContextData
 );
+
+// Simple Loader component
+
 
 const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
   const [loggedUser, setLoggedUser] = useState<Admin | null>(null);
@@ -54,11 +57,6 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      // await axios.post(
-      //   `${API_BASE_URL}/admin/logout`,
-      //   {},
-      //   { withCredentials: true }
-      // );
       setLoggedUser(null);
       localStorage.removeItem("ffa-admin");
       window.location.href = "/login";
@@ -67,9 +65,8 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  //@ts-expect-error ignore error
-  const handleAxiosError = (error) => {
-    console.log("Handling error", error); // Debugging line
+  const handleAxiosError = (error:any) => {
+    console.log("Handling error", error);
     if (axios.isAxiosError(error)) {
       if (error.response) {
         toast.error(error.response.data.message || "An error occurred");
@@ -82,6 +79,11 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       toast.error("An unexpected error occurred");
     }
   };
+
+  // Conditional rendering based on isLoading
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <AuthContext.Provider

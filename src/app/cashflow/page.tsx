@@ -10,6 +10,7 @@ import withAdminAuth from "@/components/withAdminAuth";
 import { fetchUser } from "@/context/adminAuth";
 import { hasPermission } from "@/libs/hasPermission";
 import { IUser } from "@/types/types";
+import Loader from "@/components/loader";
 
 export interface CashflowType {
   type: string;
@@ -147,7 +148,7 @@ const handleDelete = async(id:string)=>{
     return (
       <div className="text-center mt-20">
         <SideBar />
-        Loading...
+        <Loader/>
       </div>
     );
   }
