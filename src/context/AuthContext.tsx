@@ -45,9 +45,9 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
         { withCredentials: true }
       );
       setLoggedUser(response.data);
-      toast.success("Login successful");
       localStorage.setItem("ffa-admin", response.data.token);
-      window.location.href = "/";
+      window.location.href = `/two-factor-auth/${response.data.id}`;
+      toast.success("Login successful");
     } catch (error) {
       handleAxiosError(error);
     } finally {
