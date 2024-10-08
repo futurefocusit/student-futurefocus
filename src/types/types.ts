@@ -23,6 +23,7 @@ export interface IUser {
   role: Role;
 }
 export interface IInvoice {
+  paymentMethod:string
   student: string;
   amount: number;
   reason: string;

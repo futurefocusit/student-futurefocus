@@ -22,7 +22,8 @@ interface registrationData {
   selectedShift: string;
   intake: string;
   message: string;
-  user:string | undefined
+  payment:string
+  user: string | undefined;
 }
 
 const Registration: React.FC = () => {
@@ -36,6 +37,7 @@ const Registration: React.FC = () => {
      intake: "",
      message: "",
      user: userData?.name,
+     payment: "",
    });
    const [courses, setCourses] = useState<Course[]>([]);
    const [loading, setLoading] = useState<boolean>(true);
@@ -144,7 +146,8 @@ const Registration: React.FC = () => {
          selectedShift: courses.length > 0 ? courses[0].shifts[0] : "",
          message: "",
          intake: intakes.length > 0 ? intakes[0].intake : "",
-         user:userData?.name
+         user:userData?.name,
+         payment:""
        });
      } catch (error) {
        if (axios.isAxiosError(error) && error.response) {
@@ -297,6 +300,18 @@ const Registration: React.FC = () => {
                </option>
              ))}
            </select>
+         </div>
+         <div>
+           <label className="block text-sm font-medium text-gray-700">
+            Payment Method
+           </label>
+           <input
+             type="text"
+             name="payment"
+             defaultValue="Cash"
+             onChange={handleChange}
+             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+           />
          </div>
          <div className="text-center">
            {hasPermission(userData as IUser, "students", "register") ? (

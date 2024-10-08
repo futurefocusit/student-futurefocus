@@ -5,11 +5,15 @@ import API_BASE_URL from "@/config/baseURL";
 import { Search } from "lucide-react";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
-import { IUser } from "@/types/types";
+import { IInvoice, IUser } from "@/types/types";
 import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
 import { hasPermission } from "@/libs/hasPermission";
 import Loader from "@/components/loader";
 import { formatMonth } from "@/libs/formatDate";
+import { generateRegisterStatementPdf } from "@/libs/generateInvoice";
+import { convertImageUrlToBase64 } from "@/libs/convertImage";
+const imageUrl = "/futurefocuslogo.png";
+
 
 interface Student {
   _id: string;
@@ -55,7 +59,43 @@ const StudentManagement: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading,setLoading] = useState<boolean>(true);
   const [updateMode, setUpdateMode] = useState(false);
+const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+const [paymentMethod, setPaymentMethod] = useState<string>("");
+const [studentToRegister, setStudentToRegister] = useState<{
+  id: string;
+  name: string;
+} | null>(null);
+const processStatusChange = async (
+  id: string,
+  name: string,
+  newStatus: string,
+  user: string
+) => {
+  const ourlogo = await convertImageUrlToBase64(imageUrl as string);
+  const data: IInvoice = {
+    student: name,
+    amount: 10000,
+    reason: "Registration fees",
+    date: new Date(),
+    remaining: 0,
+    status: "",
+    paymentMethod: paymentMethod, 
+  };
 
+  await axios.put(`${API_BASE_URL}/students/${id}`, {
+    status: newStatus,
+    user,
+    paymentMethod, 
+  });
+
+  if (newStatus === "registered") {
+    generateRegisterStatementPdf(data, ourlogo);
+  }
+
+  await fetchStudents();
+  setPaymentMethod("");
+  setStudentToRegister(null);
+};
   const setCommentText = (value: string) => {
     setComment((prev) => ({ ...prev, comment: value }));
   };
@@ -161,15 +201,18 @@ const StudentManagement: React.FC = () => {
 
   const handleStatusChange = async (
     id: string,
+    name: string,
     newStatus: string,
     user: string
   ) => {
+    if (newStatus === "registered") {
+      setStudentToRegister({ id, name });
+      setIsPaymentModalOpen(true);
+      return;
+    }
+
     try {
-      await axios.put(`${API_BASE_URL}/students/${id}`, {
-        status: newStatus,
-        user,
-      });
-      await fetchStudents();
+      await processStatusChange(id, name, newStatus, user);
     } catch (error) {
       console.error(`Error changing student status to ${newStatus}:`, error);
       setError(
@@ -239,6 +282,16 @@ const StudentManagement: React.FC = () => {
         >
           View
         </button>
+        {hasPermission(userData as IUser, "students", "delete") ? (
+          <button
+            onClick={() => handleDelete(student._id)}
+            className="text-red-600 ml-3 hover:text-red-900"
+          >
+            Delete
+          </button>
+        ) : (
+          ""
+        )}
         {hasPermission(userData as IUser, "students", "comment") ? (
           <div className="">
             <input
@@ -266,21 +319,13 @@ const StudentManagement: React.FC = () => {
         return (
           <>
             {commonButtons}
-            {hasPermission(userData as IUser, "students", "delete") ? (
-              <button
-                onClick={() => handleDelete(student._id)}
-                className="text-red-600 ml-3 hover:text-red-900"
-              >
-                Delete
-              </button>
-            ) : (
-              ""
-            )}
+            
             {hasPermission(userData as IUser, "students", "admit") ? (
               <button
                 onClick={() =>
                   handleStatusChange(
                     student._id,
+                    student.name,
                     "accepted",
                     userData?.name as string
                   )
@@ -313,6 +358,7 @@ const StudentManagement: React.FC = () => {
                 onClick={() =>
                   handleStatusChange(
                     student._id,
+                    student.name,
                     "registered",
                     userData?.name as string
                   )
