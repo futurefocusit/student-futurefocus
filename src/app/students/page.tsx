@@ -10,8 +10,9 @@ import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
 import { hasPermission } from "@/libs/hasPermission";
 import Loader from "@/components/loader";
 import { formatMonth } from "@/libs/formatDate";
-import { generateRegisterStatementPdf } from "@/libs/generateInvoice";
+import { generateRegisterStatementPdf, generateStatementPdf } from "@/libs/generateInvoice";
 import { convertImageUrlToBase64 } from "@/libs/convertImage";
+import { toast } from "react-toastify";
 const imageUrl = "/futurefocuslogo.png";
 
 
@@ -54,6 +55,8 @@ const StudentManagement: React.FC = () => {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("pending");
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [type, setType] = useState("");
+
   const [userData, setUserData] = useState<IUser>();
   const [commentText, setComment] = useState({ comment: "" });
   const [courses, setCourses] = useState<Course[]>([]);
@@ -65,6 +68,22 @@ const [studentToRegister, setStudentToRegister] = useState<{
   id: string;
   name: string;
 } | null>(null);
+const [formData, setFormData] = useState({
+  amount: 0,
+  user: userData?.name,
+  method: "",
+});
+const handleFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const { name, value } = e.target;
+  setFormData((prevData) => ({
+    ...prevData,
+    [name]: name === "amount" ? Number(value) : value,
+  }));
+};
+const handleViewP = (student: Student,type:string) => {
+    setSelectedStudent(student);
+    setType(type)
+  };
 const processStatusChange = async (
   id: string,
   name: string,
@@ -96,6 +115,47 @@ const processStatusChange = async (
   setPaymentMethod("");
   setStudentToRegister(null);
 };
+
+const handlePay = async (id: string) => {
+  try {
+    formData.user = userData?.name;
+    const response = await axios.post(
+      `${API_BASE_URL}/payment/pay/${id}`,
+      formData
+    );
+    toast.success(response.data.message);
+    const ourlogo = await convertImageUrlToBase64(imageUrl as string);
+    generateStatementPdf(response.data.data, ourlogo as string);
+    fetchPayment();
+  } catch (error) {
+    console.log(error);
+    setError("Error happened! check payment and try again");
+  }
+};
+ const handleDiscount = async (id: string) => {
+   try {
+     const response = await axios.put(
+       `${API_BASE_URL}/payment/discount/${id}`,
+       formData
+     );
+     toast.success(response.data.message);
+     fetchPayment();
+   } catch (error) {
+     setError("Error happened! check payment and try again");
+   }
+ };
+ const handleExtra = async (id: string) => {
+   try {
+     const response = await axios.put(
+       `${API_BASE_URL}/payment/extra/${id}`,
+       formData
+     );
+     toast.success(response.data.message);
+     fetchPayment();
+   } catch (error) {
+     setError("Error happened! check payment and try again");
+   }
+ };
   const setCommentText = (value: string) => {
     setComment((prev) => ({ ...prev, comment: value }));
   };
@@ -343,16 +403,6 @@ const processStatusChange = async (
         return (
           <>
             {commonButtons}
-            {hasPermission(userData as IUser, "students", "delete") ? (
-              <button
-                onClick={() => handleDelete(student._id)}
-                className="text-red-600 ml-3 hover:text-red-900"
-              >
-                Delete
-              </button>
-            ) : (
-              ""
-            )}
             {hasPermission(userData as IUser, "students", "register") ? (
               <button
                 onClick={() =>
@@ -376,6 +426,36 @@ const processStatusChange = async (
         return (
           <>
             {commonButtons}
+            {hasPermission(userData as IUser, "payment", "pay") ? (
+              <button
+                onClick={() => handleViewP(student, "pay")}
+                className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
+              >
+                Pay
+              </button>
+            ) : (
+              ""
+            )}
+            {hasPermission(userData as IUser, "payment", "discount") ? (
+              <button
+                onClick={() => handleViewP(student, "discount")}
+                className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
+              >
+                -
+              </button>
+            ) : (
+              ""
+            )}
+            {hasPermission(userData as IUser, "payment", "add-extra") ? (
+              <button
+                onClick={() => handleViewP(student, "extra")}
+                className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
+              >
+                +
+              </button>
+            ) : (
+              ""
+            )}
             {hasPermission(userData as IUser, "students", "update") ? (
               <button
                 onClick={() => handleUpdateStudent(student)}
@@ -411,6 +491,36 @@ const processStatusChange = async (
             >
               Dropout
             </button> */}
+            {hasPermission(userData as IUser, "payment", "pay") ? (
+              <button
+                onClick={() => handleViewP(student, "pay")}
+                className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
+              >
+                Pay
+              </button>
+            ) : (
+              ""
+            )}
+            {hasPermission(userData as IUser, "payment", "discount") ? (
+              <button
+                onClick={() => handleViewP(student, "discount")}
+                className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
+              >
+                -
+              </button>
+            ) : (
+              ""
+            )}
+            {hasPermission(userData as IUser, "payment", "add-extra") ? (
+              <button
+                onClick={() => handleViewP(student, "extra")}
+                className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
+              >
+                +
+              </button>
+            ) : (
+              ""
+            )}
             {hasPermission(userData as IUser, "students", "attend") ? (
               <button
                 onClick={() => handleUpdateStudent(student)}
@@ -913,7 +1023,71 @@ const processStatusChange = async (
           </div>
         </div>
       )}
-  
+      {selectedStudent && type && (
+        <div className="fixed inset-0 flex  items-center justify-center bg-gray-800 bg-opacity-75">
+          <div className="bg-white rounded-lg overflow-hidden h-64 shadow-xl transform transition-all sm:w-full sm:max-w-lg">
+            <div className="bg-gray-50  overflow-scroll">
+              <h3 className="text-lg text-center bg-blue-600 text-white font-extrabold">
+                {type === "pay"
+                  ? "Pay School Fees"
+                  : type === "discount"
+                  ? "Add Discount"
+                  : "Add Extra"}
+              </h3>
+              <div className="mt-4 flex  flex-col gap-5">
+                <span className="flex gap-10 items-center mx-auto mb-3">
+                  <label className="font-extrabold" htmlFor="amount">
+                    Amount:
+                  </label>
+                  <input
+                    name="amount"
+                    type="number"
+                    onChange={handleFormData}
+                    placeholder="Amount in Frw"
+                    className="border-2 p-2 rounded-md border-blue-700"
+                  />
+                </span>
+                <span className="flex gap-10 items-center mx-auto mb-3">
+                  <label className="font-extrabold" htmlFor="amount">
+                    method of payment:
+                  </label>
+                  <input
+                    name="method"
+                    type="text"
+                    onChange={handleFormData}
+                    placeholder="type Method"
+                    className="border-2 p-2 rounded-md border-blue-700"
+                  />
+                </span>
+              </div>
+            </div>
+            <div className="bg-gray-50 p-4 flex justify-around">
+              <button
+                onClick={
+                  type === "pay"
+                    ? () => handlePay(selectedStudent._id)
+                    : type === "discount"
+                    ? () => handleDiscount(selectedStudent._id)
+                    : () => handleExtra(selectedStudent._id)
+                }
+                className="px-4 py-2 text-sm text-black font-extrabold hover:text-white bg-green-300 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
+              >
+                {type === "pay"
+                  ? "Pay"
+                  : type === "discount"
+                  ? "Add Discount"
+                  : "Add Extra"}
+              </button>
+              <button
+                onClick={() => setSelectedStudent(null)}
+                className="px-4 py-2 text-sm text-black font-extrabold hover:text-white bg-red-300 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
