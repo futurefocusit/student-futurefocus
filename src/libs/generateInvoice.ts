@@ -127,7 +127,7 @@ export const generateRegisterStatementPdf = (
   ];
 
   // Iterate through details to display them
-  details.forEach((detail, index) => {
+  details.forEach((detail) => {
     doc.text(detail.label, 30, y);
     doc.text(detail.value, 90, y);
     y += 10; // Increment Y for next line
