@@ -451,7 +451,6 @@ const processStatusChange = async (
   return (
     <div className="min-h-screen bg-gray-100 p-2 sm:p-4 lg:p-6">
       <SideBar />
-
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <div className="bg-gray-50 flex flex-col sm:flex-row justify-between items-center shadow-md rounded-lg p-4">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
@@ -862,6 +861,59 @@ const processStatusChange = async (
           )}
         </div>
       </div>
+      {isPaymentModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96">
+            <div className="mb-4">
+              <h3 className="text-lg font-medium text-gray-900">
+                Select Payment Method
+              </h3>
+            </div>
+            <div className="mb-4">
+              <select
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="">Select payment method</option>
+                <option value="cash">Cash</option>
+                <option value="momo">Mobile Money</option>
+                <option value="bank">Bank Transfer</option>
+              </select>
+            </div>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setIsPaymentModalOpen(false)}
+                className="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (studentToRegister && paymentMethod) {
+                    processStatusChange(
+                      studentToRegister.id,
+                      studentToRegister.name,
+                      "registered",
+                      userData?.name as string
+                    );
+                    setIsPaymentModalOpen(false);
+                  }
+                }}
+                disabled={!paymentMethod}
+                className={`inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md ${
+                  !paymentMethod
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
+                }`}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+  
     </div>
   );
 };

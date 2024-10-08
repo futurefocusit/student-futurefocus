@@ -4,10 +4,13 @@ import axios from "axios";
 import API_BASE_URL from "@/config/baseURL";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
-import { IUser } from "@/types/types";
+import { IInvoice, IUser } from "@/types/types";
 import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
 import { hasPermission } from "@/libs/hasPermission";
 import Loader from "@/components/loader";
+import { generateRegisterStatementPdf } from "@/libs/generateInvoice";
+import { convertImageUrlToBase64 } from "@/libs/convertImage";
+const imageUrl = "/futurefocuslogo.png";
 
 interface Course {
   title: string;
@@ -37,7 +40,7 @@ const Registration: React.FC = () => {
      intake: "",
      message: "",
      user: userData?.name,
-     payment: "",
+     payment: "cash",
    });
    const [courses, setCourses] = useState<Course[]>([]);
    const [loading, setLoading] = useState<boolean>(true);
@@ -116,8 +119,18 @@ const Registration: React.FC = () => {
 //   })
 
 // }
-   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-     e.preventDefault();
+   const handleSubmit = async () => {
+    const ourlogo = await convertImageUrlToBase64(imageUrl as string);
+const data:IInvoice = {
+  paymentMethod: formData.payment,
+  student: formData.name,
+  amount: 10000,
+  reason: "Registration fees",
+  date: new Date(),
+  remaining: 0,
+  status: ""
+}
+    //  e.preventDefault();
      setSubmissionResult(null);
 
      try {
@@ -131,7 +144,7 @@ const Registration: React.FC = () => {
            },
          }
        );
-
+        generateRegisterStatementPdf(data, ourlogo);
        if (response.data && response.data.message) {
          setSubmissionResult(response.data.message);
        } else {
@@ -202,7 +215,7 @@ const Registration: React.FC = () => {
            {submissionResult}
          </div>
        )}
-       <form onSubmit={handleSubmit} className="space-y-4">
+       <div  className="space-y-4">
          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
            <div>
              <label className="block text-sm font-medium text-gray-700">
@@ -316,7 +329,7 @@ const Registration: React.FC = () => {
          <div className="text-center">
            {hasPermission(userData as IUser, "students", "register") ? (
              <button
-               type="submit"
+             onClick={()=>handleSubmit()}
                className="inline-flex justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
              >
                Submit
@@ -325,7 +338,7 @@ const Registration: React.FC = () => {
              ""
            )}
          </div>
-       </form>
+       </div>
      </div>
    );
  };
