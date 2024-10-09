@@ -466,7 +466,7 @@ const handlePay = async (id: string) => {
             ) : (
               ""
             )}
-            {hasPermission(userData as IUser, "students", "admit") ? (
+            {hasPermission(userData as IUser, "students", "start") ? (
               <button
                 onClick={() =>
                   handleStatusChange(
