@@ -25,7 +25,7 @@ interface Student {
   selectedCourse: string;
   message: string;
   selectedShift: string;
-  createdAt: string;
+  updatedAt: string;
   status: string;
   comment: string;
 }
@@ -166,7 +166,7 @@ const handlePay = async (id: string) => {
       setUserData(await getLoggedUserData());
       const sortedStudents = response.data.sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       );
       setStudents(sortedStudents);
       filterStudents(activeFilter, sortedStudents);
@@ -849,7 +849,7 @@ const handlePay = async (id: string) => {
                                   <span className="font-semibold">
                                     Applied on:
                                   </span>{" "}
-                                  {formatDate(selectedStudent.createdAt)}
+                                  {formatDate(selectedStudent.updatedAt)}
                                 </p>
                                 <p>
                                   <span className="font-semibold">Status:</span>{" "}
