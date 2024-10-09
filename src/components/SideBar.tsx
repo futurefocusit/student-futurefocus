@@ -124,7 +124,7 @@ const SideBar = () => {
           </div>
           <div className="px-4">
             <a
-              href="https://www.futurefocus.co.rw"
+              href="https://www.futurefocus.co.rw/admin"
               className={`flex items-center px-4 py-2 mb-10 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white `}
             >
               <FaWebAwesome className="w-5 h-5" />
