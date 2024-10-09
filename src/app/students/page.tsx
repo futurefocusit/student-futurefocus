@@ -466,20 +466,23 @@ const handlePay = async (id: string) => {
             ) : (
               ""
             )}
-
-            <button
-              onClick={() =>
-                handleStatusChange(
-                  student._id,
-                  student.name,
-                  "started",
-                  userData?.name as string
-                )
-              }
-              className="text-green-600 hover:text-green-900 ml-3"
-            >
-              Start
-            </button>
+            {hasPermission(userData as IUser, "students", "admit") ? (
+              <button
+                onClick={() =>
+                  handleStatusChange(
+                    student._id,
+                    student.name,
+                    "started",
+                    userData?.name as string
+                  )
+                }
+                className="text-green-600 hover:text-green-900 ml-3"
+              >
+                Start
+              </button>
+            ) : (
+              ""
+            )}
           </>
         );
       case "started":
