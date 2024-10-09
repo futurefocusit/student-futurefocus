@@ -3,6 +3,7 @@ import Loader from "@/components/loader";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
 import API_BASE_URL from "@/config/baseURL";
+import { changeIndex } from "@/libs/changeIndex";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
@@ -74,7 +75,13 @@ const AttendancePage: React.FC = () => {
   }, [searchTerm, groupedAttendance, selectedDate, selectedShift]);
 
   const groupAttendanceData = (data: AttendanceRecord[]) => {
-    const grouped = data.reduce<GroupedAttendance>((acc, record) => {
+    // Sort data from newest to oldest
+    const sortedData = data.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    const grouped = sortedData.reduce<GroupedAttendance>((acc, record) => {
       const date = new Date(record.createdAt).toLocaleDateString();
       const intake = record.studentId
         ? record.studentId.intake
@@ -99,8 +106,15 @@ const AttendancePage: React.FC = () => {
         Object.keys(shiftRecords).forEach((shift) => shifts.add(shift))
       )
     );
-    setAvailableShifts(Array.from(shifts));
+
+    const shiftArray = Array.from(shifts);
+    changeIndex(shiftArray, 5, 2);
+    changeIndex(shiftArray, 5, 3);
+
+    console.log(shiftArray);
+    setAvailableShifts(shiftArray);
   };
+
 
   const filterAttendance = () => {
     const filtered: GroupedAttendance = {};
@@ -175,7 +189,8 @@ if (loading) {
         >
           All Shifts
         </button>
-        {availableShifts.map((shift) => (
+        {  
+        availableShifts.map((shift) => (
           <button
             key={shift}
             className={`px-4 py-2 rounded-md ${
@@ -235,7 +250,7 @@ if (loading) {
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 {new Date(
-                                  record.createdAt
+                                  record.updatedAt
                                 ).toLocaleTimeString()}
                               </td>
                             </tr>
