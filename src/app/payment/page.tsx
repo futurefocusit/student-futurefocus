@@ -309,231 +309,239 @@ if (loading) {
               <div key={intake} className="mt-8">
                 <h3 className="text-xl font-semibold mb-4">Intake: {intake}</h3>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          No
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Name
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                          Amount To Pay
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                          Amount Paid
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                          Amount Discounted
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                          Extra mount
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                          Remaining
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {intakeStudents.map((student, index) => (
-                        <tr key={student._id}>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">
-                              {index + 1}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">
-                              {student.name}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
-                            <div className="text-sm text-gray-900">
-                              {payment
-                                .filter((p) => p.studentId === student._id)
-                                .map((p) => (
-                                  <div key={p._id}>
-                                    {new Intl.NumberFormat().format(
-                                      p.amountDue
-                                    )}{" "}
-                                    Frw
-                                  </div>
-                                ))}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
-                            <div className="text-sm text-gray-900">
-                              {payment
-                                .filter((p) => p.studentId === student._id)
-                                .map((p) => (
-                                  <div key={p._id}>
-                                    {new Intl.NumberFormat().format(
-                                      p.amountPaid
-                                    )}{" "}
-                                    Frw
-                                  </div>
-                                ))}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
-                            <div className="text-sm text-gray-900">
-                              {payment
-                                .filter((p) => p.studentId === student._id)
-                                .map((p) => (
-                                  <div key={p._id}>
-                                    {new Intl.NumberFormat().format(
-                                      p.amountDiscounted
-                                    )}{" "}
-                                    Frw
-                                  </div>
-                                ))}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
-                            <div className="text-sm text-gray-900">
-                              {payment
-                                .filter((p) => p.studentId === student._id)
-                                .map((p) => (
-                                  <div key={p._id}>
-                                    {new Intl.NumberFormat().format(
-                                      p.extraAmount
-                                    )}{" "}
-                                    Frw
-                                  </div>
-                                ))}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
-                            {payment
-                              .filter((p) => p.studentId === student._id)
-                              .map((p) => (
-                                <div key={p._id}>
-                                  {new Intl.NumberFormat().format(
-                                    p.amountDue - p.amountPaid
-                                  )}{" "}
-                                  Frw
-                                </div>
-                              ))}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap gap-1 flex text-sm font-medium">
-                            {hasPermission(
-                              userData as IUser,
-                              "payment",
-                              "pay"
-                            ) ? (
-                              <button
-                                onClick={() => handleView(student, "pay")}
-                                className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
-                              >
-                                Pay
-                              </button>
-                            ) : (
-                              ""
-                            )}
-                            {hasPermission(
-                              userData as IUser,
-                              "payment",
-                              "discount"
-                            ) ? (
-                              <button
-                                onClick={() => handleView(student, "discount")}
-                                className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
-                              >
-                                -
-                              </button>
-                            ) : (
-                              ""
-                            )}
-                            {hasPermission(
-                              userData as IUser,
-                              "payment",
-                              "add-extra"
-                            ) ? (
-                              <button
-                                onClick={() => handleView(student, "extra")}
-                                className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
-                              >
-                                +
-                              </button>
-                            ) : (
-                              ""
-                            )}
-                            {hasPermission(
-                              userData as IUser,
-                              "payment",
-                              "delete"
-                            ) ? (
-                              <button
-                                onClick={() => handleDelete(student._id)}
-                                className="bg-red-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-red-900"
-                              >
-                                delete
-                              </button>
-                            ) : (
-                              ""
-                            )}
-                            {hasPermission(
-                              userData as IUser,
-                              "students",
-                              "comment"
-                            ) ? (
-                              <div className="">
-                                <input
-                                  className="p-1 bg-gray-200 border-2 border-gray-500 rounded-md"
-                                  type="text"
-                                  placeholder="type comment..."
-                                  defaultValue={payment
-                                    .filter((p) => p.studentId === student._id)
-                                    .map((p) => (
-                                       p.comment
-                                       
-                                    ))}
-                                  onChange={(event) =>
-                                    setCommentText(event.target.value)
-                                  }
-                                />
-                                <button
-                                  onClick={() => handleSaveComment(student._id)}
-                                  className="text-blue-600 ml-3 hover:text-blue-900"
-                                >
-                                  save
-                                </button>
-                              </div>
-                            ) : (
-                              ""
-                            )}
-                          </td>
+                  {hasPermission(userData as IUser, "payment", "view") ? (
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            No
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Name
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                            Amount To Pay
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                            Amount Paid
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                            Amount Discounted
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                            Extra mount
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                            Remaining
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                    <tfoot className="bg-gray-100">
-                      <tr>
-                        <td className="px-6 py-4 font-bold" colSpan={2}>
-                          Totals:
-                        </td>
-                        <td className="px-6 py-4 font-bold">
-                          {new Intl.NumberFormat().format(totalDue)} Frw
-                        </td>
-                        <td className="px-6 py-4 font-bold">
-                          {new Intl.NumberFormat().format(totalPaid)} Frw
-                        </td>
-                        <td className="px-6 py-4 font-bold">
-                          {new Intl.NumberFormat().format(totalDiscounted)} Frw
-                        </td>
-                        <td className="px-6 py-4 font-bold">
-                          {new Intl.NumberFormat().format(totalExtras)} Frw
-                        </td>
-                        <td className="px-6 py-4 font-bold">
-                          {new Intl.NumberFormat().format(remaining)} Frw
-                        </td>
-                        <td className="px-6 py-4"></td>
-                      </tr>
-                    </tfoot>
-                  </table>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {intakeStudents.map((student, index) => (
+                          <tr key={student._id}>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm font-medium text-gray-900">
+                                {index + 1}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm font-medium text-gray-900">
+                                {student.name}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
+                              <div className="text-sm text-gray-900">
+                                {payment
+                                  .filter((p) => p.studentId === student._id)
+                                  .map((p) => (
+                                    <div key={p._id}>
+                                      {new Intl.NumberFormat().format(
+                                        p.amountDue
+                                      )}{" "}
+                                      Frw
+                                    </div>
+                                  ))}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
+                              <div className="text-sm text-gray-900">
+                                {payment
+                                  .filter((p) => p.studentId === student._id)
+                                  .map((p) => (
+                                    <div key={p._id}>
+                                      {new Intl.NumberFormat().format(
+                                        p.amountPaid
+                                      )}{" "}
+                                      Frw
+                                    </div>
+                                  ))}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
+                              <div className="text-sm text-gray-900">
+                                {payment
+                                  .filter((p) => p.studentId === student._id)
+                                  .map((p) => (
+                                    <div key={p._id}>
+                                      {new Intl.NumberFormat().format(
+                                        p.amountDiscounted
+                                      )}{" "}
+                                      Frw
+                                    </div>
+                                  ))}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
+                              <div className="text-sm text-gray-900">
+                                {payment
+                                  .filter((p) => p.studentId === student._id)
+                                  .map((p) => (
+                                    <div key={p._id}>
+                                      {new Intl.NumberFormat().format(
+                                        p.extraAmount
+                                      )}{" "}
+                                      Frw
+                                    </div>
+                                  ))}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
+                              {payment
+                                .filter((p) => p.studentId === student._id)
+                                .map((p) => (
+                                  <div key={p._id}>
+                                    {new Intl.NumberFormat().format(
+                                      p.amountDue - p.amountPaid
+                                    )}{" "}
+                                    Frw
+                                  </div>
+                                ))}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap gap-1 flex text-sm font-medium">
+                              {hasPermission(
+                                userData as IUser,
+                                "payment",
+                                "pay"
+                              ) ? (
+                                <button
+                                  onClick={() => handleView(student, "pay")}
+                                  className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
+                                >
+                                  Pay
+                                </button>
+                              ) : (
+                                ""
+                              )}
+                              {hasPermission(
+                                userData as IUser,
+                                "payment",
+                                "discount"
+                              ) ? (
+                                <button
+                                  onClick={() =>
+                                    handleView(student, "discount")
+                                  }
+                                  className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
+                                >
+                                  -
+                                </button>
+                              ) : (
+                                ""
+                              )}
+                              {hasPermission(
+                                userData as IUser,
+                                "payment",
+                                "add-extra"
+                              ) ? (
+                                <button
+                                  onClick={() => handleView(student, "extra")}
+                                  className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
+                                >
+                                  +
+                                </button>
+                              ) : (
+                                ""
+                              )}
+                              {hasPermission(
+                                userData as IUser,
+                                "payment",
+                                "delete"
+                              ) ? (
+                                <button
+                                  onClick={() => handleDelete(student._id)}
+                                  className="bg-red-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-red-900"
+                                >
+                                  delete
+                                </button>
+                              ) : (
+                                ""
+                              )}
+                              {hasPermission(
+                                userData as IUser,
+                                "students",
+                                "comment"
+                              ) ? (
+                                <div className="">
+                                  <input
+                                    className="p-1 bg-gray-200 border-2 border-gray-500 rounded-md"
+                                    type="text"
+                                    placeholder="type comment..."
+                                    defaultValue={payment
+                                      .filter(
+                                        (p) => p.studentId === student._id
+                                      )
+                                      .map((p) => p.comment)}
+                                    onChange={(event) =>
+                                      setCommentText(event.target.value)
+                                    }
+                                  />
+                                  <button
+                                    onClick={() =>
+                                      handleSaveComment(student._id)
+                                    }
+                                    className="text-blue-600 ml-3 hover:text-blue-900"
+                                  >
+                                    save
+                                  </button>
+                                </div>
+                              ) : (
+                                ""
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot className="bg-gray-100">
+                        <tr>
+                          <td className="px-6 py-4 font-bold" colSpan={2}>
+                            Totals:
+                          </td>
+                          <td className="px-6 py-4 font-bold">
+                            {new Intl.NumberFormat().format(totalDue)} Frw
+                          </td>
+                          <td className="px-6 py-4 font-bold">
+                            {new Intl.NumberFormat().format(totalPaid)} Frw
+                          </td>
+                          <td className="px-6 py-4 font-bold">
+                            {new Intl.NumberFormat().format(totalDiscounted)}{" "}
+                            Frw
+                          </td>
+                          <td className="px-6 py-4 font-bold">
+                            {new Intl.NumberFormat().format(totalExtras)} Frw
+                          </td>
+                          <td className="px-6 py-4 font-bold">
+                            {new Intl.NumberFormat().format(remaining)} Frw
+                          </td>
+                          <td className="px-6 py-4"></td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  ) : (
+                    <div className="text-center">you dont't have permission to view this</div>
+                  )}
                 </div>
               </div>
             );

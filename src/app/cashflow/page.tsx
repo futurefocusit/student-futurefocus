@@ -212,105 +212,125 @@ const handleDelete = async(id:string)=>{
         </div>
 
         <div className="p-4">
-          <div className="overflow-x-auto">
-            {Object.entries(groupedCashflows).map(
-              ([date, { total, transactions }]) => (
-                <div key={date} className="mb-4">
-                  <h3 className="text-lg font-bold text-gray-800">{date}</h3>
-                  <p className="text-sm text-gray-600">
-                    Total for the day: {new Intl.NumberFormat().format(total)}{" "}
-                    Frw
-                  </p>
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          No
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          User
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Amount
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Payment Method
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Reason
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Time
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {transactions.map((cashflow, index) => (
-                        <tr key={index}>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">
-                              {index + 1}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
-                              {cashflow.user || "N/A"}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
-                              {new Intl.NumberFormat().format(cashflow.amount)}{" "}
-                              Frw
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
-                              {cashflow.payment}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
-                              {cashflow.reason || "N/A"}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
-                              {new Date(cashflow.createdAt).toLocaleTimeString(
-                                [],
-                                { hour: "2-digit", minute: "2-digit" }
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            
-                              <div className="text-sm font-bold text-red-500 hover:text-red-900">
-                               {hasPermission(loggedUser as IUser, 'cashflow', 'delete')? <button onClick={()=>handleDelete(cashflow._id)}>delete</button>:""}
-                              </div>
-                            
-                          </td>
+          {hasPermission(loggedUser as IUser, "cashflow", "view") ? (
+            <div className="overflow-x-auto">
+              {Object.entries(groupedCashflows).map(
+                ([date, { total, transactions }]) => (
+                  <div key={date} className="mb-4">
+                    <h3 className="text-lg font-bold text-gray-800">{date}</h3>
+                    <p className="text-sm text-gray-600">
+                      Total for the day: {new Intl.NumberFormat().format(total)}{" "}
+                      Frw
+                    </p>
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            No
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            User
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Amount
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Payment Method
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Reason
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Time
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            actions
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )
-            )}
-            <div className="mt-6">
-              <h4 className="text-lg font-bold text-gray-800">
-                Monthly Totals
-              </h4>
-              <ul>
-                {Object.entries(monthlyTotals).map(([monthYear, total]) => (
-                  <li key={monthYear} className="text-sm text-gray-600">
-                    {monthYear}: {new Intl.NumberFormat().format(total)} Frw
-                  </li>
-                ))}
-              </ul>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {transactions.map((cashflow, index) => (
+                          <tr key={index}>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm font-medium text-gray-900">
+                                {index + 1}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">
+                                {cashflow.user || "N/A"}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">
+                                {new Intl.NumberFormat().format(
+                                  cashflow.amount
+                                )}{" "}
+                                Frw
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">
+                                {cashflow.payment}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">
+                                {cashflow.reason || "N/A"}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">
+                                {new Date(
+                                  cashflow.createdAt
+                                ).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm font-bold text-red-500 hover:text-red-900">
+                                {hasPermission(
+                                  loggedUser as IUser,
+                                  "cashflow",
+                                  "delete"
+                                ) ? (
+                                  <button
+                                    onClick={() => handleDelete(cashflow._id)}
+                                  >
+                                    delete
+                                  </button>
+                                ) : (
+                                  ""
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )
+              )}
+              <div className="mt-6">
+                <h4 className="text-lg font-bold text-gray-800">
+                  Monthly Totals
+                </h4>
+                <ul>
+                  {Object.entries(monthlyTotals).map(([monthYear, total]) => (
+                    <li key={monthYear} className="text-sm text-gray-600">
+                      {monthYear}: {new Intl.NumberFormat().format(total)} Frw
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="text-center">
+              you dont't have permission to view this
+            </div>
+          )}
         </div>
       </div>
 

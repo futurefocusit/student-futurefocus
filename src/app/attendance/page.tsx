@@ -25,7 +25,7 @@ interface Student {
 
 interface AttendanceRecord {
   _id: string;
-  studentId: Student | null; // Allow for null values
+  studentId: Student | null; 
   status: "present" | "absent";
   createdAt: string;
   updatedAt: string;

@@ -636,7 +636,7 @@ const handlePay = async (id: string) => {
                 Intake: {intake}
               </h3>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
+                <table className="min-w-full divide-y divide-gray-200 ">
                   <thead className="bg-gray-50">
                     <tr>
                       <th
@@ -714,7 +714,7 @@ const handlePay = async (id: string) => {
                           </div>
                         </td>
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex flex-wrap gap-2">
+                          <div className="flex  gap-2">
                             {renderActionButtons(student)}
                           </div>
                         </td>
