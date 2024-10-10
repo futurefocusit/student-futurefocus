@@ -1,14 +1,14 @@
 "use client";
-import { Admin, useAuth } from "@/context/AuthContext";
+import { Admin, TeamMember, useAuth } from "@/context/AuthContext";
 import React, { FormEvent, useState } from "react";
 
 const LoginForm = () => {
-  const { login, isLoading } = useAuth();
-  const [formData, setFormData] = useState<Admin>({
+  const { loginTeamMember, isLoading } = useAuth();
+  const [formData, setFormData] = useState<TeamMember>({
+    name:"",
+    _id:"",
     email: "",
     password: "",
-    isSuperAdmin: false,
-    name:""
   });
 
   const handleChangeFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,10 +19,9 @@ const LoginForm = () => {
     });
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     try {
-      await login(formData);
+      await loginTeamMember(formData);
     } catch (error) {
       console.log(error);
     }
@@ -35,7 +34,7 @@ const LoginForm = () => {
           <img src="/logo.png" alt="Logo" className="w-24 h-24 mx-auto" />
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <div>
           <div className="mb-4">
             <label
               htmlFor="email"
@@ -85,21 +84,20 @@ const LoginForm = () => {
               </label>
             </div>
             <a
-              href="https://futurefocus.co.rw/admin/forgot-password"
+              href="/staff/forgot-password"
               className="text-blue-600 hover:text-blue-800 text-sm"
             >
               Forgot password?
             </a>
           </div>
           <button
-            type="submit"
+            onClick={()=>handleSubmit()}
             className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
             disabled={isLoading}
           >
             {isLoading ? "Logging in..." : "Login"}
           </button>
-          <a  href="/staff/login" className="mx-auto text-center text-blue-600">login as Staff</a>
-        </form>
+        </div>
       </div>
     </div>
   );
