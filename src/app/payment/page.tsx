@@ -540,7 +540,9 @@ if (loading) {
                       </tfoot>
                     </table>
                   ) : (
-                    <div className="text-center">you dont't have permission to view this</div>
+                    <div className="text-center">
+                      you dont`&apos;t have permission to view this
+                    </div>
                   )}
                 </div>
               </div>

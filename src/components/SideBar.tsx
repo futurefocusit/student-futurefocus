@@ -18,7 +18,6 @@ import { useAuth } from "@/context/AuthContext";
 import { FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
 import { IUser } from "@/types/types";
 import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
-import { hasPermission } from "@/libs/hasPermission";
 
 const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);

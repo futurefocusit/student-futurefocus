@@ -328,7 +328,7 @@ const handleDelete = async(id:string)=>{
             </div>
           ) : (
             <div className="text-center">
-              you dont't have permission to view this
+              you dont`&apos;t have permission to view this
             </div>
           )}
         </div>
