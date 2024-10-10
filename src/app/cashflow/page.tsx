@@ -161,7 +161,6 @@ const handleDelete = async(id:string)=>{
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <SideBar />
@@ -374,6 +373,7 @@ const handleDelete = async(id:string)=>{
       )}
     </div>
   );
+
 };
 
 export default withAdminAuth(PaymentsPage);

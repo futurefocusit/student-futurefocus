@@ -12,11 +12,13 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaMoneyBillAlt,
+  FaClock,
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import { FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
 import { IUser } from "@/types/types";
 import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
+import { hasPermission } from "@/libs/hasPermission";
 
 const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,6 +35,7 @@ const SideBar = () => {
     { label: "Transaction", icon: FaExchangeAlt, href: "/transactions" },
     { label: "Attendances", icon: FaCalendarCheck, href: "/attendance" },
     { label: "Cashflow", icon: FaMoneyBillAlt, href: "/cashflow" },
+    { label: "staff Attendance", icon: FaClock, href: "/attendance/staff" },
   ];
 
   useEffect(() => {

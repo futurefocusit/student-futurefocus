@@ -322,44 +322,55 @@ const Dashboard = () => {
             {summary.studentStatusCounts.droppedOut || 0}
           </p>
         </a>
-        <a
-          href="/students"
-          className="bg-white p-6 rounded-lg shadow-md text-center"
-        >
-          <h3 className="text-lg font-semibold">Completed Students</h3>
-          <p className="text-2xl font-bold">
-            {summary.studentStatusCounts.completed || 0}
-          </p>
-        </a>
-
-        <a
-          href="/payment"
-          className="bg-white p-6 rounded-lg shadow-md text-center"
-        >
-          <h3 className="text-lg font-semibold">Unpaid Students</h3>
-          <p className="text-2xl font-bold">
-            {summary.paymentStatusCounts.unpaid}
-          </p>
-        </a>
-        <a
-          href="/payment"
-          className="bg-white p-6 rounded-lg shadow-md text-center"
-        >
-          <h3 className="text-lg font-semibold">Partial Paid Student</h3>
-          <p className="text-2xl font-bold">
-            {summary.paymentStatusCounts.partial}
-          </p>
-        </a>
-        <a
-          href="/payment"
-          className="bg-white p-6 rounded-lg shadow-md text-center"
-        >
-          <h3 className="text-lg font-semibold">completed Payments</h3>
-          <p className="text-2xl font-bold">
-            {summary.paymentStatusCounts.paid}
-          </p>
-        </a>
-
+          <a
+            href="/students"
+            className="bg-white p-6 rounded-lg shadow-md text-center"
+          >
+            <h3 className="text-lg font-semibold">Completed Students</h3>
+            <p className="text-2xl font-bold">
+              {summary.studentStatusCounts.completed || 0}
+            </p>
+          </a>
+       
+        {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
+          <a
+            href="/payment"
+            className="bg-white p-6 rounded-lg shadow-md text-center"
+          >
+            <h3 className="text-lg font-semibold">Unpaid Students</h3>
+            <p className="text-2xl font-bold">
+              {summary.paymentStatusCounts.unpaid}
+            </p>
+          </a>
+        ) : (
+          ""
+        )}
+        {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
+          <a
+            href="/payment"
+            className="bg-white p-6 rounded-lg shadow-md text-center"
+          >
+            <h3 className="text-lg font-semibold">Partial Paid Student</h3>
+            <p className="text-2xl font-bold">
+              {summary.paymentStatusCounts.partial}
+            </p>
+          </a>
+        ) : (
+          ""
+        )}
+        {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
+          <a
+            href="/payment"
+            className="bg-white p-6 rounded-lg shadow-md text-center"
+          >
+            <h3 className="text-lg font-semibold">completed Payments</h3>
+            <p className="text-2xl font-bold">
+              {summary.paymentStatusCounts.paid}
+            </p>
+          </a>
+        ) : (
+          ""
+        )}
         {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
           <a
             href="/payment"

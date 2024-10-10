@@ -1,6 +1,6 @@
 "use client";
-import { Admin, TeamMember, useAuth } from "@/context/AuthContext";
-import React, { FormEvent, useState } from "react";
+import { TeamMember, useAuth } from "@/context/AuthContext";
+import React, { useState } from "react";
 
 const LoginForm = () => {
   const { loginTeamMember, isLoading } = useAuth();

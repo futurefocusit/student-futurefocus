@@ -1,12 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "@/context/AuthContext";
 import Loader from "@/components/loader";
 import API_BASE_URL from "@/config/baseURL";
 import { toast } from "react-toastify";
-import Link from "next/link";
-import withMemberAuth from "@/components/withMemberAuth";
+import SideBar from "@/components/SideBar";
+import withAdminAuth from "@/components/withAdminAuth";
 
 interface AttendanceRecord {
   _id: string;
@@ -21,7 +20,6 @@ type GroupedAttendance = {
 };
 
 const AttendancePage: React.FC = () => {
-  const {  loggedMember, logout } = useAuth();
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -30,11 +28,9 @@ const AttendancePage: React.FC = () => {
   const [endDate, setEndDate] = useState<string>("");
 
   const fetchAttendance = async () => {
-    if (!loggedMember) return;
-
     try {
       const response = await axios.get<AttendanceRecord[]>(
-        `${API_BASE_URL}/member/my-attendance/${loggedMember._id}`,
+        `${API_BASE_URL}/member/attendance`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("ffa-team-member")}`,
@@ -56,12 +52,11 @@ const AttendancePage: React.FC = () => {
 
   useEffect(() => {
     fetchAttendance();
-  }, [loggedMember]);
+  }, []);
 
   const markAttendance = async (recordId: string) => {
-    if (!loggedMember) return;
     try {
-      await axios.put(`${API_BASE_URL}/member/request-attend/${recordId}`, {
+      await axios.put(`${API_BASE_URL}/member/approve-attend/${recordId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("ffa-team-member")}`,
         },
@@ -78,10 +73,10 @@ const AttendancePage: React.FC = () => {
     switch (status.toLowerCase()) {
       case "present":
         return "text-green-600";
+      case "pending":
+        return "text-gray-600";
       case "absent":
         return "text-red-600";
-      case "pending":
-        return "text-yellow-600";
       default:
         return "text-gray-600";
     }
@@ -90,8 +85,7 @@ const AttendancePage: React.FC = () => {
   const filterAttendance = () => {
     return attendance.filter((record) => {
       const matchesStatus =
-        statusFilter === "all" ||
-        record.status.toLowerCase() === statusFilter.toLowerCase();
+        statusFilter === "all" || record.status.toLowerCase() === statusFilter;
       const recordDate = new Date(record.createdAt);
       const matchesStartDate = !startDate || recordDate >= new Date(startDate);
       const matchesEndDate = !endDate || recordDate <= new Date(endDate);
@@ -124,7 +118,7 @@ const AttendancePage: React.FC = () => {
 
   return (
     <div>
-      <Navbar loggedMember={loggedMember} logout={logout} />
+      <SideBar />
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Attendance Records</h1>
 
@@ -138,8 +132,8 @@ const AttendancePage: React.FC = () => {
             >
               <option value="all">All</option>
               <option value="present">Present</option>
-              <option value="absent">Absent</option>
               <option value="pending">Pending</option>
+              <option value="absent">Absent</option>
             </select>
           </div>
           <div className="flex-1">
@@ -196,7 +190,7 @@ const AttendancePage: React.FC = () => {
                         {record.status}
                       </td>
                       <td className="border-b border-gray-200 p-2">
-                        {record.status === "absent" && (
+                        {record.status === "pending" && (
                           <button
                             onClick={() => markAttendance(record._id)}
                             className="bg-blue-500 text-white px-2 py-1 rounded"
@@ -217,36 +211,4 @@ const AttendancePage: React.FC = () => {
   );
 };
 
-const Navbar: React.FC<{
-  //@ts-expect-error errro
-  loggedMember;
-  logout: () => void;
-}> = ({ loggedMember, logout }) => {
-  return (
-    <nav className="bg-gray-800 text-white p-4">
-      <div className="container mx-auto flex justify-between items-center">
-        <Link href="/" className="text-lg font-bold">
-          My Attendances
-        </Link>
-        <div className="flex items-center">
-          {loggedMember ? (
-            <>
-              <span className="mr-4">
-                {loggedMember?.name} | {loggedMember?.email}
-              </span>
-              <button onClick={logout} className="bg-red-500 px-3 py-1 rounded">
-                Logout
-              </button>
-            </>
-          ) : (
-            <Link href="/login" className="bg-blue-500 px-3 py-1 rounded">
-              Login
-            </Link>
-          )}
-        </div>
-      </div>
-    </nav>
-  );
-};
-
-export default withMemberAuth(AttendancePage);
+export default withAdminAuth(AttendancePage);

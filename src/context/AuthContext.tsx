@@ -4,8 +4,8 @@ import {
   createContext,
   ReactNode,
   useContext,
-  useEffect,
   useState,
+  useCallback,
 } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -20,17 +20,17 @@ export interface Admin {
 }
 
 export interface TeamMember {
-  _id: string; // Assuming there's an ID for the team member
+  _id: string;
   email: string;
   name: string;
-  password:string
+  password: string;
 }
 
 interface AuthContextData {
   signed: boolean;
   isLoading: boolean;
-  loggedUser: Admin |null;
-  loggedMember:  TeamMember | null;
+  loggedUser: Admin | null;
+  loggedMember: TeamMember | null;
   login: (user: Admin) => Promise<void>;
   loginTeamMember: (member: TeamMember) => Promise<void>;
   fetchLoggedTeamMember: () => Promise<void>;
@@ -46,16 +46,17 @@ export const AuthContext = createContext<AuthContextData>(
 );
 
 const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
-  const [loggedMember, setLoggedMember] = useState< TeamMember | null>(null);
-  const [loggedUser, setLoggedUser] = useState<Admin |null>(null);
+  const [loggedMember, setLoggedMember] = useState<TeamMember | null>(null);
+  const [loggedUser, setLoggedUser] = useState<Admin | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch logged team member details
-  const fetchLoggedTeamMember = async () => {
-    const token = localStorage.getItem("ffa-team-member");
-    if (!token) return;
 
-    setIsLoading(true);
+  const fetchLoggedTeamMember = useCallback(async () => {
+    const token = localStorage.getItem("ffa-team-member");
+    if (!token) {
+   window.location.href='/login'
+    };
+
     try {
       const response = await axios.get(`${API_BASE_URL}/member/logged-user`, {
         headers: {
@@ -65,12 +66,13 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       setLoggedMember(response.data);
     } catch (error) {
       handleAxiosError(error);
-    } finally {
-      setIsLoading(false);
+      // Clear invalid token
+      localStorage.removeItem("ffa-team-member");
+      setLoggedMember(null);
     }
-  };
+  }, []);
 
-  const login = async (userData: Admin) => {
+  const login = useCallback(async (userData: Admin) => {
     setIsLoading(true);
     try {
       const response = await axios.post(
@@ -87,9 +89,9 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const loginTeamMember = async (memberData: TeamMember) => {
+  const loginTeamMember = useCallback(async (memberData: TeamMember) => {
     setIsLoading(true);
     try {
       const response = await axios.post(
@@ -97,64 +99,69 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
         memberData,
         { withCredentials: true }
       );
-      setLoggedUser(response.data);
+      setLoggedMember(response.data);
       toast.success("Login successful!");
       localStorage.setItem("ffa-team-member", response.data.token);
+      window.location.href = "/staff";
     } catch (error) {
       handleAxiosError(error);
-
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       setLoggedUser(null);
+      setLoggedMember(null);
       localStorage.removeItem("ffa-admin");
       localStorage.removeItem("ffa-team-member");
       window.location.href = "/login";
     } catch (error) {
       handleAxiosError(error);
     }
-  };
+  }, []);
 
   const handleAxiosError = (error: unknown) => {
-    console.log("Handling error", error);
+    console.error("API Error:", error);
     if (axios.isAxiosError(error)) {
       if (error.response) {
-        toast.error(error.response.data.message || "An error occurred");
+        const errorMessage = error.response.data.message || "An error occurred";
+        toast.error(errorMessage);
+
+        // Handle 401 Unauthorized errors
+        if (error.response.status === 401) {
+          logout();
+        }
       } else if (error.request) {
         toast.error("Failed to connect to server");
       } else {
-        toast.error("Error sending request. Try again.");
+        toast.error("Error sending request. Please try again.");
       }
     } else {
       toast.error("An unexpected error occurred");
     }
   };
 
-  useEffect(() => {
-    fetchLoggedTeamMember();
-  }, []);
+
+
+  const contextValue = {
+    signed: Boolean(loggedUser || loggedMember),
+    isLoading,
+    loggedUser,
+    loggedMember,
+    login,
+    loginTeamMember,
+    fetchLoggedTeamMember,
+    logout,
+  };
 
   if (isLoading) {
     return <Loader />;
   }
 
   return (
-    <AuthContext.Provider
-      value={{
-        signed: Boolean(loggedUser),
-        isLoading,
-        loggedUser,
-        loggedMember,
-        login,
-        loginTeamMember,
-        fetchLoggedTeamMember,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
       <ToastContainer />
     </AuthContext.Provider>
