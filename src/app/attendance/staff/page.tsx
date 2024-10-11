@@ -12,10 +12,10 @@ import { IUser } from "@/types/types";
 
 interface AttendanceRecord {
   _id: string;
-  name: string;
+  memberId: {name:string,role:string};
   email: string;
   status: string;
-  createdAt: string;
+  updatedAt: string;
 }
 
 type GroupedAttendance = {
@@ -44,7 +44,7 @@ const AttendancePage: React.FC = () => {
       );
       const sortedAttendance = response.data.sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       );
       setAttendance(sortedAttendance);
     } catch (error) {
@@ -91,7 +91,7 @@ const AttendancePage: React.FC = () => {
     return attendance.filter((record) => {
       const matchesStatus =
         statusFilter === "all" || record.status.toLowerCase() === statusFilter;
-      const recordDate = new Date(record.createdAt);
+      const recordDate = new Date(record.updatedAt);
       const matchesStartDate = !startDate || recordDate >= new Date(startDate);
       const matchesEndDate = !endDate || recordDate <= new Date(endDate);
       return matchesStatus && matchesStartDate && matchesEndDate;
@@ -102,7 +102,7 @@ const AttendancePage: React.FC = () => {
     filteredRecords: AttendanceRecord[]
   ): GroupedAttendance => {
     return filteredRecords.reduce((groups: GroupedAttendance, record) => {
-      const date = new Date(record.createdAt).toLocaleDateString("en-US", {
+      const date = new Date(record.updatedAt).toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -174,7 +174,16 @@ const AttendancePage: React.FC = () => {
                   <thead>
                     <tr>
                       <th className="border-b-2 border-gray-300 p-2 text-left">
-                        Time
+                        #
+                      </th>
+                      <th className="border-b-2 border-gray-300 p-2 text-left">
+                        Time In
+                      </th>
+                      <th className="border-b-2 border-gray-300 p-2 text-left">
+                        Name
+                      </th>
+                      <th className="border-b-2 border-gray-300 p-2 text-left">
+                        Role
                       </th>
                       <th className="border-b-2 border-gray-300 p-2 text-left">
                         Status
@@ -185,10 +194,21 @@ const AttendancePage: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {records.map((record) => (
+                    {records.map((record, index) => (
                       <tr key={record._id}>
                         <td className="border-b border-gray-200 p-2">
-                          {new Date(record.createdAt).toLocaleTimeString()}
+                          {index + 1}
+                        </td>
+                        <td className="border-b border-gray-200 p-2">
+                          {record.status === "present"||record.status==='pending'
+                            ? new Date(record.updatedAt).toLocaleTimeString()
+                            : "Not In yet"}
+                        </td>
+                        <td className="border-b border-gray-200 p-2">
+                          {record.memberId.name}
+                        </td>
+                        <td className="border-b border-gray-200 p-2">
+                          {record.memberId.role}
                         </td>
                         <td
                           className={`border-b border-gray-200 p-2 ${getStatusColor(

@@ -26,6 +26,7 @@ interface Student {
   message: string;
   selectedShift: string;
   updatedAt: string;
+  createdAt: string;
   status: string;
   comment: string;
 }
@@ -852,7 +853,7 @@ const handlePay = async (id: string) => {
                                   <span className="font-semibold">
                                     Applied on:
                                   </span>{" "}
-                                  {formatDate(selectedStudent.updatedAt)}
+                                  {formatDate(selectedStudent.createdAt)}
                                 </p>
                                 <p>
                                   <span className="font-semibold">Status:</span>{" "}
