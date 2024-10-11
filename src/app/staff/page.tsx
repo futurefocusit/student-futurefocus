@@ -7,13 +7,16 @@ import API_BASE_URL from "@/config/baseURL";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import withMemberAuth from "@/components/withMemberAuth";
+import { isToday } from "@/libs/formatDate";
 
 interface AttendanceRecord {
   _id: string;
   name: string;
   email: string;
   status: string;
-  createdAt: string;
+  updatedAt: string;
+  createdAt:string
+  timeOut:string
 }
 
 type GroupedAttendance = {
@@ -69,8 +72,22 @@ const AttendancePage: React.FC = () => {
       toast.success("Attendance marked successfully!");
       await fetchAttendance();
     } catch (error) {
-      console.error("Error marking attendance:", error);
       toast.error("Failed to mark attendance.");
+    }
+  };
+  const handleLeave = async (recordId: string) => {
+    if (!loggedMember) return;
+    try {
+      await axios.put(`${API_BASE_URL}/member/leave/${recordId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-team-member")}`,
+        },
+      });
+      toast.success('thank you for coming');
+      await fetchAttendance();
+    } catch (error) {
+ 
+      toast.error("Failed to leave. try again");
     }
   };
 
@@ -172,7 +189,10 @@ const AttendancePage: React.FC = () => {
                 <thead>
                   <tr>
                     <th className="border-b-2 border-gray-300 p-2 text-left">
-                      Time
+                      Time In
+                    </th>
+                    <th className="border-b-2 border-gray-300 p-2 text-left">
+                      Time Out
                     </th>
                     <th className="border-b-2 border-gray-300 p-2 text-left">
                       Status
@@ -186,7 +206,11 @@ const AttendancePage: React.FC = () => {
                   {records.map((record) => (
                     <tr key={record._id}>
                       <td className="border-b border-gray-200 p-2">
-                        {new Date(record.createdAt).toLocaleTimeString()}
+                        {record.status === "present" ||
+                          record.status === "pending"?new Date(record.updatedAt).toLocaleTimeString():'----'}
+                      </td>
+                      <td className="border-b border-gray-200 p-2">
+                        { record.timeOut? new Date(record.timeOut).toLocaleTimeString():'---'}
                       </td>
                       <td
                         className={`border-b border-gray-200 p-2 ${getStatusColor(
@@ -202,6 +226,14 @@ const AttendancePage: React.FC = () => {
                             className="bg-blue-500 text-white px-2 py-1 rounded"
                           >
                             Attend
+                          </button>
+                        )}
+                        {isToday(record.createdAt)&&!record.timeOut && record.status === "present" && (
+                          <button
+                            onClick={() => handleLeave(record._id)}
+                            className="bg-orange-500 hover:bg-orange-700 cursor-pointer text-white px-2 py-1 rounded"
+                          >
+                            Leave
                           </button>
                         )}
                       </td>

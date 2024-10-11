@@ -12,10 +12,11 @@ import { IUser } from "@/types/types";
 
 interface AttendanceRecord {
   _id: string;
-  memberId: {name:string,role:string};
+  memberId: { name: string; role: string };
   email: string;
   status: string;
   updatedAt: string;
+  timeOut:string
 }
 
 type GroupedAttendance = {
@@ -176,9 +177,7 @@ const AttendancePage: React.FC = () => {
                       <th className="border-b-2 border-gray-300 p-2 text-left">
                         #
                       </th>
-                      <th className="border-b-2 border-gray-300 p-2 text-left">
-                        Time In
-                      </th>
+
                       <th className="border-b-2 border-gray-300 p-2 text-left">
                         Name
                       </th>
@@ -187,6 +186,12 @@ const AttendancePage: React.FC = () => {
                       </th>
                       <th className="border-b-2 border-gray-300 p-2 text-left">
                         Status
+                      </th>
+                      <th className="border-b-2 border-gray-300 p-2 text-left">
+                        Time In
+                      </th>
+                      <th className="border-b-2 border-gray-300 p-2 text-left">
+                        Time Out
                       </th>
                       <th className="border-b-2 border-gray-300 p-2 text-left">
                         Action
@@ -199,11 +204,7 @@ const AttendancePage: React.FC = () => {
                         <td className="border-b border-gray-200 p-2">
                           {index + 1}
                         </td>
-                        <td className="border-b border-gray-200 p-2">
-                          {record.status === "present"||record.status==='pending'
-                            ? new Date(record.updatedAt).toLocaleTimeString()
-                            : "Not In yet"}
-                        </td>
+
                         <td className="border-b border-gray-200 p-2">
                           {record.memberId.name}
                         </td>
@@ -216,6 +217,18 @@ const AttendancePage: React.FC = () => {
                           )}`}
                         >
                           {record.status}
+                        </td>
+                        <td className="border-b border-gray-200 p-2">
+                          {record.status === "present" ||
+                          record.status === "pending"
+                            ? new Date(record.updatedAt).toLocaleTimeString()
+                            : "---"}
+                        </td>
+                        <td className="border-b border-gray-200 p-2">
+                          {record.timeOut
+                            ? new Date(record.timeOut).toLocaleTimeString() ||
+                              "--"
+                            : "---"}
                         </td>
                         {hasPermission(
                           loggedUser as IUser,
