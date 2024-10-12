@@ -57,7 +57,7 @@ const StudentManagement: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>("pending");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [type, setType] = useState("");
-
+const [studentCounts, setStudentCounts] = useState<Record<string, number>>({});
   const [userData, setUserData] = useState<IUser>();
   const [commentText, setComment] = useState({ comment: "" });
   const [courses, setCourses] = useState<Course[]>([]);
@@ -85,6 +85,14 @@ const handleViewP = (student: Student,type:string) => {
     setSelectedStudent(student);
     setType(type)
   };
+ const getStudentCountByStatus = (
+   students: Student[]
+ ): Record<string, number> => {
+   return students.reduce((acc, student) => {
+     acc[student.status] = (acc[student.status] || 0) + 1;
+     return acc;
+   }, {} as Record<string, number>);
+ };
 const processStatusChange = async (
   id: string,
   name: string,
@@ -170,6 +178,7 @@ const handlePay = async (id: string) => {
           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       );
       setStudents(sortedStudents);
+      setStudentCounts(getStudentCountByStatus(sortedStudents));
       filterStudents(activeFilter, sortedStudents);
     } catch (error) {
       console.error("Error fetching student data:", error);
@@ -607,12 +616,12 @@ const handlePay = async (id: string) => {
                   }`}
                 >
                   {status === "pending"
-                    ? "Candidates"
+                    ? `Candidates (${studentCounts[status] || 0}) `
                     : status === "accepted"
-                    ? "Admitted"
+                    ? `Admitted (${studentCounts[status] || 0})`
                     : status === "started"
-                    ? "Active"
-                    : status.charAt(0).toUpperCase() + status.slice(1)}
+                    ? `Active (${studentCounts[status] || 0})`
+                    : `${status.charAt(0).toUpperCase() + status.slice(1)} (${studentCounts[status] || 0})`}
                 </button>
               ))}
             </div>
