@@ -16,7 +16,7 @@ import {
 } from "@/libs/generateInvoice";
 import { convertImageUrlToBase64 } from "@/libs/convertImage";
 // import { toast } from "react-toastify";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 const imageUrl = "/futurefocuslogo.png";
 
 interface Student {
