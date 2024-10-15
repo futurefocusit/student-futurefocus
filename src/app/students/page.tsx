@@ -15,7 +15,7 @@ import {
   generateStatementPdf,
 } from "@/libs/generateInvoice";
 import { convertImageUrlToBase64 } from "@/libs/convertImage";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
 const imageUrl = "/futurefocuslogo.png";
 
@@ -52,7 +52,7 @@ interface GroupedStudents {
 }
 
 const StudentManagement: React.FC = () => {
-  const router = useRouter();
+  // const router = useRouter();
   const searchParams = useSearchParams();
   const filter = searchParams.get("filter");
 
@@ -633,7 +633,16 @@ const StudentManagement: React.FC = () => {
             </a>
           )}
         </div>
-        {error && <p className="text-red-600 p-4 text-center">{error}</p>}
+        {error ||
+          (succes && (
+            <p
+              className={`${
+                error ? " text-red-600" : "text-green-500"
+              } p-4 text-center`}
+            >
+              {error}
+            </p>
+          ))}
 
         <div className="p-4 space-y-4">
           <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
