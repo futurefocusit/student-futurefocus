@@ -10,11 +10,14 @@ import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
 import { hasPermission } from "@/libs/hasPermission";
 import Loader from "@/components/loader";
 import { formatMonth } from "@/libs/formatDate";
-import { generateRegisterStatementPdf, generateStatementPdf } from "@/libs/generateInvoice";
+import {
+  generateRegisterStatementPdf,
+  generateStatementPdf,
+} from "@/libs/generateInvoice";
 import { convertImageUrlToBase64 } from "@/libs/convertImage";
 import { toast } from "react-toastify";
+import { useRouter, useSearchParams } from "next/navigation";
 const imageUrl = "/futurefocuslogo.png";
-
 
 interface Student {
   _id: string;
@@ -49,122 +52,150 @@ interface GroupedStudents {
 }
 
 const StudentManagement: React.FC = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const filter = searchParams.get("filter");
+
+  let defaultFilter;
+  if (filter) {
+    defaultFilter = filter;
+  } else {
+    defaultFilter = "pending";
+  }
   const [students, setStudents] = useState<Student[]>([]);
   const [payment, setPayment] = useState<Payment[]>([]);
   const [groupedStudents, setGroupedStudents] = useState<GroupedStudents>({});
   const [error, setError] = useState<string | null>(null);
+  const [succes, setSucces] = useState<string | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-  const [activeFilter, setActiveFilter] = useState<string>("pending");
+  const [activeFilter, setActiveFilter] = useState<string>(defaultFilter);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [type, setType] = useState("");
-const [studentCounts, setStudentCounts] = useState<Record<string, number>>({});
+  const [studentCounts, setStudentCounts] = useState<Record<string, number>>(
+    {}
+  );
   const [userData, setUserData] = useState<IUser>();
   const [commentText, setComment] = useState({ comment: "" });
   const [courses, setCourses] = useState<Course[]>([]);
-  const [loading,setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [updateMode, setUpdateMode] = useState(false);
-const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-const [paymentMethod, setPaymentMethod] = useState<string>("");
-const [studentToRegister, setStudentToRegister] = useState<{
-  id: string;
-  name: string;
-} | null>(null);
-const [formData, setFormData] = useState({
-  amount: 0,
-  user: userData?.name,
-  method: "",
-});
-const handleFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const { name, value } = e.target;
-  setFormData((prevData) => ({
-    ...prevData,
-    [name]: name === "amount" ? Number(value) : value,
-  }));
-};
-const handleViewP = (student: Student,type:string) => {
-    setSelectedStudent(student);
-    setType(type)
-  };
- const getStudentCountByStatus = (
-   students: Student[]
- ): Record<string, number> => {
-   return students.reduce((acc, student) => {
-     acc[student.status] = (acc[student.status] || 0) + 1;
-     return acc;
-   }, {} as Record<string, number>);
- };
-const processStatusChange = async (
-  id: string,
-  name: string,
-  newStatus: string,
-  user: string
-) => {
-  const ourlogo = await convertImageUrlToBase64(imageUrl as string);
-  const data: IInvoice = {
-    student: name,
-    amount: 10000,
-    reason: "Registration fees",
-    date: new Date(),
-    remaining: 0,
-    status: "",
-    paymentMethod: paymentMethod, 
-  };
-
-  await axios.put(`${API_BASE_URL}/students/${id}`, {
-    status: newStatus,
-    user,
-    paymentMethod, 
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<string>("");
+  const [studentToRegister, setStudentToRegister] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [formData, setFormData] = useState({
+    amount: 0,
+    user: userData?.name,
+    method: "",
   });
 
-  if (newStatus === "registered") {
-    generateRegisterStatementPdf(data, ourlogo);
-  }
+  const handleFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: name === "amount" ? Number(value) : value,
+    }));
+  };
+  const handleViewP = (student: Student, type: string) => {
+    setSelectedStudent(student);
+    setType(type);
+  };
+  const getStudentCountByStatus = (
+    students: Student[]
+  ): Record<string, number> => {
+    return students.reduce((acc, student) => {
+      acc[student.status] = (acc[student.status] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+  };
+  const processStatusChange = async (
+    id: string,
+    name: string,
+    newStatus: string,
+    user: string
+  ) => {
+    try {
+      const ourlogo = await convertImageUrlToBase64(imageUrl as string);
+      const data: IInvoice = {
+        student: name,
+        amount: 10000,
+        reason: "Registration fees",
+        date: new Date(),
+        remaining: 0,
+        status: "",
+        paymentMethod: paymentMethod,
+      };
 
-  await fetchStudents();
-  setPaymentMethod("");
-  setStudentToRegister(null);
-};
+      await axios.put(`${API_BASE_URL}/students/${id}`, {
+        status: newStatus,
+        user,
+        paymentMethod,
+      });
+      setError(null);
+      setSucces("status changed");
 
-const handlePay = async (id: string) => {
-  try {
-    formData.user = userData?.name;
-    const response = await axios.post(
-      `${API_BASE_URL}/payment/pay/${id}`,
-      formData
-    );
-    toast.success(response.data.message);
-    const ourlogo = await convertImageUrlToBase64(imageUrl as string);
-    generateStatementPdf(response.data.data, ourlogo as string);
-    fetchPayment();
-  } catch (error) {
-    console.log(error);
-    setError("Error happened! check payment and try again");
-  }
-};
- const handleDiscount = async (id: string) => {
-   try {
-     const response = await axios.put(
-       `${API_BASE_URL}/payment/discount/${id}`,
-       formData
-     );
-     toast.success(response.data.message);
-     fetchPayment();
-   } catch (error) {
-     setError("Error happened! check payment and try again");
-   }
- };
- const handleExtra = async (id: string) => {
-   try {
-     const response = await axios.put(
-       `${API_BASE_URL}/payment/extra/${id}`,
-       formData
-     );
-     toast.success(response.data.message);
-     fetchPayment();
-   } catch (error) {
-     setError("Error happened! check payment and try again");
-   }
- };
+      if (newStatus === "registered") {
+        generateRegisterStatementPdf(data, ourlogo);
+      }
+
+      await fetchStudents();
+      setPaymentMethod("");
+      setStudentToRegister(null);
+    } catch (error) {
+      setSucces(null);
+      setError("failed to change status");
+    }
+  };
+
+  const handlePay = async (id: string) => {
+    try {
+      formData.user = userData?.name;
+      const response = await axios.post(
+        `${API_BASE_URL}/payment/pay/${id}`,
+        formData
+      );
+      setSucces(response.data.message);
+      setError(null);
+      const ourlogo = await convertImageUrlToBase64(imageUrl as string);
+      generateStatementPdf(response.data.data, ourlogo as string);
+      fetchPayment();
+    } catch (error) {
+      console.log(error);
+      setSucces(null);
+      setError("Error happened! check payment and try again");
+    }
+  };
+  const handleDiscount = async (id: string) => {
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/payment/discount/${id}`,
+        formData
+      );
+      setSucces(response.data.message);
+      setError(null);
+
+      fetchPayment();
+    } catch (error) {
+      setError("Error happened! check payment and try again");
+      setSucces(null);
+    }
+  };
+  const handleExtra = async (id: string) => {
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/payment/extra/${id}`,
+        formData
+      );
+      setSucces(response.data.message);
+      setError(null);
+      fetchPayment();
+    } catch (error) {
+      setError("Error happened! check payment and try again");
+      setSucces(null);
+    }
+  };
   const setCommentText = (value: string) => {
     setComment((prev) => ({ ...prev, comment: value }));
   };
@@ -183,9 +214,8 @@ const handlePay = async (id: string) => {
     } catch (error) {
       console.error("Error fetching student data:", error);
       setError("Failed to load student data. Please try again later.");
-    } 
-    finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
   const fetchCourses = async () => {
@@ -214,11 +244,14 @@ const handlePay = async (id: string) => {
           intake: selectedStudent.intake,
         }
       );
+      setSucces("updated student successfully");
+      setError(null);
       await fetchStudents();
       setSelectedStudent(null);
       setUpdateMode(false);
     } catch (error) {
       console.error("Error updating student:", error);
+      setSucces(null);
       setError("Failed to update student. Please try again.");
     }
   };
@@ -245,11 +278,9 @@ const handlePay = async (id: string) => {
   };
 
   useEffect(() => {
- 
-       fetchStudents();
-     fetchPayment();
+    fetchStudents();
+    fetchPayment();
     fetchCourses();
-
   }, []);
 
   const handleDelete = async (id: string) => {
@@ -259,6 +290,8 @@ const handlePay = async (id: string) => {
       setStudents(updatedStudents);
       filterStudents(activeFilter, updatedStudents);
       setSelectedStudent(null);
+      setError(null);
+      setSucces("deleted student successfully");
     } catch (error) {
       console.error("Error deleting student:", error);
       setError("Failed to delete student. Please try again.");
@@ -293,9 +326,12 @@ const handlePay = async (id: string) => {
   const handleAttend = async (id: string) => {
     try {
       await axios.put(`${API_BASE_URL}/students/attend/${id}`);
+      setSucces("attend succesfully");
+      setError(null);
       await fetchStudents();
     } catch (error) {
       setError(`Failed to attend student. Please try again.`);
+      setError(null);
     }
   };
 
@@ -337,6 +373,8 @@ const handlePay = async (id: string) => {
       await axios.put(`${API_BASE_URL}/students/comment/${studentId}`, {
         comment: commentText.comment,
       });
+      setError(null);
+      setSucces("comment savec");
     } catch (error) {
       console.error("Error saving comment:", error);
       setError("Failed to save comment. Please try again.");
@@ -389,7 +427,7 @@ const handlePay = async (id: string) => {
         return (
           <>
             {commonButtons}
-            
+
             {hasPermission(userData as IUser, "students", "admit") ? (
               <button
                 onClick={() =>
@@ -621,7 +659,9 @@ const handlePay = async (id: string) => {
                     ? `Admitted (${studentCounts[status] || 0})`
                     : status === "started"
                     ? `Active (${studentCounts[status] || 0})`
-                    : `${status.charAt(0).toUpperCase() + status.slice(1)} (${studentCounts[status] || 0})`}
+                    : `${status.charAt(0).toUpperCase() + status.slice(1)} (${
+                        studentCounts[status] || 0
+                      })`}
                 </button>
               ))}
             </div>

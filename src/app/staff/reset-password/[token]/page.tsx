@@ -50,10 +50,10 @@ const ResetPasswordPage = () => {
       setIsLoading(true);
       const response = await axios.put(
         `${API_BASE_URL}/member/reset-password/${token}`,
-        { password:password }
+        { password: password }
       );
       toast.success(response.data.message);
-      window.location.href = "/admin/login";
+      window.location.href = "/staff/login";
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         toast.error(error.response.data.message);

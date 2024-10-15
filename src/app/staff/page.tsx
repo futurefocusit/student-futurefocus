@@ -15,8 +15,8 @@ interface AttendanceRecord {
   email: string;
   status: string;
   updatedAt: string;
-  createdAt:string
-  timeOut:string
+  createdAt: string;
+  timeOut: string;
 }
 
 type GroupedAttendance = {
@@ -24,7 +24,7 @@ type GroupedAttendance = {
 };
 
 const AttendancePage: React.FC = () => {
-  const {  loggedMember, logout } = useAuth();
+  const { loggedMember, logout } = useAuth();
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -83,10 +83,9 @@ const AttendancePage: React.FC = () => {
           Authorization: `Bearer ${localStorage.getItem("ffa-team-member")}`,
         },
       });
-      toast.success('thank you for coming');
+      toast.success("thank you for coming");
       await fetchAttendance();
     } catch (error) {
- 
       toast.error("Failed to leave. try again");
     }
   };
@@ -207,10 +206,14 @@ const AttendancePage: React.FC = () => {
                     <tr key={record._id}>
                       <td className="border-b border-gray-200 p-2">
                         {record.status === "present" ||
-                          record.status === "pending"?new Date(record.updatedAt).toLocaleTimeString():'----'}
+                        record.status === "pending"
+                          ? new Date(record.updatedAt).toLocaleTimeString()
+                          : "----"}
                       </td>
                       <td className="border-b border-gray-200 p-2">
-                        { record.timeOut? new Date(record.timeOut).toLocaleTimeString():'---'}
+                        {record.timeOut
+                          ? new Date(record.timeOut).toLocaleTimeString()
+                          : "---"}
                       </td>
                       <td
                         className={`border-b border-gray-200 p-2 ${getStatusColor(
@@ -220,22 +223,25 @@ const AttendancePage: React.FC = () => {
                         {record.status}
                       </td>
                       <td className="border-b border-gray-200 p-2">
-                        {record.status === "absent" && (
-                          <button
-                            onClick={() => markAttendance(record._id)}
-                            className="bg-blue-500 text-white px-2 py-1 rounded"
-                          >
-                            Attend
-                          </button>
-                        )}
-                        {isToday(record.createdAt)&&!record.timeOut && record.status === "present" && (
-                          <button
-                            onClick={() => handleLeave(record._id)}
-                            className="bg-orange-500 hover:bg-orange-700 cursor-pointer text-white px-2 py-1 rounded"
-                          >
-                            Leave
-                          </button>
-                        )}
+                        {record.status === "absent" &&
+                          isToday(record.createdAt) && (
+                            <button
+                              onClick={() => markAttendance(record._id)}
+                              className="bg-blue-500 text-white px-2 py-1 rounded"
+                            >
+                              Attend
+                            </button>
+                          )}
+                        {isToday(record.createdAt) &&
+                          !record.timeOut &&
+                          record.status === "present" && (
+                            <button
+                              onClick={() => handleLeave(record._id)}
+                              className="bg-orange-500 hover:bg-orange-700 cursor-pointer text-white px-2 py-1 rounded"
+                            >
+                              Leave
+                            </button>
+                          )}
                       </td>
                     </tr>
                   ))}

@@ -103,8 +103,8 @@ const Dashboard = () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/admin/dashboard`);
         setSummary(response.data);
-          await fetchUser();
-          setUserData(await getLoggedUserData());
+        await fetchUser();
+        setUserData(await getLoggedUserData());
       } catch (error) {
         //@ts-expect-error ignore error
         setError(error);
@@ -260,8 +260,6 @@ const Dashboard = () => {
     ],
   };
 
-  
-
   return (
     <div className="flex flex-col md:items-center p-4">
       <SideBar />
@@ -287,7 +285,7 @@ const Dashboard = () => {
           </p>
         </a>
         <a
-          href="/students"
+          href="/students?filter=started"
           className="bg-white p-6 rounded-lg shadow-md text-center"
         >
           <h3 className="text-lg font-semibold">Active Students</h3>
@@ -296,7 +294,7 @@ const Dashboard = () => {
           </p>
         </a>
         <a
-          href="/students"
+          href="/students?filter=registered"
           className="bg-white p-6 rounded-lg shadow-md text-center"
         >
           <h3 className="text-lg font-semibold">Registered Students</h3>
@@ -305,7 +303,7 @@ const Dashboard = () => {
           </p>
         </a>
         <a
-          href="/students"
+          href="/students?filter=accepted"
           className="bg-white p-6 rounded-lg shadow-md text-center"
         >
           <h3 className="text-lg font-semibold">Admitted Students</h3>
@@ -314,7 +312,7 @@ const Dashboard = () => {
           </p>
         </a>
         <a
-          href="/students"
+          href="/students?filter=droppedOut"
           className="bg-white p-6 rounded-lg shadow-md text-center"
         >
           <h3 className="text-lg font-semibold">Dropped Out Students</h3>
@@ -322,16 +320,16 @@ const Dashboard = () => {
             {summary.studentStatusCounts.droppedOut || 0}
           </p>
         </a>
-          <a
-            href="/students"
-            className="bg-white p-6 rounded-lg shadow-md text-center"
-          >
-            <h3 className="text-lg font-semibold">Completed Students</h3>
-            <p className="text-2xl font-bold">
-              {summary.studentStatusCounts.completed || 0}
-            </p>
-          </a>
-       
+        <a
+          href="/students/?filter=completed"
+          className="bg-white p-6 rounded-lg shadow-md text-center"
+        >
+          <h3 className="text-lg font-semibold">Completed Students</h3>
+          <p className="text-2xl font-bold">
+            {summary.studentStatusCounts.completed || 0}
+          </p>
+        </a>
+
         {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
           <a
             href="/payment"
