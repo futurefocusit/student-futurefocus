@@ -32,7 +32,7 @@ interface Payment {
   status: string;
   amountDiscounted: number;
   extraAmount: number;
-  comment:string
+  comment: string;
   _id: string;
 }
 
@@ -46,29 +46,29 @@ const StudentManagement: React.FC = () => {
   const [groupedStudents, setGroupedStudents] = useState<GroupedStudents>({});
   const [error, setError] = useState<string | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-  const [type ,setType] = useState('')
+  const [type, setType] = useState("");
   const [commentText, setComment] = useState({ comment: "" });
   const [activeFilter, setActiveFilter] = useState<string>("registered");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
- const [userData, setUserData] = useState<IUser>();
-const setCommentText = (value: string) => {
-  setComment((prev) => ({ ...prev, comment: value }));
-};
- const handleSaveComment = async (studentId: string) => {
-   try {
-     await axios.put(`${API_BASE_URL}/payment/comment/${studentId}`, {
-       comment: commentText.comment,
-     });
-   } catch (error) {
-     console.error("Error saving comment:", error);
-     setError("Failed to save comment. Please try again.");
-   }
- };
+  const [userData, setUserData] = useState<IUser>();
+  const setCommentText = (value: string) => {
+    setComment((prev) => ({ ...prev, comment: value }));
+  };
+  const handleSaveComment = async (studentId: string) => {
+    try {
+      await axios.put(`${API_BASE_URL}/payment/comment/${studentId}`, {
+        comment: commentText.comment,
+      });
+    } catch (error) {
+      console.error("Error saving comment:", error);
+      setError("Failed to save comment. Please try again.");
+    }
+  };
   const [formData, setFormData] = useState({
-    amount:0,
-    user:userData?.name,
-    method:""
+    amount: 0,
+    user: userData?.name,
+    method: "",
   });
 
   const handleFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,10 +81,10 @@ const setCommentText = (value: string) => {
 
   const fetchStudents = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const response = await axios.get<Student[]>(`${API_BASE_URL}/students`);
-        await fetchUser();
-        setUserData(await getLoggedUserData());
+      await fetchUser();
+      setUserData(await getLoggedUserData());
       const sortedStudents = response.data.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -94,12 +94,10 @@ const setCommentText = (value: string) => {
     } catch (error) {
       console.error("Error fetching student data:", error);
       setError("Failed to load student data. Please try again later.");
-    }
-    finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
-  
 
   const fetchPayment = async () => {
     try {
@@ -127,25 +125,24 @@ const setCommentText = (value: string) => {
     fetchPayment();
   }, []);
 
-  const handleView = (student: Student,type:string) => {
+  const handleView = (student: Student, type: string) => {
     setSelectedStudent(student);
-    setType(type)
+    setType(type);
   };
 
   const handlePay = async (id: string) => {
     try {
-
       formData.user = userData?.name;
       const response = await axios.post(
         `${API_BASE_URL}/payment/pay/${id}`,
         formData
       );
       toast.success(response.data.message);
-      const ourlogo=await convertImageUrlToBase64(imageUrl as string)
-      generateStatementPdf(response.data.data,ourlogo as string )
+      const ourlogo = await convertImageUrlToBase64(imageUrl as string);
+      generateStatementPdf(response.data.data, ourlogo as string);
       fetchPayment();
     } catch (error) {
-      console.log(error)
+      console.log(error);
       setError("Error happened! check payment and try again");
     }
   };
@@ -234,14 +231,14 @@ const setCommentText = (value: string) => {
       remaining: totalDue - totalPaid,
     };
   };
-if (loading) {
-  return (
-    <div className="text-center mt-20">
-      <SideBar />
-      <Loader />
-    </div>
-  );
-}
+  if (loading) {
+    return (
+      <div className="text-center mt-20">
+        <SideBar />
+        <Loader />
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
       <SideBar />

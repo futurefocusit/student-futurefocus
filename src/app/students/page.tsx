@@ -75,6 +75,8 @@ const StudentManagement: React.FC = () => {
     {}
   );
   const [userData, setUserData] = useState<IUser>();
+  const [openView, setOpenView] = useState(false)
+  const [openPay, setOpenPay] = useState(false)
   const [commentText, setComment] = useState({ comment: "" });
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -101,6 +103,7 @@ const StudentManagement: React.FC = () => {
   const handleViewP = (student: Student, type: string) => {
     setSelectedStudent(student);
     setType(type);
+    setOpenPay(true)
   };
   const getStudentCountByStatus = (
     students: Student[]
@@ -299,8 +302,18 @@ const StudentManagement: React.FC = () => {
   };
 
   const handleView = (student: Student) => {
+    setOpenView(true)
     setSelectedStudent(student);
   };
+  const handleDisableView=()=>{
+    setOpenView(false);
+    setSelectedStudent(null);
+  }
+ 
+  const handleDisableViewP=()=>{
+    setOpenPay(false);
+    setSelectedStudent(null);
+  }
 
   const handleStatusChange = async (
     id: string,
@@ -785,7 +798,7 @@ const StudentManagement: React.FC = () => {
             </div>
           ))}
 
-          {selectedStudent && (
+          {selectedStudent && openView && (
             <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
               <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg">
                 <div className="bg-gray-50 p-6 h-96 overflow-scroll">
@@ -995,7 +1008,7 @@ const StudentManagement: React.FC = () => {
                             </div>
                             <div className="bg-gray-50 p-4 flex justify-end">
                               <button
-                                onClick={() => setSelectedStudent(null)}
+                                onClick={() => handleDisableView()}
                                 className="inline-flex justify-center px-4 py-2 text-sm  text-black font-extrabold hover:text-white  bg-red-300 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
                               >
                                 Close
@@ -1092,7 +1105,7 @@ const StudentManagement: React.FC = () => {
           </div>
         </div>
       )}
-      {selectedStudent && type && (
+      {selectedStudent && type &&openPay && (
         <div className="fixed inset-0 flex  items-center justify-center bg-gray-800 bg-opacity-75">
           <div className="bg-white rounded-lg overflow-hidden h-64 shadow-xl transform transition-all sm:w-full sm:max-w-lg">
             <div className="bg-gray-50  overflow-scroll">
@@ -1148,7 +1161,7 @@ const StudentManagement: React.FC = () => {
                   : "Add Extra"}
               </button>
               <button
-                onClick={() => setSelectedStudent(null)}
+                onClick={() => handleDisableViewP()}
                 className="px-4 py-2 text-sm text-black font-extrabold hover:text-white bg-red-300 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
               >
                 Close

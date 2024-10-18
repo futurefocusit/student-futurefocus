@@ -255,7 +255,7 @@ const AttendancePage: React.FC = () => {
   );
 };
 
-const Navbar: React.FC<{
+export const Navbar: React.FC<{
   //@ts-expect-error errro
   loggedMember;
   logout: () => void;
