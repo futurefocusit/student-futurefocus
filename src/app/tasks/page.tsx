@@ -23,6 +23,8 @@ import API_BASE_URL from "@/config/baseURL";
 import { useAuth } from "@/context/AuthContext";
 import withAdminAuth from "@/components/withAdminAuth";
 import SideBar from "@/components/SideBar";
+import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
+import { IUser } from "@/types/types";
 
 interface Comment {
   _id: string;
@@ -56,34 +58,40 @@ const MemberTasks: React.FC = () => {
   const [endTime, setEndTime] = useState<string>("");
   const [startTime, setStartTime] = useState<string>("");
   const { loggedMember } = useAuth();
+  const [userData, setUserData] = useState<IUser>();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [comment, setComment] = useState<string>("");
   const [reply, setReply] = useState<{
     commentId: string;
     text: string;
   } | null>(null);
-
+  useEffect(() => {
+    const fetchUserData = async () => {
+      await fetchUser();
+      setUserData(await getLoggedUserData());
+    };
+    fetchUserData();
+  }, []);
   useEffect(() => {
     fetchTasks();
     fetchUsers();
   }, []);
-const statusColor=(status:string)=>{
-  switch(status){
-    case 'started':
-      return "#153cec";
-      case 'completed':
+  const statusColor = (status: string) => {
+    switch (status) {
+      case "started":
+        return "#153cec";
+      case "completed":
         return "#36c622";
-        
-          default:
-            return "#272033";
-            }
-}
+
+      default:
+        return "#272033";
+    }
+  };
   const fetchTasks = async () => {
     try {
       const res = await axios.get<Task[]>(`${API_BASE_URL}/task`);
       setTasks(res.data);
     } catch (error) {
-  
       console.error("Error fetching tasks:", error);
     }
   };
@@ -93,7 +101,6 @@ const statusColor=(status:string)=>{
       const res = await axios.get<User[]>(`${API_BASE_URL}/member`);
       setUsers(res.data);
     } catch (error) {
-     
       console.error("Error fetching users:", error);
     }
   };
@@ -104,7 +111,8 @@ const statusColor=(status:string)=>{
       await axios.post(`${API_BASE_URL}/task`, {
         task,
         user,
-        manager: loggedMember?._id,
+        manager: userData?._id,
+
         endTime,
         startTime,
       });
@@ -112,7 +120,6 @@ const statusColor=(status:string)=>{
       resetForm();
       fetchTasks();
     } catch (error) {
-      alert("Error assigning task. Please check your input.");
       console.error("Error assigning task:", error);
     }
   };
@@ -140,7 +147,6 @@ const statusColor=(status:string)=>{
       await axios.delete(`${API_BASE_URL}/task/${taskId}`);
       fetchTasks();
     } catch (error) {
-      alert("Error deleting task. Please try again.");
       console.error("Error deleting task:", error);
     }
   };
@@ -149,12 +155,11 @@ const statusColor=(status:string)=>{
     try {
       await axios.post(`${API_BASE_URL}/task/comment/${taskId}`, {
         text: comment,
-        user: loggedMember?._id,
+        user: userData?._id,
       });
       setComment("");
       fetchTasks();
     } catch (error) {
-      alert("Error adding comment. Please try again.");
       console.error("Error adding comment:", error);
     }
   };
@@ -164,12 +169,11 @@ const statusColor=(status:string)=>{
     try {
       await axios.post(`${API_BASE_URL}/task/comment/reply/${commentId}`, {
         text: reply.text,
-        user: loggedMember?._id,
+        user: userData?._id,
       });
       setReply(null);
       fetchTasks();
     } catch (error) {
-      alert("Error adding reply. Please try again.");
       console.error("Error adding reply:", error);
     }
   };
@@ -340,7 +344,7 @@ const statusColor=(status:string)=>{
                               borderRadius: "4px",
                             }}
                           >
-                            {replyComment.user.name}: {replyComment.text}
+                            {replyComment?.user?.name}: {replyComment?.text}
                           </Typography>
                         </div>
                       ))}
