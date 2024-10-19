@@ -14,12 +14,12 @@ import {
   Typography,
   IconButton,
 } from "@mui/material";
-import { Send, Message, Check, Delete } from "@mui/icons-material";
+import { Send, Message, Check } from "@mui/icons-material";
 import API_BASE_URL from "@/config/baseURL";
 
 import withMemberAuth from "@/components/withMemberAuth";
 import { useAuth } from "@/context/AuthContext";
-import { Navbar } from "../page";
+import { Navbar } from "@/components/NavBar";
 
 interface Comment {
   _id: string;
