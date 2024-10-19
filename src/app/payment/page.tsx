@@ -166,6 +166,7 @@ const StudentManagement: React.FC = () => {
       toast.success(response.data.message);
       fetchPayment();
     } catch (error) {
+      console.log(error)
       setError("Error happened! check payment and try again");
     }
   };
@@ -178,6 +179,7 @@ const StudentManagement: React.FC = () => {
       toast.success(response.data.message);
       fetchPayment();
     } catch (error) {
+      console.log(error)
       setError("Error happened! check payment and try again");
     }
   };

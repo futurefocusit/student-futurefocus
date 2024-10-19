@@ -92,6 +92,7 @@ const PaymentsPage: React.FC = () => {
       fetchCashflows();
       toast.success(response.data.message);
     } catch (error) {
+      console.log(error)
       toast.error("Failed to add transaction");
     }
   };
