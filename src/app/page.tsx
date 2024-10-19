@@ -19,8 +19,9 @@ import {
 } from "chart.js";
 import Loader from "@/components/loader";
 import { hasPermission } from "@/libs/hasPermission";
-import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
-import { IUser } from "@/types/types";
+import {  useAuth } from "@/context/AuthContext";
+import { TeamMember } from "@/types/types";
+
 
 ChartJS.register(
   LinearScale,
@@ -96,15 +97,15 @@ const Dashboard = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [userData, setUserData] = useState<IUser>();
+  const { fetchLoggedUser, loggedUser } = useAuth();
+
 
   useEffect(() => {
     const fetchSummary = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/admin/dashboard`);
         setSummary(response.data);
-        await fetchUser();
-        setUserData(await getLoggedUserData());
+        await fetchLoggedUser();
       } catch (error) {
         //@ts-expect-error ignore error
         setError(error);
@@ -330,7 +331,7 @@ const Dashboard = () => {
           </p>
         </a>
 
-        {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
+        {hasPermission(loggedUser as TeamMember, "dashboard", "view-dashboard") ? (
           <a
             href="/payment"
             className="bg-white p-6 rounded-lg shadow-md text-center"
@@ -343,7 +344,7 @@ const Dashboard = () => {
         ) : (
           ""
         )}
-        {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
+        {hasPermission(loggedUser as TeamMember, "dashboard", "view-dashboard") ? (
           <a
             href="/payment"
             className="bg-white p-6 rounded-lg shadow-md text-center"
@@ -356,7 +357,7 @@ const Dashboard = () => {
         ) : (
           ""
         )}
-        {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
+        {hasPermission(loggedUser as TeamMember, "dashboard", "view-dashboard") ? (
           <a
             href="/payment"
             className="bg-white p-6 rounded-lg shadow-md text-center"
@@ -369,7 +370,7 @@ const Dashboard = () => {
         ) : (
           ""
         )}
-        {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
+        {hasPermission(loggedUser as TeamMember, "dashboard", "view-dashboard") ? (
           <a
             href="/payment"
             className="bg-white p-6 rounded-lg shadow-md text-center"
@@ -382,7 +383,7 @@ const Dashboard = () => {
         ) : (
           ""
         )}
-        {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
+        {hasPermission(loggedUser as TeamMember, "dashboard", "view-dashboard") ? (
           <a className="bg-white p-6 rounded-lg shadow-md text-center">
             <h3 className="text-lg font-semibold">Total Amount Paid</h3>
             <p className="text-2xl font-bold">
@@ -398,7 +399,7 @@ const Dashboard = () => {
         {/* @ts-expect-error error */}
         <Bar data={studentsData} options={options} />
       </div>
-      {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
+      {hasPermission(loggedUser as TeamMember, "dashboard", "view-dashboard") ? (
         <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mt-6">
           <h2 className="text-2xl font-semibold mb-4">Payments Statistics</h2>
           {/* @ts-expect-error error */}
@@ -408,7 +409,7 @@ const Dashboard = () => {
         ""
       )}
 
-      {hasPermission(userData as IUser, "dashboard", "view-dashboard") ? (
+      {hasPermission(loggedUser as TeamMember, "dashboard", "view-dashboard") ? (
         <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mt-6">
           <h2 className="text-2xl font-semibold mb-4">Monthly Cash Flow</h2>
           <Line data={cashflowData} options={{ responsive: true }} />

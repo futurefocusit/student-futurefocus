@@ -1,25 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { FaSpinner } from "react-icons/fa";
-import { fetchUser } from "@/context/adminAuth";
+import { useAuth } from "@/context/AuthContext";
 
 const withAdminAuth = <P extends object>(WrappedComponent: React.FC) => {
   const AuthHOC: React.FC<P> = () => {
-    const [loading, setLoading] = useState(true);
+    const [loading,setLoading]=useState(true)
+    const {fetchLoggedUser,loggedUser} = useAuth()
     // const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
       const checkAuth = async () => {
         try {
-          await fetchUser();
-          setLoading(false);
+          await fetchLoggedUser();
+          if(!loggedUser?.isAdmin){
+            window.location.href='/staff/task'
+             return 
+          }
         } catch (error) {
-          console.log(error)
+          console.log(error);
           toast.error("logged out ");
           // setError("Unauthorized");
           window.location.href = "/login";
+        } finally {
+          setLoading(false);
         }
-      };
+      }
 
       checkAuth();
     }, []);

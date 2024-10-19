@@ -4,40 +4,11 @@ import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
 import API_BASE_URL from "@/config/baseURL";
 import { changeIndex } from "@/libs/changeIndex";
+import { AttendanceRecord, GroupedAttendance } from "@/types/types";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-interface Student {
-  _id: string;
-  name: string;
-  email: string;
-  phone: string;
-  selectedCourse: string;
-  selectedShift: string;
-  intake: string;
-  message: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface AttendanceRecord {
-  _id: string;
-  studentId: Student | null; 
-  status: "present" | "absent";
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface GroupedAttendance {
-  [date: string]: {
-    [intake: string]: {
-      [shift: string]: AttendanceRecord[];
-    };
-  };
-}
 
 const AttendancePage: React.FC = () => {
   const [groupedAttendance, setGroupedAttendance] = useState<GroupedAttendance>(
@@ -54,16 +25,15 @@ const AttendancePage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true)
+        setLoading(true);
         const response = await axios.get(`${API_BASE_URL}/students/attendance`);
         const data: AttendanceRecord[] = response.data;
-        console.log("Fetched Data:", data); 
+        console.log("Fetched Data:", data);
         groupAttendanceData(data);
       } catch (error) {
         console.error("Failed to fetch attendance data:", error);
-      }
-      finally{
-        setLoading(false)
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -115,7 +85,6 @@ const AttendancePage: React.FC = () => {
     setAvailableShifts(shiftArray);
   };
 
-
   const filterAttendance = () => {
     const filtered: GroupedAttendance = {};
 
@@ -153,14 +122,14 @@ const AttendancePage: React.FC = () => {
 
     setFilteredAttendance(filtered);
   };
-if (loading) {
-  return (
-    <div className="text-center mt-20">
-      <SideBar />
-      <Loader />
-    </div>
-  );
-}
+  if (loading) {
+    return (
+      <div className="text-center mt-20">
+        <SideBar />
+        <Loader />
+      </div>
+    );
+  }
   return (
     <div className="container mx-auto p-4">
       <SideBar />
@@ -189,8 +158,7 @@ if (loading) {
         >
           All Shifts
         </button>
-        {  
-        availableShifts.map((shift) => (
+        {availableShifts.map((shift) => (
           <button
             key={shift}
             className={`px-4 py-2 rounded-md ${
