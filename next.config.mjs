@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    productionBrowserSourceMaps: false,
+    webpack: (config) => {
+        config.optimization.minimize = false; // Disable Terser
+        return config;
+    },
 };
 
 export default nextConfig;
