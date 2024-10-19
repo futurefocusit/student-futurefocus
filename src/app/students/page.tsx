@@ -148,6 +148,7 @@ const StudentManagement: React.FC = () => {
       setPaymentMethod("");
       setStudentToRegister(null);
     } catch (error) {
+      console.log(error)
       setSucces(null);
       setError("failed to change status");
     }
@@ -185,6 +186,7 @@ const StudentManagement: React.FC = () => {
 
       fetchPayment();
     } catch (error) {
+      console.log(error)
       setError("Error happened! check payment and try again");
       setSucces(null);
     }
@@ -199,6 +201,7 @@ const StudentManagement: React.FC = () => {
       setError(null);
       fetchPayment();
     } catch (error) {
+      console.log(error)
       setError("Error happened! check payment and try again");
       setSucces(null);
     }
@@ -347,6 +350,7 @@ const StudentManagement: React.FC = () => {
       setError(null);
       await fetchStudents();
     } catch (error) {
+      console.log(error)
       setError(`Failed to attend student. Please try again.`);
       setError(null);
     }

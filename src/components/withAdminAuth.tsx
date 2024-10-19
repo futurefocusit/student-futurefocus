@@ -14,6 +14,7 @@ const withAdminAuth = <P extends object>(WrappedComponent: React.FC) => {
           await fetchUser();
           setLoading(false);
         } catch (error) {
+          console.log(error)
           toast.error("logged out ");
           // setError("Unauthorized");
           window.location.href = "/login";

@@ -71,6 +71,7 @@ const Registration: React.FC = () => {
        } catch (err) {
          setError("Failed to load courses.");
          setLoading(false);
+         console.log(error)
        }
      };
      const getIntakes = async () => {

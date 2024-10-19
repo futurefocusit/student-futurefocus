@@ -24,6 +24,7 @@ const withMemberAuth = <P extends object>(
             toast.error("Session expired. Please log in again.");
             window.location.href = "/staff/login";
           }
+          console.log(error)
         }
       };
 
