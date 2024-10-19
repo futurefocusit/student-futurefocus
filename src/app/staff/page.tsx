@@ -140,7 +140,7 @@ const AttendancePage: React.FC = () => {
 
   return (
     <div>
-      <Navbar loggedMember={loggedMember} logout={logout} />
+      <Navbar loggedMember={loggedMember} logout={logout}  active="attendance"/>
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Attendance Records</h1>
 
@@ -259,13 +259,29 @@ export const Navbar: React.FC<{
   //@ts-expect-error errro
   loggedMember;
   logout: () => void;
-}> = ({ loggedMember, logout }) => {
+  active:string
+}> = ({ loggedMember, logout, active }) => {
   return (
     <nav className="bg-gray-800 text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
-        <Link href="/" className="text-lg font-bold">
-          My Attendances
-        </Link>
+        <div className=" flex gap-5">
+          <Link
+            href="/staff"
+            className={`${
+              active === "attendance" ? "text-blue-600" : "text-white"
+            } text-lg font-bold hover:text-gray-500`}
+          >
+            My Attendances
+          </Link>
+          <Link
+            href="/staff/task"
+            className={`${
+              active === "task" ? "text-blue-600" : "text-white"
+            } text-lg font-bold hover:text-gray-500`}
+          >
+            My Tasks
+          </Link>
+        </div>
         <div className="flex items-center">
           {loggedMember ? (
             <>

@@ -13,6 +13,7 @@ import {
   FaChevronRight,
   FaMoneyBillAlt,
   FaClock,
+  FaTasks,
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import { FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
@@ -35,6 +36,7 @@ const SideBar = () => {
     { label: "Attendances", icon: FaCalendarCheck, href: "/attendance" },
     { label: "Cashflow", icon: FaMoneyBillAlt, href: "/cashflow" },
     { label: "staff Attendance", icon: FaClock, href: "/attendance/staff" },
+    { label: "Tasks", icon: FaTasks, href: "/tasks" },
   ];
 
   useEffect(() => {

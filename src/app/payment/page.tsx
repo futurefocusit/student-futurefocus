@@ -570,18 +570,22 @@ const StudentManagement: React.FC = () => {
                         className="border-2 p-2 rounded-md border-blue-700"
                       />
                     </span>
-                    <span className="flex gap-10 items-center mx-auto mb-3">
-                      <label className="font-extrabold" htmlFor="amount">
-                        method of payment:
-                      </label>
-                      <input
-                        name="method"
-                        type="text"
-                        onChange={handleFormData}
-                        placeholder="type Method"
-                        className="border-2 p-2 rounded-md border-blue-700"
-                      />
-                    </span>
+                    {type === "pay" ? (
+                      <span className="flex gap-10 items-center mx-auto mb-3">
+                        <p className="font-extrabold">
+                          method of payment:
+                        </p>
+                        <input
+                          name="method"
+                          type="text"
+                          onChange={handleFormData}
+                          placeholder="type Method"
+                          className="border-2 p-2 rounded-md border-blue-700"
+                        />
+                      </span>
+                    ) : (
+                     ""
+                    )}
                   </div>
                 </div>
                 <div className="bg-gray-50 p-4 flex justify-around">

@@ -13,8 +13,12 @@ import {
   CardHeader,
   Typography,
   IconButton,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
-import { Send, Message, Check, Delete, Edit } from "@mui/icons-material";
+import { Send, Message, Check, Delete } from "@mui/icons-material";
 import API_BASE_URL from "@/config/baseURL";
 import { useAuth } from "@/context/AuthContext";
 import withAdminAuth from "@/components/withAdminAuth";
@@ -31,17 +35,22 @@ interface Comment {
 interface Task {
   _id: string;
   task: string;
-  manager: { name: string; _id: string; role: string };
+  user: { name: string; _id: string; role: string };
   startTime: string;
   endTime: string;
   status: string;
   comments: Comment[];
 }
 
+interface User {
+  _id: string;
+  name: string;
+}
+
 const MemberTasks: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
-  const [isUpdateOpen, setIsUpdateOpen] = useState<boolean>(false);
   const [task, setTask] = useState<string>("");
   const [user, setUser] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
@@ -56,15 +65,36 @@ const MemberTasks: React.FC = () => {
 
   useEffect(() => {
     fetchTasks();
+    fetchUsers();
   }, []);
-
+const statusColor=(status:string)=>{
+  switch(status){
+    case 'started':
+      return "#153cec";
+      case 'completed':
+        return "#36c622";
+        
+          default:
+            return "#272033";
+            }
+}
   const fetchTasks = async () => {
     try {
       const res = await axios.get<Task[]>(`${API_BASE_URL}/task`);
       setTasks(res.data);
     } catch (error) {
-      alert("Error fetching tasks. Please try again.");
+  
       console.error("Error fetching tasks:", error);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get<User[]>(`${API_BASE_URL}/member`);
+      setUsers(res.data);
+    } catch (error) {
+     
+      console.error("Error fetching users:", error);
     }
   };
 
@@ -96,10 +126,11 @@ const MemberTasks: React.FC = () => {
 
   const handleMarkAsDone = async (taskId: string) => {
     try {
-      await axios.patch(`${API_BASE_URL}/task/${taskId}/done`);
+      await axios.put(`${API_BASE_URL}/task/${taskId}`, {
+        status: "completed",
+      });
       fetchTasks();
     } catch (error) {
-      alert("Error marking task as done. Please try again.");
       console.error("Error marking task as done:", error);
     }
   };
@@ -112,24 +143,6 @@ const MemberTasks: React.FC = () => {
       alert("Error deleting task. Please try again.");
       console.error("Error deleting task:", error);
     }
-  };
-
-  const handleUpdateTask = async (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent default form submission behavior
-    if (!selectedTask) return;
-   try {
-     await axios.patch(`${API_BASE_URL}/task/${selectedTask._id}`, {
-       task,
-       user,
-       startTime,
-       endTime,
-     });
-     setIsUpdateOpen(false);
-     resetForm();
-     fetchTasks();
-   } catch (error) {
-     console.error("Error updating task:", error);
-   }
   };
 
   const handleAddComment = async (taskId: string) => {
@@ -199,14 +212,21 @@ const MemberTasks: React.FC = () => {
                 onChange={(e) => setTask(e.target.value)}
                 required
               />
-              <TextField
-                margin="dense"
-                label="User ID"
-                fullWidth
-                value={user}
-                onChange={(e) => setUser(e.target.value)}
-                required
-              />
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="user-select-label">Assign to User</InputLabel>
+                <Select
+                  labelId="user-select-label"
+                  value={user}
+                  onChange={(e) => setUser(e.target.value)}
+                  required
+                >
+                  {users.map((user) => (
+                    <MenuItem key={user._id} value={user._id}>
+                      {user.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               <TextField
                 margin="dense"
                 label="Start Time"
@@ -237,57 +257,6 @@ const MemberTasks: React.FC = () => {
           </DialogContent>
         </Dialog>
 
-        <Dialog open={isUpdateOpen} onClose={() => setIsUpdateOpen(false)}>
-          <DialogTitle>Update Task</DialogTitle>
-          <DialogContent>
-            <form onSubmit={handleUpdateTask}>
-              <TextField
-                autoFocus
-                margin="dense"
-                label="Task description"
-                fullWidth
-                value={task}
-                onChange={(e) => setTask(e.target.value)}
-                required
-              />
-              <TextField
-                margin="dense"
-                label="User ID"
-                fullWidth
-                value={user}
-                onChange={(e) => setUser(e.target.value)}
-                required
-              />
-              <TextField
-                margin="dense"
-                label="Start Time"
-                type="datetime-local"
-                fullWidth
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                required
-              />
-              <TextField
-                margin="dense"
-                label="End Time"
-                type="datetime-local"
-                fullWidth
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                required
-              />
-              <DialogActions>
-                <Button onClick={() => setIsUpdateOpen(false)} color="primary">
-                  Cancel
-                </Button>
-                <Button type="submit" color="primary">
-                  Update Task
-                </Button>
-              </DialogActions>
-            </form>
-          </DialogContent>
-        </Dialog>
-
         <div
           style={{
             display: "grid",
@@ -299,7 +268,10 @@ const MemberTasks: React.FC = () => {
             <Card key={t._id}>
               <CardHeader
                 title={t.task}
-                subheader={`Assigned to: ${t.manager?.name} | Status: ${t.status}`}
+                subheader={`Assigned to: ${t.user?.name} | Status: ${t.status}`}
+                style={{
+                  backgroundColor: statusColor(t.status),
+                }}
               />
               <CardContent>
                 <Typography variant="body2">
@@ -324,21 +296,6 @@ const MemberTasks: React.FC = () => {
                   style={{ marginLeft: "8px" }}
                 >
                   <Delete style={{ marginRight: "8px" }} />
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => {
-                    setTask(t.task);
-                    setUser(t.manager?._id);
-                    setStartTime(t.startTime);
-                    setEndTime(t.endTime);
-                    setSelectedTask(t);
-                    setIsUpdateOpen(true);
-                  }}
-                  style={{ marginLeft: "8px" }}
-                >
-                  <Edit style={{ marginRight: "8px" }} />
                 </Button>
               </CardContent>
             </Card>

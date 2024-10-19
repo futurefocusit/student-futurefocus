@@ -80,6 +80,7 @@ const StudentManagement: React.FC = () => {
   const [commentText, setComment] = useState({ comment: "" });
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isPaying, setIsPaying] = useState<boolean>(false);
   const [updateMode, setUpdateMode] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<string>("");
@@ -154,6 +155,7 @@ const StudentManagement: React.FC = () => {
 
   const handlePay = async (id: string) => {
     try {
+      setIsPaying(true)
       formData.user = userData?.name;
       const response = await axios.post(
         `${API_BASE_URL}/payment/pay/${id}`,
@@ -168,6 +170,8 @@ const StudentManagement: React.FC = () => {
       console.log(error);
       setSucces(null);
       setError("Error happened! check payment and try again");
+    }finally{
+      setIsPaying(false)
     }
   };
   const handleDiscount = async (id: string) => {
@@ -1105,7 +1109,7 @@ const StudentManagement: React.FC = () => {
           </div>
         </div>
       )}
-      {selectedStudent && type &&openPay && (
+      {selectedStudent && type && openPay && (
         <div className="fixed inset-0 flex  items-center justify-center bg-gray-800 bg-opacity-75">
           <div className="bg-white rounded-lg overflow-hidden h-64 shadow-xl transform transition-all sm:w-full sm:max-w-lg">
             <div className="bg-gray-50  overflow-scroll">
@@ -1129,18 +1133,20 @@ const StudentManagement: React.FC = () => {
                     className="border-2 p-2 rounded-md border-blue-700"
                   />
                 </span>
-                <span className="flex gap-10 items-center mx-auto mb-3">
-                  <label className="font-extrabold" htmlFor="amount">
-                    method of payment:
-                  </label>
-                  <input
-                    name="method"
-                    type="text"
-                    onChange={handleFormData}
-                    placeholder="type Method"
-                    className="border-2 p-2 rounded-md border-blue-700"
-                  />
-                </span>
+                {type === "pay" ? (
+                  <span className="flex gap-10 items-center mx-auto mb-3">
+                    <p className="font-extrabold">method of payment:</p>
+                    <input
+                      name="method"
+                      type="text"
+                      onChange={handleFormData}
+                      placeholder="type Method"
+                      className="border-2 p-2 rounded-md border-blue-700"
+                    />
+                  </span>
+                ) : (
+                  ""
+                )}
               </div>
             </div>
             <div className="bg-gray-50 p-4 flex justify-around">
@@ -1155,7 +1161,7 @@ const StudentManagement: React.FC = () => {
                 className="px-4 py-2 text-sm text-black font-extrabold hover:text-white bg-green-300 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
               >
                 {type === "pay"
-                  ? "Pay"
+                  ? isPaying?"Paying...": "Pay"
                   : type === "discount"
                   ? "Add Discount"
                   : "Add Extra"}
