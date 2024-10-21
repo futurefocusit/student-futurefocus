@@ -11,12 +11,12 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import API_BASE_URL from "@/config/baseURL";
 import Loader from "@/components/loader";
-import { TeamMember } from "@/types/types";
+import { TeamMember, TeamMemberLogin } from "@/types/types";
 interface AuthContextData {
   signed: boolean;
   isLoading: boolean;
   loggedUser: TeamMember | null;
-  login: (user: TeamMember) => Promise<void>;
+  login: (user: TeamMemberLogin) => Promise<void>;
   fetchLoggedUser: () => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -49,14 +49,13 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       setLoggedUser(response.data);
     } catch (error) {
       handleAxiosError(error);
-      // Clear invalid token
       localStorage.removeItem("ffa-admin");
       setLoggedUser(null);
     }
   }, []);
 
 
-  const login = useCallback(async (memberData: TeamMember) => {
+  const login = useCallback(async (memberData: TeamMemberLogin) => {
     setIsLoading(true);
     try {
       const response = await axios.post(
@@ -66,8 +65,11 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       );
       setLoggedUser(response.data);
       toast.success("Login successful!");
-      localStorage.setItem("ffa-team-member", response.data.token);
-      window.location.href = "/staff";
+      if(!response.data.token){
+        window.location.href = `/two-factor-auth/${response.data.id}`;
+      }
+      localStorage.setItem("ffa-admin", response.data.token);
+      // window.location.href = "/staff";
     } catch (error) {
       handleAxiosError(error);
     } finally {
@@ -80,8 +82,8 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       setLoggedUser(null);
       setLoggedUser(null);
       localStorage.removeItem("ffa-admin");
-      localStorage.removeItem("ffa-team-member");
-      window.location.href = "/login";
+      localStorage.removeItem("ffa-member");
+      // window.location.href = "/login";
     } catch (error) {
       handleAxiosError(error);
     }

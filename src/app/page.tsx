@@ -103,7 +103,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchSummary = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/admin/dashboard`);
+        const response = await axios.get(`${API_BASE_URL}/others/dashboard`);
         setSummary(response.data);
         await fetchLoggedUser();
       } catch (error) {
@@ -153,27 +153,27 @@ const Dashboard = () => {
       {
         label: "Pending",
         data: summary.shiftStudents.map((ss) => ss.pending),
-        backgroundColor: "rgba(255, 206, 86, 0.6)", // Yellow
+        backgroundColor: "rgba(255, 206, 86, 0.6)", 
       },
       {
         label: "Accepted",
         data: summary.shiftStudents.map((ss) => ss.accepted),
-        backgroundColor: "rgba(75, 192, 192, 0.6)", // Green
+        backgroundColor: "rgba(75, 192, 192, 0.6)", 
       },
       {
         label: "Registered",
         data: summary.shiftStudents.map((ss) => ss.registered),
-        backgroundColor: "rgba(54, 162, 235, 0.6)", // Blue
+        backgroundColor: "rgba(54, 162, 235, 0.6)", 
       },
       {
         label: "Started",
         data: summary.shiftStudents.map((ss) => ss.started),
-        backgroundColor: "rgba(153, 102, 255, 0.6)", // Purple
+        backgroundColor: "rgba(153, 102, 255, 0.6)",
       },
       {
         label: "Completed",
         data: summary.shiftStudents.map((ss) => ss.completed),
-        backgroundColor: "rgba(75, 192, 192, 0.6)", // Another green
+        backgroundColor: "rgba(75, 192, 192, 0.6)",
       },
       {
         label: "Dropped Out",

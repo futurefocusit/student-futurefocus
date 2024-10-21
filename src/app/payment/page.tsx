@@ -6,12 +6,12 @@ import { Search } from "lucide-react";
 import { toast } from "react-toastify";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
-import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
-import { IUser } from "@/types/types";
 import { hasPermission } from "@/libs/hasPermission";
 import { generateStatementPdf } from "@/libs/generateInvoice";
 import { convertImageUrlToBase64 } from "@/libs/convertImage";
 import Loader from "@/components/loader";
+import { useAuth } from "@/context/AuthContext";
+import { TeamMember } from "@/types/types";
 const imageUrl = "/futurefocuslogo.png";
 interface Student {
   _id: string;
@@ -51,7 +51,7 @@ const StudentManagement: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>("registered");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
-  const [userData, setUserData] = useState<IUser>();
+  const { fetchLoggedUser, loggedUser } = useAuth();
   const setCommentText = (value: string) => {
     setComment((prev) => ({ ...prev, comment: value }));
   };
@@ -67,7 +67,7 @@ const StudentManagement: React.FC = () => {
   };
   const [formData, setFormData] = useState({
     amount: 0,
-    user: userData?.name,
+    user: loggedUser?.name,
     method: "",
   });
 
@@ -83,8 +83,7 @@ const StudentManagement: React.FC = () => {
     try {
       setLoading(true);
       const response = await axios.get<Student[]>(`${API_BASE_URL}/students`);
-      await fetchUser();
-      setUserData(await getLoggedUserData());
+      await fetchLoggedUser();
       const sortedStudents = response.data.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -132,7 +131,7 @@ const StudentManagement: React.FC = () => {
 
   const handlePay = async (id: string) => {
     try {
-      formData.user = userData?.name;
+      formData.user = loggedUser?.name;
       const response = await axios.post(
         `${API_BASE_URL}/payment/pay/${id}`,
         formData
@@ -250,7 +249,7 @@ const StudentManagement: React.FC = () => {
           <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
             Student Payment
           </h2>
-          {hasPermission(userData as IUser, "students", "register") ? (
+          {hasPermission(loggedUser as TeamMember, "students", "register") ? (
             <a
               href="/students/register-new"
               className="p-2 bg-green-400 hover:bg-green-700 rounded-lg px-5 text-white font-bold"
@@ -308,7 +307,7 @@ const StudentManagement: React.FC = () => {
               <div key={intake} className="mt-8">
                 <h3 className="text-xl font-semibold mb-4">Intake: {intake}</h3>
                 <div className="overflow-x-auto">
-                  {hasPermission(userData as IUser, "payment", "view") ? (
+                  {hasPermission(loggedUser as TeamMember, "payment", "view") ? (
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
@@ -421,7 +420,7 @@ const StudentManagement: React.FC = () => {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap gap-1 flex text-sm font-medium">
                               {hasPermission(
-                                userData as IUser,
+                                loggedUser as TeamMember,
                                 "payment",
                                 "pay"
                               ) ? (
@@ -435,7 +434,7 @@ const StudentManagement: React.FC = () => {
                                 ""
                               )}
                               {hasPermission(
-                                userData as IUser,
+                                loggedUser as TeamMember,
                                 "payment",
                                 "discount"
                               ) ? (
@@ -451,7 +450,7 @@ const StudentManagement: React.FC = () => {
                                 ""
                               )}
                               {hasPermission(
-                                userData as IUser,
+                                loggedUser as TeamMember,
                                 "payment",
                                 "add-extra"
                               ) ? (
@@ -465,7 +464,7 @@ const StudentManagement: React.FC = () => {
                                 ""
                               )}
                               {hasPermission(
-                                userData as IUser,
+                                loggedUser as TeamMember,
                                 "payment",
                                 "delete"
                               ) ? (
@@ -479,7 +478,7 @@ const StudentManagement: React.FC = () => {
                                 ""
                               )}
                               {hasPermission(
-                                userData as IUser,
+                                loggedUser as TeamMember,
                                 "students",
                                 "comment"
                               ) ? (

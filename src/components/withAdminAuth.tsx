@@ -1,44 +1,49 @@
-import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { FaSpinner } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
+import { useState, useEffect } from "react";
+import { FaSpinner } from "react-icons/fa";
+import { toast } from "react-toastify";
 
-const withAdminAuth = <P extends object>(WrappedComponent: React.FC) => {
-  const AuthHOC: React.FC<P> = () => {
-    const [loading,setLoading]=useState(true)
-    const {fetchLoggedUser,loggedUser} = useAuth()
-    // const [error, setError] = useState<string | null>(null);
+const withAdminAuth = <P extends object>(WrappedComponent: React.FC<P>) => {
+  const AuthHOC: React.FC<P> = (props) => {
+    const [loading, setLoading] = useState(true);
+    const { fetchLoggedUser, loggedUser } = useAuth();
 
     useEffect(() => {
       const checkAuth = async () => {
+        setLoading(true);
         try {
           await fetchLoggedUser();
-          if(!loggedUser?.isAdmin){
-            window.location.href='/staff/task'
-             return 
-          }
         } catch (error) {
-          console.log(error);
-          toast.error("logged out ");
-          // setError("Unauthorized");
+          console.error(error);
+          toast.error("You have been logged out.");
           window.location.href = "/login";
+          return;
         } finally {
           setLoading(false);
         }
-      }
+      };
 
       checkAuth();
-    }, []);
+    }, [fetchLoggedUser]);
+
+    useEffect(() => {
+      if (!loading && loggedUser && !loggedUser.isAdmin) {
+        toast.error("Unauthorized access. Redirecting...");
+        window.location.href = "/staff/task";
+      }
+      console.log(loggedUser);
+
+    }, [loading, loggedUser]);
 
     if (loading) {
       return (
-        <p className=" items-start mx-auto ">
-          <FaSpinner size={1} color="blue" />
-        </p>
+        <div className="flex justify-center items-start mx-auto">
+          <FaSpinner size={24} color="blue" />
+        </div>
       );
     }
 
-    return <WrappedComponent />;
+    return <WrappedComponent {...props} />;
   };
 
   return AuthHOC;

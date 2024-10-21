@@ -21,8 +21,16 @@ export interface TeamMember {
   email: string;
   name: string;
   password: string;
-  isAdmin: string;
+  isAdmin: boolean;
   role: Role;
+}
+export interface TeamMemberLogin {
+
+  email: string;
+  // name: string;
+  password: string;
+  // isAdmin: string;
+  // role: Role;
 }
 export interface IInvoice {
   paymentMethod:string

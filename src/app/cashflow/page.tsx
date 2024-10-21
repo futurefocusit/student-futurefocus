@@ -7,10 +7,10 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
-import { fetchUser } from "@/context/adminAuth";
 import { hasPermission } from "@/libs/hasPermission";
-import { IUser } from "@/types/types";
 import Loader from "@/components/loader";
+import { useAuth } from "@/context/AuthContext";
+import { TeamMember } from "@/types/types";
 
 export interface CashflowType {
   type: string;
@@ -28,7 +28,8 @@ const PaymentsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"income" | "expenses">("income");
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [loggedUser, setLoggedUser] = useState<IUser>();
+  const { fetchLoggedUser, loggedUser } = useAuth();
+
   const [formData, setFormData] = useState({
     user: loggedUser?.name,
     reason: "",
@@ -40,7 +41,7 @@ const PaymentsPage: React.FC = () => {
 
   const fetchCashflows = async () => {
     try {
-      setLoggedUser(await fetchUser());
+     await fetchLoggedUser();
       const response = await axios.get(`${API_BASE_URL}/cashflow`);
       if (!response) {
         throw new Error("Network response was not ok");
@@ -200,7 +201,7 @@ const handleDelete = async(id:string)=>{
               Expenses
             </button>
           </div>
-          {hasPermission(loggedUser as IUser, "cashflow", "add") ? (
+          {hasPermission(loggedUser as TeamMember, "cashflow", "add") ? (
             <button
               onClick={() => setShowModal(true)}
               className="ml-4 px-4 py-2 bg-green-500 text-white font-semibold rounded"
@@ -213,7 +214,7 @@ const handleDelete = async(id:string)=>{
         </div>
 
         <div className="p-4">
-          {hasPermission(loggedUser as IUser, "cashflow", "view") ? (
+          {hasPermission(loggedUser as TeamMember, "cashflow", "view") ? (
             <div className="overflow-x-auto">
               {Object.entries(groupedCashflows).map(
                 ([date, { total, transactions }]) => (
@@ -293,7 +294,7 @@ const handleDelete = async(id:string)=>{
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="text-sm font-bold text-red-500 hover:text-red-900">
                                 {hasPermission(
-                                  loggedUser as IUser,
+                                  loggedUser as TeamMember,
                                   "cashflow",
                                   "delete"
                                 ) ? (
