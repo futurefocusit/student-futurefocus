@@ -13,6 +13,7 @@ const withAdminAuth = <P extends object>(WrappedComponent: React.FC<P>) => {
         setLoading(true);
         try {
           await fetchLoggedUser();
+          
         } catch (error) {
           console.error(error);
           toast.error("You have been logged out.");
