@@ -72,7 +72,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       // window.location.href = "/staff";
     } catch (error) {
       handleAxiosError(error);
-    } finally {
+    }  finally {
       setIsLoading(false);
     }
   }, []);
