@@ -67,6 +67,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       toast.success("Login successful!");
       if(!response.data.token){
         window.location.href = `/two-factor-auth/${response.data.id}`;
+        return
       }
       localStorage.setItem("ffa-admin", response.data.token);
       window.location.href = "/staff";
