@@ -69,7 +69,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
         window.location.href = `/two-factor-auth/${response.data.id}`;
       }
       localStorage.setItem("ffa-admin", response.data.token);
-      // window.location.href = "/staff";
+      window.location.href = "/staff";
     } catch (error) {
       handleAxiosError(error);
     }  finally {
