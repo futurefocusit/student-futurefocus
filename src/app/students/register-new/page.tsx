@@ -76,7 +76,7 @@ const Registration: React.FC = () => {
      };
      const getIntakes = async () => {
        try {
-         const response = await axios.get(`${API_BASE_URL}/admin/intake`);
+         const response = await axios.get(`${API_BASE_URL}/others/intake`);
          setIntakes(response.data.intakes);
          if (response.data.length > 0) {
            setFormData((prevData) => ({
