@@ -84,7 +84,7 @@ const LoginForm = () => {
               </label>
             </div>
             <a
-              href="https://futurefocus.co.rw/admin/forgot-password"
+              href="/staff/forgot-password"
               className="text-blue-600 hover:text-blue-800 text-sm"
             >
               Forgot password?
@@ -97,7 +97,6 @@ const LoginForm = () => {
           >
             {isLoading ? "Logging in..." : "Login"}
           </button>
-          <a  href="/staff/login" className="mx-auto text-center text-blue-600">login as Staff</a>
         </form>
       </div>
     </div>
