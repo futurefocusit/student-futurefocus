@@ -1,9 +1,11 @@
 "use client";
-import { TeamMember, useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
+import { TeamMember } from "@/types/types";
 import React, { useState } from "react";
 
 const LoginForm = () => {
-  const { loginTeamMember, isLoading } = useAuth();
+  const { login, isLoading } = useAuth();
+  //@ts-expect-error error
   const [formData, setFormData] = useState<TeamMember>({
     name:"",
     _id:"",
@@ -21,7 +23,7 @@ const LoginForm = () => {
 
   const handleSubmit = async () => {
     try {
-      await loginTeamMember(formData);
+      await login(formData);
     } catch (error) {
       console.log(error);
     }
