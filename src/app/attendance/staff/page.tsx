@@ -202,7 +202,7 @@ await fetchLoggedUser()
                           {record.memberId.name}
                         </td>
                         <td className="border-b border-gray-200 p-2">
-                          {record.memberId.role}
+                          {record.memberId.position}
                         </td>
                         <td
                           className={`border-b border-gray-200 p-2 ${getStatusColor(

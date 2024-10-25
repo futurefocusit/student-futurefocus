@@ -14,7 +14,7 @@ import { TeamMember } from "@/types/types";
 
 export interface CashflowType {
   type: string;
-  _id:string
+  _id: string;
   user: string;
   amount: number;
   reason: string;
@@ -29,6 +29,10 @@ const PaymentsPage: React.FC = () => {
   const [filter, setFilter] = useState<"income" | "expenses">("income");
   const [showModal, setShowModal] = useState<boolean>(false);
   const { fetchLoggedUser, loggedUser } = useAuth();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchField, setSearchField] = useState<"user" | "payment" | "reason">(
+    "user"
+  );
 
   const [formData, setFormData] = useState({
     user: loggedUser?.name,
@@ -41,7 +45,7 @@ const PaymentsPage: React.FC = () => {
 
   const fetchCashflows = async () => {
     try {
-     await fetchLoggedUser();
+      await fetchLoggedUser();
       const response = await axios.get(`${API_BASE_URL}/cashflow`);
       if (!response) {
         throw new Error("Network response was not ok");
@@ -63,13 +67,23 @@ const PaymentsPage: React.FC = () => {
   const filteredCashflows = cashflows
     .filter((cashflow) => {
       const cashflowDate = new Date(cashflow.createdAt);
-      return (
-        cashflow.type === filter &&
+      const matchesDate =
         cashflowDate.getMonth() ===
           (selectedDate ? selectedDate.getMonth() : new Date().getMonth()) &&
         cashflowDate.getFullYear() ===
-          (selectedDate ? selectedDate.getFullYear() : new Date().getFullYear())
-      );
+          (selectedDate
+            ? selectedDate.getFullYear()
+            : new Date().getFullYear());
+
+      const matchesType = cashflow.type === filter;
+
+      const matchesSearch = searchQuery
+        ? cashflow[searchField]
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase())
+        : true;
+
+      return matchesDate && matchesType && matchesSearch;
     })
     .sort(
       (a, b) =>
@@ -93,22 +107,21 @@ const PaymentsPage: React.FC = () => {
       fetchCashflows();
       toast.success(response.data.message);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toast.error("Failed to add transaction");
     }
   };
-const handleDelete = async(id:string)=>{
-  try {
-    const response = await axios.delete(`${API_BASE_URL}/cashflow/${id}`)
-    toast.success(response.data.message)
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await axios.delete(`${API_BASE_URL}/cashflow/${id}`);
+      toast.success(response.data.message);
       await fetchCashflows();
-
-  } catch (error) {
-    toast.error('failed to delete data')
-    //@ts-expect-error error
-    throw new Error(error);
-  }
-}
+    } catch (error) {
+      toast.error("failed to delete data");
+      //@ts-expect-error error
+      throw new Error(error);
+    }
+  };
   const groupByDate = (data: CashflowType[]) => {
     return data.reduce((groups, cashflow) => {
       const date = new Date(cashflow.createdAt);
@@ -150,7 +163,7 @@ const handleDelete = async(id:string)=>{
     return (
       <div className="text-center mt-20">
         <SideBar />
-        <Loader/>
+        <Loader />
       </div>
     );
   }
@@ -163,239 +176,258 @@ const handleDelete = async(id:string)=>{
       </div>
     );
   }
-  return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <SideBar />
-      <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
-        <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
-          Cash Flow
-        </h2>
+ return (
+   <div className="min-h-screen bg-gray-100 p-4">
+     <SideBar />
+     <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+       <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
+         Cash Flow
+       </h2>
 
-        <div className="flex justify-around p-4">
-          <DatePicker
-            selected={selectedDate}
-            onChange={(date) => setSelectedDate(date)}
-            showMonthYearPicker
-            dateFormat="MMMM yyyy"
-            className="border-2 rounded hover:cursor-pointer px-3"
-          />
-          <div>
-            <button
-              onClick={() => setFilter("income")}
-              className={`px-4 py-2 font-semibold ${
-                filter === "income"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-800"
-              } rounded-l`}
-            >
-              Income
-            </button>
-            <button
-              onClick={() => setFilter("expenses")}
-              className={`px-4 py-2 font-semibold ${
-                filter === "expenses"
-                  ? "bg-red-500 text-white"
-                  : "bg-gray-200 text-gray-800"
-              } rounded-r`}
-            >
-              Expenses
-            </button>
-          </div>
-          {hasPermission(loggedUser as TeamMember, "cashflow", "add") ? (
-            <button
-              onClick={() => setShowModal(true)}
-              className="ml-4 px-4 py-2 bg-green-500 text-white font-semibold rounded"
-            >
-              Add Transaction
-            </button>
-          ) : (
-            ""
-          )}
-        </div>
+       <div className="flex justify-around p-4 flex-wrap gap-4">
+         <DatePicker
+           selected={selectedDate}
+           onChange={(date) => setSelectedDate(date)}
+           showMonthYearPicker
+           dateFormat="MMMM yyyy"
+           className="border-2 rounded hover:cursor-pointer px-3"
+         />
 
-        <div className="p-4">
-          {hasPermission(loggedUser as TeamMember, "cashflow", "view") ? (
-            <div className="overflow-x-auto">
-              {Object.entries(groupedCashflows).map(
-                ([date, { total, transactions }]) => (
-                  <div key={date} className="mb-4">
-                    <h3 className="text-lg font-bold text-gray-800">{date}</h3>
-                    <p className="text-sm text-gray-600">
-                      Total for the day: {new Intl.NumberFormat().format(total)}{" "}
-                      Frw
-                    </p>
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            No
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            User
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Amount
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Payment Method
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Reason
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Time
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {transactions.map((cashflow, index) => (
-                          <tr key={index}>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-medium text-gray-900">
-                                {index + 1}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">
-                                {cashflow.user || "N/A"}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">
-                                {new Intl.NumberFormat().format(
-                                  cashflow.amount
-                                )}{" "}
-                                Frw
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">
-                                {cashflow.payment}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">
-                                {cashflow.reason || "N/A"}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">
-                                {new Date(
-                                  cashflow.createdAt
-                                ).toLocaleTimeString([], {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-bold text-red-500 hover:text-red-900">
-                                {hasPermission(
-                                  loggedUser as TeamMember,
-                                  "cashflow",
-                                  "delete"
-                                ) ? (
-                                  <button
-                                    onClick={() => handleDelete(cashflow._id)}
-                                  >
-                                    delete
-                                  </button>
-                                ) : (
-                                  ""
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )
-              )}
-              <div className="mt-6">
-                <h4 className="text-lg font-bold text-gray-800">
-                  Monthly Totals
-                </h4>
-                <ul>
-                  {Object.entries(monthlyTotals).map(([monthYear, total]) => (
-                    <li key={monthYear} className="text-sm text-gray-600">
-                      {monthYear}: {new Intl.NumberFormat().format(total)} Frw
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center">
-              you dont`&apos;t have permission to view this
-            </div>
-          )}
-        </div>
-      </div>
+         <div className="flex gap-2">
+           <select
+             value={searchField}
+             onChange={(e) =>
+               setSearchField(e.target.value as "user" | "payment" | "reason")
+             }
+             className="border-2 rounded px-3"
+           >
+             <option value="user">Search by User</option>
+             <option value="payment">Search by Payment Method</option>
+             <option value="reason">Search by Reason</option>
+           </select>
+           <input
+             type="text"
+             value={searchQuery}
+             onChange={(e) => setSearchQuery(e.target.value)}
+             placeholder={`Search by ${searchField}...`}
+             className="border-2 rounded px-3"
+           />
+         </div>
 
-      {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold mb-4">Add New Transaction</h2>
+         <div>
+           <button
+             onClick={() => setFilter("income")}
+             className={`px-4 py-2 font-semibold ${
+               filter === "income"
+                 ? "bg-blue-500 text-white"
+                 : "bg-gray-200 text-gray-800"
+             } rounded-l`}
+           >
+             Income
+           </button>
+           <button
+             onClick={() => setFilter("expenses")}
+             className={`px-4 py-2 font-semibold ${
+               filter === "expenses"
+                 ? "bg-red-500 text-white"
+                 : "bg-gray-200 text-gray-800"
+             } rounded-r`}
+           >
+             Expenses
+           </button>
+         </div>
 
-            <div className="flex gap-5 flex-col">
-              <select
-                onChange={handleFormData}
-                className="border-2 rounded px-3"
-                name="type"
-                id="type"
-              >
-                <option value="">Select type</option>
-                <option value="income">Income</option>
-                <option value="expenses">Expenses</option>
-              </select>
-              <input
-                name="amount"
-                onChange={handleFormData}
-                placeholder="Amount"
-                className="border-2 rounded px-3 "
-                type="number"
-              />
-              <input
-                name="reason"
-                maxLength={50}
-                onChange={handleFormData}
-                placeholder="Reason"
-                className="border-2 rounded px-3 "
-                type="text"
-              />
-              <input
-                name="payment"
-                onChange={handleFormData}
-                placeholder="Payment Method"
-                className="border-2 rounded px-3 "
-                type="text"
-              />
-            </div>
+         {hasPermission(loggedUser as TeamMember, "cashflow", "add") ? (
+           <button
+             onClick={() => setShowModal(true)}
+             className="px-4 py-2 bg-green-500 text-white font-semibold rounded"
+           >
+             Add Transaction
+           </button>
+         ) : null}
+       </div>
 
-            <div className="flex justify-between">
-              <button
-                onClick={handleSubmit}
-                className="mt-4 px-4 py-2 bg-green-500 text-white rounded"
-              >
-                Submit
-              </button>
-              <button
-                onClick={() => setShowModal(false)}
-                className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+       <div className="p-4">
+         {hasPermission(loggedUser as TeamMember, "cashflow", "view") ? (
+           <div className="overflow-x-auto">
+             {Object.entries(groupedCashflows).map(
+               ([date, { total, transactions }]) => (
+                 <div key={date} className="mb-4">
+                   <h3 className="text-lg font-bold text-gray-800">{date}</h3>
+                   <p className="text-sm text-gray-600">
+                     Total for the day: {new Intl.NumberFormat().format(total)}{" "}
+                     Frw
+                   </p>
+                   <table className="min-w-full divide-y divide-gray-200">
+                     <thead className="bg-gray-50">
+                       <tr>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                           No
+                         </th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                           User
+                         </th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                           Amount
+                         </th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                           Payment Method
+                         </th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                           Reason
+                         </th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                           Time
+                         </th>
+                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                           actions
+                         </th>
+                       </tr>
+                     </thead>
+                     <tbody className="bg-white divide-y divide-gray-200">
+                       {transactions.map((cashflow, index) => (
+                         <tr key={index}>
+                           <td className="px-6 py-4 whitespace-nowrap">
+                             <div className="text-sm font-medium text-gray-900">
+                               {index + 1}
+                             </div>
+                           </td>
+                           <td className="px-6 py-4 whitespace-nowrap">
+                             <div className="text-sm text-gray-900">
+                               {cashflow.user || "N/A"}
+                             </div>
+                           </td>
+                           <td className="px-6 py-4 whitespace-nowrap">
+                             <div className="text-sm text-gray-900">
+                               {new Intl.NumberFormat().format(cashflow.amount)}{" "}
+                               Frw
+                             </div>
+                           </td>
+                           <td className="px-6 py-4 whitespace-nowrap">
+                             <div className="text-sm text-gray-900">
+                               {cashflow.payment}
+                             </div>
+                           </td>
+                           <td className="px-6 py-4 whitespace-nowrap">
+                             <div className="text-sm text-gray-900">
+                               {cashflow.reason || "N/A"}
+                             </div>
+                           </td>
+                           <td className="px-6 py-4 whitespace-nowrap">
+                             <div className="text-sm text-gray-900">
+                               {new Date(cashflow.createdAt).toLocaleTimeString(
+                                 [],
+                                 {
+                                   hour: "2-digit",
+                                   minute: "2-digit",
+                                 }
+                               )}
+                             </div>
+                           </td>
+                           <td className="px-6 py-4 whitespace-nowrap">
+                             <div className="text-sm font-bold text-red-500 hover:text-red-900">
+                               {hasPermission(
+                                 loggedUser as TeamMember,
+                                 "cashflow",
+                                 "delete"
+                               ) ? (
+                                 <button
+                                   onClick={() => handleDelete(cashflow._id)}
+                                 >
+                                   delete
+                                 </button>
+                               ) : (
+                                 ""
+                               )}
+                             </div>
+                           </td>
+                         </tr>
+                       ))}
+                     </tbody>
+                   </table>
+                 </div>
+               )
+             )}
+             <div className="mt-6">
+               <h4 className="text-lg font-bold text-gray-800">
+                 Monthly Totals
+               </h4>
+               <ul>
+                 {Object.entries(monthlyTotals).map(([monthYear, total]) => (
+                   <li key={monthYear} className="text-sm text-gray-600">
+                     {monthYear}: {new Intl.NumberFormat().format(total)} Frw
+                   </li>
+                 ))}
+               </ul>
+             </div>
+           </div>
+         ) : (
+           <div className="text-center">
+             you dont`&apos;t have permission to view this
+           </div>
+         )}
+       </div>
+     </div>
 
+     {showModal && (
+       <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50">
+         <div className="bg-white p-6 rounded-lg shadow-lg">
+           <h2 className="text-xl font-bold mb-4">Add New Transaction</h2>
+
+           <div className="flex gap-5 flex-col">
+             <select
+               onChange={handleFormData}
+               className="border-2 rounded px-3"
+               name="type"
+               id="type"
+             >
+               <option value="">Select type</option>
+               <option value="income">Income</option>
+               <option value="expenses">Expenses</option>
+             </select>
+             <input
+               name="amount"
+               onChange={handleFormData}
+               placeholder="Amount"
+               className="border-2 rounded px-3 "
+               type="number"
+             />
+             <input
+               name="reason"
+               maxLength={50}
+               onChange={handleFormData}
+               placeholder="Reason"
+               className="border-2 rounded px-3 "
+               type="text"
+             />
+             <input
+               name="payment"
+               onChange={handleFormData}
+               placeholder="Payment Method"
+               className="border-2 rounded px-3 "
+               type="text"
+             />
+           </div>
+
+           <div className="flex justify-between">
+             <button
+               onClick={handleSubmit}
+               className="mt-4 px-4 py-2 bg-green-500 text-white rounded"
+             >
+               Submit
+             </button>
+             <button
+               onClick={() => setShowModal(false)}
+               className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
+             >
+               Close
+             </button>
+           </div>
+         </div>
+       </div>
+     )}
+   </div>
+ );
 };
 
 export default withAdminAuth(PaymentsPage);
