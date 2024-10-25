@@ -64,7 +64,7 @@ export interface AttendanceRecord {
 }
 export interface memberAttendanceRecord {
   _id: string;
-  memberId: { name: string; role: string };
+  memberId: { name: string; position: string };
   email: string;
   status: string;
   updatedAt: string;
