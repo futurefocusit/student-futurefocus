@@ -82,7 +82,6 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       setLoggedUser(null);
       setLoggedUser(null);
       localStorage.removeItem("ffa-admin");
-      localStorage.removeItem("ffa-member");
       window.location.href = "/login";
     } catch (error) {
       handleAxiosError(error);
