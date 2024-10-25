@@ -11,29 +11,13 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import API_BASE_URL from "@/config/baseURL";
 import Loader from "@/components/loader";
-
-export interface Admin {
-  email: string;
-  name: string;
-  password: string;
-  isSuperAdmin: boolean;
-}
-
-export interface TeamMember {
-  _id: string;
-  email: string;
-  name: string;
-  password: string;
-}
-
+import { TeamMember, TeamMemberLogin } from "@/types/types";
 interface AuthContextData {
   signed: boolean;
   isLoading: boolean;
-  loggedUser: Admin | null;
-  loggedMember: TeamMember | null;
-  login: (user: Admin) => Promise<void>;
-  loginTeamMember: (member: TeamMember) => Promise<void>;
-  fetchLoggedTeamMember: () => Promise<void>;
+  loggedUser: TeamMember | null;
+  login: (user: TeamMemberLogin) => Promise<void>;
+  fetchLoggedUser: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -46,13 +30,12 @@ export const AuthContext = createContext<AuthContextData>(
 );
 
 const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
-  const [loggedMember, setLoggedMember] = useState<TeamMember | null>(null);
-  const [loggedUser, setLoggedUser] = useState<Admin | null>(null);
+  const [loggedUser, setLoggedUser] = useState<TeamMember | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
 
-  const fetchLoggedTeamMember = useCallback(async () => {
-    const token = localStorage.getItem("ffa-team-member");
+  const fetchLoggedUser = useCallback(async () => {
+    const token = localStorage.getItem("ffa-admin");
     if (!token) {
    window.location.href='/login'
     };
@@ -63,35 +46,16 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setLoggedMember(response.data);
-    } catch (error) {
-      handleAxiosError(error);
-      // Clear invalid token
-      localStorage.removeItem("ffa-team-member");
-      setLoggedMember(null);
-    }
-  }, []);
-
-  const login = useCallback(async (userData: Admin) => {
-    setIsLoading(true);
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/admin/login`,
-        userData,
-        { withCredentials: true }
-      );
       setLoggedUser(response.data);
-      toast.success("Check email for OTP");
-      localStorage.setItem("ffa-admin", response.data.token);
-      window.location.href = `/two-factor-auth/${response.data.id}`;
     } catch (error) {
       handleAxiosError(error);
-    } finally {
-      setIsLoading(false);
+      localStorage.removeItem("ffa-admin");
+      setLoggedUser(null);
     }
   }, []);
 
-  const loginTeamMember = useCallback(async (memberData: TeamMember) => {
+
+  const login = useCallback(async (memberData: TeamMemberLogin) => {
     setIsLoading(true);
     try {
       const response = await axios.post(
@@ -99,13 +63,16 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
         memberData,
         { withCredentials: true }
       );
-      setLoggedMember(response.data);
+      setLoggedUser(response.data);
       toast.success("Login successful!");
-      localStorage.setItem("ffa-team-member", response.data.token);
-      window.location.href = "/staff";
+      if(!response.data.token){
+        window.location.href = `/two-factor-auth/${response.data.id}`;
+      }
+      localStorage.setItem("ffa-admin", response.data.token);
+      // window.location.href = "/staff";
     } catch (error) {
       handleAxiosError(error);
-    } finally {
+    }  finally {
       setIsLoading(false);
     }
   }, []);
@@ -113,10 +80,10 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = useCallback(async () => {
     try {
       setLoggedUser(null);
-      setLoggedMember(null);
+      setLoggedUser(null);
       localStorage.removeItem("ffa-admin");
-      localStorage.removeItem("ffa-team-member");
-      window.location.href = "/login";
+      localStorage.removeItem("ffa-member");
+      // window.location.href = "/login";
     } catch (error) {
       handleAxiosError(error);
     }
@@ -146,14 +113,12 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
 
 
   const contextValue = {
-    signed: Boolean(loggedUser || loggedMember),
+    signed: Boolean(loggedUser),
     isLoading,
     loggedUser,
-    loggedMember,
     login,
-    loginTeamMember,
-    fetchLoggedTeamMember,
     logout,
+    fetchLoggedUser
   };
 
   if (isLoading) {

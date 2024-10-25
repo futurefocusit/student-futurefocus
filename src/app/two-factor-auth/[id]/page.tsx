@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 const ResetPasswordPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '']); // 4 separate boxes for OTP
-  const [token, setToken] = useState<string | null>(null);
+  const [id, setId] = useState<string | null>(null);
 
   const handleOTPChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return; // Allow only numbers
@@ -31,8 +31,8 @@ const ResetPasswordPage = () => {
   useEffect(() => {
     const pathParts = window.location.pathname.split("/");
     const tokenIndex = pathParts.indexOf("two-factor-auth") + 1;
-    const token = pathParts[tokenIndex];
-    setToken(token || null);
+    const id = pathParts[tokenIndex];
+    setId(id || null);
   }, []);
   
   const handleVerifyOTP = async () => {
@@ -40,7 +40,7 @@ const ResetPasswordPage = () => {
       setIsLoading(true);
       const OTP = otp.join(''); 
       const response = await axios.post(
-        `${API_BASE_URL}/admin/two-factor/${token}`,
+        `${API_BASE_URL}/member/two-factor/${id}`,
         { OTP }
       );
       toast.success(response.data.message);

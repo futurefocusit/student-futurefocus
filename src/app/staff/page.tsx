@@ -7,7 +7,7 @@ import API_BASE_URL from "@/config/baseURL";
 import { toast } from "react-toastify";
 import withMemberAuth from "@/components/withMemberAuth";
 import { isToday } from "@/libs/formatDate";
-import { Navbar } from "@/components/NavBar";
+import SideBar from "@/components/SideBar";
 
 interface AttendanceRecord {
   _id: string;
@@ -24,20 +24,24 @@ type GroupedAttendance = {
 };
 
 const AttendancePage: React.FC = () => {
-  const { loggedMember, logout } = useAuth();
+  const { logout } = useAuth();
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
+  const { fetchLoggedUser, loggedUser } = useAuth();
+
 
   const fetchAttendance = async () => {
-    if (!loggedMember) return;
+   
 
     try {
+      await fetchLoggedUser()
+      if(!loggedUser) return 
       const response = await axios.get<AttendanceRecord[]>(
-        `${API_BASE_URL}/member/my-attendance/${loggedMember._id}`,
+        `${API_BASE_URL}/member/my-attendance/${loggedUser._id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("ffa-team-member")}`,
@@ -59,10 +63,10 @@ const AttendancePage: React.FC = () => {
 
   useEffect(() => {
     fetchAttendance();
-  }, [loggedMember]);
+  }, [loggedUser]);
 
   const markAttendance = async (recordId: string) => {
-    if (!loggedMember) return;
+    if (!loggedUser) return;
     try {
       await axios.put(`${API_BASE_URL}/member/request-attend/${recordId}`, {
         headers: {
@@ -76,7 +80,7 @@ const AttendancePage: React.FC = () => {
     }
   };
   const handleLeave = async (recordId: string) => {
-    if (!loggedMember) return;
+    if (!loggedUser) return;
     try {
       await axios.put(`${API_BASE_URL}/member/leave/${recordId}`, {
         headers: {
@@ -140,7 +144,7 @@ const AttendancePage: React.FC = () => {
 
   return (
     <div>
-      <Navbar loggedMember={loggedMember} logout={logout}  active="attendance"/>
+      <SideBar/>
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Attendance Records</h1>
 

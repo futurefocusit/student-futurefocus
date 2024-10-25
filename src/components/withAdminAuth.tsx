@@ -1,38 +1,50 @@
-import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { useAuth } from "@/context/AuthContext";
+import { useState, useEffect } from "react";
 import { FaSpinner } from "react-icons/fa";
-import { fetchUser } from "@/context/adminAuth";
+import { toast } from "react-toastify";
 
-const withAdminAuth = <P extends object>(WrappedComponent: React.FC) => {
-  const AuthHOC: React.FC<P> = () => {
+const withAdminAuth = <P extends object>(WrappedComponent: React.FC<P>) => {
+  const AuthHOC: React.FC<P> = (props) => {
     const [loading, setLoading] = useState(true);
-    // const [error, setError] = useState<string | null>(null);
+    const { fetchLoggedUser, loggedUser } = useAuth();
 
     useEffect(() => {
       const checkAuth = async () => {
+        setLoading(true);
         try {
-          await fetchUser();
-          setLoading(false);
+          await fetchLoggedUser();
+          
         } catch (error) {
-          console.log(error)
-          toast.error("logged out ");
-          // setError("Unauthorized");
+          console.error(error);
+          toast.error("You have been logged out.");
           window.location.href = "/login";
+          return;
+        } finally {
+          setLoading(false);
         }
       };
 
       checkAuth();
-    }, []);
+    }, [fetchLoggedUser]);
+
+    useEffect(() => {
+      if (!loading && loggedUser && !loggedUser.isAdmin) {
+        toast.error("Unauthorized access. Redirecting...");
+        window.location.href = "/staff/task";
+      }
+      console.log(loggedUser);
+
+    }, [loading, loggedUser]);
 
     if (loading) {
       return (
-        <p className=" items-start mx-auto ">
-          <FaSpinner size={1} color="blue" />
-        </p>
+        <div className="flex justify-center items-start mx-auto">
+          <FaSpinner size={24} color="blue" />
+        </div>
       );
     }
 
-    return <WrappedComponent />;
+    return <WrappedComponent {...props} />;
   };
 
   return AuthHOC;

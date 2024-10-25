@@ -8,21 +8,21 @@ const withMemberAuth = <P extends object>(
 ) => {
   const AuthHOC: React.FC<P> = (props) => {
     const [loading, setLoading] = useState(true);
-    const { fetchLoggedTeamMember } = useAuth();
+    const { fetchLoggedUser } = useAuth();
 
     useEffect(() => {
       let isMounted = true;
 
       const checkAuth = async () => {
         try {
-          await fetchLoggedTeamMember();
+          await fetchLoggedUser();
           if (isMounted) {
             setLoading(false);
           }
         } catch (error) {
           if (isMounted) {
             toast.error("Session expired. Please log in again.");
-            window.location.href = "/staff/login";
+            window.location.href = "/login";
           }
           console.log(error)
         }
@@ -34,7 +34,7 @@ const withMemberAuth = <P extends object>(
       return () => {
         isMounted = false;
       };
-    }, [fetchLoggedTeamMember]); 
+    }, [fetchLoggedUser]); 
 
     if (loading) {
       return (

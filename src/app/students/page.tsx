@@ -5,8 +5,7 @@ import API_BASE_URL from "@/config/baseURL";
 import { Search } from "lucide-react";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
-import { IInvoice, IUser } from "@/types/types";
-import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
+import { IInvoice, TeamMember } from "@/types/types";
 import { hasPermission } from "@/libs/hasPermission";
 import Loader from "@/components/loader";
 import { formatMonth } from "@/libs/formatDate";
@@ -17,6 +16,7 @@ import {
 import { convertImageUrlToBase64 } from "@/libs/convertImage";
 // import { toast } from "react-toastify";
 import { useSearchParams } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 const imageUrl = "/futurefocuslogo.png";
 
 interface Student {
@@ -74,7 +74,6 @@ const StudentManagement: React.FC = () => {
   const [studentCounts, setStudentCounts] = useState<Record<string, number>>(
     {}
   );
-  const [userData, setUserData] = useState<IUser>();
   const [openView, setOpenView] = useState(false)
   const [openPay, setOpenPay] = useState(false)
   const [commentText, setComment] = useState({ comment: "" });
@@ -84,13 +83,14 @@ const StudentManagement: React.FC = () => {
   const [updateMode, setUpdateMode] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<string>("");
+  const { fetchLoggedUser, loggedUser } = useAuth();
   const [studentToRegister, setStudentToRegister] = useState<{
     id: string;
     name: string;
   } | null>(null);
   const [formData, setFormData] = useState({
     amount: 0,
-    user: userData?.name,
+    user: loggedUser?.name,
     method: "",
   });
 
@@ -157,7 +157,7 @@ const StudentManagement: React.FC = () => {
   const handlePay = async (id: string) => {
     try {
       setIsPaying(true)
-      formData.user = userData?.name;
+      formData.user = loggedUser?.name;
       const response = await axios.post(
         `${API_BASE_URL}/payment/pay/${id}`,
         formData
@@ -212,8 +212,7 @@ const StudentManagement: React.FC = () => {
   const fetchStudents = async () => {
     try {
       const response = await axios.get<Student[]>(`${API_BASE_URL}/students`);
-      await fetchUser();
-      setUserData(await getLoggedUserData());
+      await fetchLoggedUser();
       const sortedStudents = response.data.sort(
         (a, b) =>
           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
@@ -411,7 +410,7 @@ const StudentManagement: React.FC = () => {
         >
           View
         </button>
-        {hasPermission(userData as IUser, "students", "delete") ? (
+        {hasPermission(loggedUser as TeamMember, "students", "delete") ? (
           <button
             onClick={() => handleDelete(student._id)}
             className="text-red-600 ml-3 hover:text-red-900"
@@ -421,7 +420,7 @@ const StudentManagement: React.FC = () => {
         ) : (
           ""
         )}
-        {hasPermission(userData as IUser, "students", "comment") ? (
+        {hasPermission(loggedUser as TeamMember, "students", "comment") ? (
           <div className="">
             <input
               className="p-1 bg-gray-200 border-2 border-gray-500 rounded-md"
@@ -449,14 +448,14 @@ const StudentManagement: React.FC = () => {
           <>
             {commonButtons}
 
-            {hasPermission(userData as IUser, "students", "admit") ? (
+            {hasPermission(loggedUser as TeamMember, "students", "admit") ? (
               <button
                 onClick={() =>
                   handleStatusChange(
                     student._id,
                     student.name,
                     "accepted",
-                    userData?.name as string
+                    loggedUser?.name as string
                   )
                 }
                 className="text-green-600 hover:text-green-900 ml-3"
@@ -472,14 +471,14 @@ const StudentManagement: React.FC = () => {
         return (
           <>
             {commonButtons}
-            {hasPermission(userData as IUser, "students", "register") ? (
+            {hasPermission(loggedUser as TeamMember, "students", "register") ? (
               <button
                 onClick={() =>
                   handleStatusChange(
                     student._id,
                     student.name,
                     "registered",
-                    userData?.name as string
+                    loggedUser?.name as string
                   )
                 }
                 className="text-blue-600 hover:text-blue-900 ml-3"
@@ -495,7 +494,7 @@ const StudentManagement: React.FC = () => {
         return (
           <>
             {commonButtons}
-            {hasPermission(userData as IUser, "payment", "pay") ? (
+            {hasPermission(loggedUser as TeamMember, "payment", "pay") ? (
               <button
                 onClick={() => handleViewP(student, "pay")}
                 className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
@@ -505,7 +504,7 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
-            {hasPermission(userData as IUser, "payment", "discount") ? (
+            {hasPermission(loggedUser as TeamMember, "payment", "discount") ? (
               <button
                 onClick={() => handleViewP(student, "discount")}
                 className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
@@ -515,7 +514,7 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
-            {hasPermission(userData as IUser, "payment", "add-extra") ? (
+            {hasPermission(loggedUser as TeamMember, "payment", "add-extra") ? (
               <button
                 onClick={() => handleViewP(student, "extra")}
                 className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
@@ -525,7 +524,7 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
-            {hasPermission(userData as IUser, "students", "update") ? (
+            {hasPermission(loggedUser as TeamMember, "students", "update") ? (
               <button
                 onClick={() => handleUpdateStudent(student)}
                 className="text-green-600 hover:text-green-900 ml-3"
@@ -535,14 +534,14 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
-            {hasPermission(userData as IUser, "students", "start") ? (
+            {hasPermission(loggedUser as TeamMember, "students", "start") ? (
               <button
                 onClick={() =>
                   handleStatusChange(
                     student._id,
                     student.name,
                     "started",
-                    userData?.name as string
+                    loggedUser?.name as string
                   )
                 }
                 className="text-green-600 hover:text-green-900 ml-3"
@@ -570,7 +569,7 @@ const StudentManagement: React.FC = () => {
             >
               Dropout
             </button> */}
-            {hasPermission(userData as IUser, "payment", "pay") ? (
+            {hasPermission(loggedUser as TeamMember, "payment", "pay") ? (
               <button
                 onClick={() => handleViewP(student, "pay")}
                 className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
@@ -580,7 +579,7 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
-            {hasPermission(userData as IUser, "payment", "discount") ? (
+            {hasPermission(loggedUser as TeamMember, "payment", "discount") ? (
               <button
                 onClick={() => handleViewP(student, "discount")}
                 className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
@@ -590,7 +589,7 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
-            {hasPermission(userData as IUser, "payment", "add-extra") ? (
+            {hasPermission(loggedUser as TeamMember, "payment", "add-extra") ? (
               <button
                 onClick={() => handleViewP(student, "extra")}
                 className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
@@ -600,7 +599,7 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
-            {hasPermission(userData as IUser, "students", "attend") ? (
+            {hasPermission(loggedUser as TeamMember, "students", "attend") ? (
               <button
                 onClick={() => handleUpdateStudent(student)}
                 className="text-green-600 hover:text-green-900 ml-3"
@@ -610,7 +609,7 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
-            {hasPermission(userData as IUser, "students", "attend") ? (
+            {hasPermission(loggedUser as TeamMember, "students", "attend") ? (
               <button
                 onClick={() => handleAttend(student._id)}
                 className="text-green-600 hover:text-green-900 ml-3"
@@ -645,7 +644,7 @@ const StudentManagement: React.FC = () => {
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
             Students
           </h2>
-          {hasPermission(userData as IUser, "students", "register") && (
+          {hasPermission(loggedUser as TeamMember, "students", "register") && (
             <a
               href="/students/register-new"
               className="px-4 py-2 bg-green-400 hover:bg-green-700 rounded-lg text-white font-bold"
@@ -1095,7 +1094,7 @@ const StudentManagement: React.FC = () => {
                       studentToRegister.id,
                       studentToRegister.name,
                       "registered",
-                      userData?.name as string
+                      loggedUser?.name as string
                     );
                     setIsPaymentModalOpen(false);
                   }

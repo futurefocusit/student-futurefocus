@@ -7,7 +7,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-
   Card,
   CardContent,
   CardHeader,
@@ -16,22 +15,21 @@ import {
 } from "@mui/material";
 import { Send, Message, Check } from "@mui/icons-material";
 import API_BASE_URL from "@/config/baseURL";
-
 import withMemberAuth from "@/components/withMemberAuth";
 import { useAuth } from "@/context/AuthContext";
-import { Navbar } from "@/components/NavBar";
+import SideBar from "@/components/SideBar";
 
 interface Comment {
   _id: string;
   text: string;
   createdAt: string;
-  user: { name: string; _id: string }; 
-  replies?: Comment[]; 
+  user: { name: string; _id: string };
+  replies?: Comment[];
 }
 
 interface Task {
   _id: string;
-  status:string
+  status: string;
   task: string;
   manager: { name: string; _id: string; role: string };
   startTime: string;
@@ -40,24 +38,19 @@ interface Task {
 }
 
 const MemberTasks: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);  
- const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const { fetchLoggedUser, loggedUser } = useAuth();
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [comment, setComment] = useState<string>("");
   const [reply, setReply] = useState<{
     commentId: string;
     text: string;
   } | null>(null);
-  const { loggedMember,logout } = useAuth();
-
-  useEffect(() => {
-    fetchTasks();
-  }, []);
-
   const fetchTasks = async () => {
     try {
-      if (!loggedMember) return;
+      await fetchLoggedUser();
       const res = await axios.get<Task[]>(
-        `${API_BASE_URL}/task/${loggedMember._id}`
+        `${API_BASE_URL}/task/${loggedUser?._id}`
       );
       setTasks(res.data);
     } catch (error) {
@@ -65,16 +58,18 @@ const MemberTasks: React.FC = () => {
     }
   };
 
-  
+  useEffect(() => {
+    fetchTasks();
+  }, []);
 
   const handleAddComment = async (taskId: string) => {
     try {
       await axios.post(`${API_BASE_URL}/task/comment/${taskId}`, {
         text: comment,
-        user: loggedMember?._id,
+        user: loggedUser?._id,
       });
       setComment("");
-      fetchTasks();
+      await fetchTasks(); // Refresh tasks after adding a comment
     } catch (error) {
       console.error("Error adding comment:", error);
     }
@@ -84,44 +79,42 @@ const MemberTasks: React.FC = () => {
     try {
       await axios.post(`${API_BASE_URL}/task/comment/reply/${commentId}`, {
         text: reply?.text,
-        user: loggedMember?._id,
+        user: loggedUser?._id,
       });
       setReply(null);
-      fetchTasks();
+      await fetchTasks(); // Refresh tasks after adding a reply
     } catch (error) {
       console.error("Error adding reply:", error);
     }
   };
-   const handleMarkAsStarted = async (taskId: string) => {
+
+  const handleMarkAsStarted = async (taskId: string) => {
     try {
-      await axios.put(`${API_BASE_URL}/task/${taskId}`, {
-        status: "started",
-      });
-      fetchTasks();
+      await axios.put(`${API_BASE_URL}/task/${taskId}`, { status: "started" });
+      await fetchTasks(); // Refresh tasks after updating status
     } catch (error) {
-      console.error("Error marking task as done:", error);
+      console.error("Error marking task as started:", error);
     }
   };
-const statusColor = (status: string) => {
-  switch (status) {
-    case "started":
-      return "#153cec";
-    case "completed":
-      return "#36c622";
 
-    default:
-      return "#272033";
-  }
-};
+  const statusColor = (status: string) => {
+    switch (status) {
+      case "started":
+        return "#153cec";
+      case "completed":
+        return "#36c622";
+      default:
+        return "#272033";
+    }
+  };
+
   return (
     <>
-      <Navbar loggedMember={loggedMember} logout={logout} active="task" />
+      <SideBar />
       <div style={{ maxWidth: "800px", margin: "0 auto", padding: "16px" }}>
         <Typography variant="h4" gutterBottom>
           My Tasks
         </Typography>
-
-
         <div
           style={{
             display: "grid",
@@ -134,9 +127,7 @@ const statusColor = (status: string) => {
               <CardHeader
                 title={t.task}
                 subheader={`Assigned by: ${t.manager?.name} | Status: ${t.status}`}
-                style={{
-                  backgroundColor: statusColor(t.status),
-                }}
+                style={{ backgroundColor: statusColor(t.status) }}
               />
               <CardContent>
                 <Typography variant="body2">
@@ -154,7 +145,6 @@ const statusColor = (status: string) => {
                 >
                   <Check style={{ marginRight: "8px" }} />
                 </Button>
-                
               </CardContent>
             </Card>
           ))}

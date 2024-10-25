@@ -17,14 +17,14 @@ import {
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import { FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
-import { IUser } from "@/types/types";
-import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
+import { TeamMember } from "@/types/types";
 
 const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const [userData, setUserData] = useState<IUser>();
+  const { fetchLoggedUser, loggedUser } = useAuth();
+
 
   const { logout } = useAuth();
 
@@ -56,8 +56,7 @@ const SideBar = () => {
   }, []);
   useEffect(() => {
     const fetchUserData = async () => {
-      await fetchUser();
-      setUserData(await getLoggedUserData());
+      await fetchLoggedUser();
     };
     fetchUserData();
   }, []);
@@ -153,14 +152,14 @@ const SideBar = () => {
                     isExpanded ? "" : "hidden"
                   }`}
                 >
-                  {userData?.name}
+                  {loggedUser?.name}
                 </p>
                 <p
                   className={`mx-4 font-medium text-gray-400 ${
                     isExpanded ? "" : "hidden"
                   }`}
                 >
-                  {userData?.role.role}
+                  {loggedUser?.role.role}
                 </p>
               </span>
             </div>

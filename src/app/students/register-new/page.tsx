@@ -4,12 +4,12 @@ import axios from "axios";
 import API_BASE_URL from "@/config/baseURL";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
-import { IInvoice, IUser } from "@/types/types";
-import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
+import { IInvoice, TeamMember} from "@/types/types";
 import { hasPermission } from "@/libs/hasPermission";
 import Loader from "@/components/loader";
 import { generateRegisterStatementPdf } from "@/libs/generateInvoice";
 import { convertImageUrlToBase64 } from "@/libs/convertImage";
+import { useAuth } from "@/context/AuthContext";
 const imageUrl = "/futurefocuslogo.png";
 
 interface Course {
@@ -30,7 +30,11 @@ interface registrationData {
 }
 
 const Registration: React.FC = () => {
-   const [userData, setUserData] = useState<IUser>();
+  
+   const [courses, setCourses] = useState<Course[]>([]);
+   const [loading, setLoading] = useState<boolean>(true);
+   const [error, setError] = useState<string | null>(null);
+  const { fetchLoggedUser, loggedUser } = useAuth();
    const [formData, setFormData] = useState<registrationData>({
      name: "",
      email: "",
@@ -39,12 +43,9 @@ const Registration: React.FC = () => {
      selectedShift: "",
      intake: "",
      message: "",
-     user: userData?.name,
+     user: loggedUser?.name,
      payment: "cash",
    });
-   const [courses, setCourses] = useState<Course[]>([]);
-   const [loading, setLoading] = useState<boolean>(true);
-   const [error, setError] = useState<string | null>(null);
    const [intakes, setIntakes] = useState<{ _id: string; intake: string }[]>(
      []
    );
@@ -56,8 +57,7 @@ const Registration: React.FC = () => {
      const fetchCourses = async () => {
        try {
          const response = await axios.get(`${API_BASE_URL}/course`);
-         await fetchUser();
-         setUserData(await getLoggedUserData());
+         await fetchLoggedUser();
          setCourses(response.data);
 
          if (response.data.length > 0) {
@@ -135,7 +135,7 @@ const data:IInvoice = {
      setSubmissionResult(null);
 
      try {
-      formData.user=userData?.name
+      formData.user=loggedUser?.name
        const response = await axios.post(
          `${API_BASE_URL}/students/register`,
          formData,
@@ -160,7 +160,7 @@ const data:IInvoice = {
          selectedShift: courses.length > 0 ? courses[0].shifts[0] : "",
          message: "",
          intake: intakes.length > 0 ? intakes[0].intake : "",
-         user:userData?.name,
+         user:loggedUser?.name,
          payment:""
        });
      } catch (error) {
@@ -328,7 +328,7 @@ const data:IInvoice = {
            />
          </div>
          <div className="text-center">
-           {hasPermission(userData as IUser, "students", "register") ? (
+           {hasPermission(loggedUser as TeamMember, "students", "register") ? (
              <button
              onClick={()=>handleSubmit()}
                className="inline-flex justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"

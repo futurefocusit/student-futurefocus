@@ -3,9 +3,9 @@ import Loader from "@/components/loader";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
 import API_BASE_URL from "@/config/baseURL";
-import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
-import { hasPermission } from "@/libs/hasPermission";
-import { IUser } from "@/types/types";
+import { useAuth } from "@/context/AuthContext";
+import { hasPermission } from "@/libs/hasPermission";import { TeamMember } from "@/types/types";
+;
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -40,12 +40,11 @@ const PaymentsPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [userData, setUserData] = useState<IUser>()
+  const { fetchLoggedUser, loggedUser } = useAuth();
   const fetchPayments = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/payment/transaction`);
-        await fetchUser();
-        setUserData(await getLoggedUserData());
+        await fetchLoggedUser();
 
       if (!response) {
         throw new Error("Network response was not ok");
@@ -123,7 +122,7 @@ const PaymentsPage: React.FC = () => {
             className="border p-2 mb-4 w-full"
           />
           <div className="overflow-x-auto">
-            {hasPermission(userData as IUser, "payment", "view") ? (
+            {hasPermission(loggedUser as TeamMember, "payment", "view") ? (
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
@@ -189,7 +188,7 @@ const PaymentsPage: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-red-700 hover:text-red-900">
                           {hasPermission(
-                            userData as IUser,
+                            loggedUser as TeamMember,
                             "transaction",
                             "delete"
                           ) ? (

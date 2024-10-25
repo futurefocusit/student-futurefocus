@@ -1,14 +1,13 @@
 "use client";
-import { Admin, useAuth } from "@/context/AuthContext";
+import {  useAuth } from "@/context/AuthContext";
+import { TeamMember, TeamMemberLogin } from "@/types/types";
 import React, { FormEvent, useState } from "react";
 
 const LoginForm = () => {
   const { login, isLoading } = useAuth();
-  const [formData, setFormData] = useState<Admin>({
+  const [formData, setFormData] = useState<TeamMemberLogin>({
     email: "",
-    password: "",
-    isSuperAdmin: false,
-    name:""
+    password: ""
   });
 
   const handleChangeFormData = (e: React.ChangeEvent<HTMLInputElement>) => {

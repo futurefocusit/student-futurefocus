@@ -7,35 +7,28 @@ import { toast } from "react-toastify";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
 import { hasPermission } from "@/libs/hasPermission";
-import { fetchUser } from "@/context/adminAuth";
-import { IUser } from "@/types/types";
+import { memberAttendanceRecord, TeamMember } from "@/types/types";
+import { useAuth } from "@/context/AuthContext";
 
-interface AttendanceRecord {
-  _id: string;
-  memberId: { name: string; role: string };
-  email: string;
-  status: string;
-  updatedAt: string;
-  timeOut:string
-}
+
 
 type GroupedAttendance = {
-  [key: string]: AttendanceRecord[];
+  [key: string]: memberAttendanceRecord[];
 };
 
 const AttendancePage: React.FC = () => {
-  const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
+  const [attendance, setAttendance] = useState<memberAttendanceRecord[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  const [loggedUser, setLoggedUser] = useState<IUser>();
+const {fetchLoggedUser,loggedUser}=useAuth()
 
   const fetchAttendance = async () => {
     try {
-      setLoggedUser(await fetchUser());
-      const response = await axios.get<AttendanceRecord[]>(
+await fetchLoggedUser()
+      const response = await axios.get<memberAttendanceRecord[]>(
         `${API_BASE_URL}/member/attendance`,
         {
           headers: {
@@ -100,7 +93,7 @@ const AttendancePage: React.FC = () => {
   };
 
   const groupAttendanceByDate = (
-    filteredRecords: AttendanceRecord[]
+    filteredRecords: memberAttendanceRecord[]
   ): GroupedAttendance => {
     return filteredRecords.reduce((groups: GroupedAttendance, record) => {
       const date = new Date(record.updatedAt).toLocaleDateString("en-US", {
@@ -125,7 +118,7 @@ const AttendancePage: React.FC = () => {
   return (
     <div>
       <SideBar />
-      {hasPermission(loggedUser as IUser, "staff-attendance", "view") ? (
+      {hasPermission(loggedUser as TeamMember, "staff-attendance", "view") ? (
         <div className="container mx-auto p-4">
           <h1 className="text-2xl font-bold mb-4">Attendance Records</h1>
 
@@ -231,7 +224,7 @@ const AttendancePage: React.FC = () => {
                             : "---"}
                         </td>
                         {hasPermission(
-                          loggedUser as IUser,
+                          loggedUser as TeamMember,
                           "staff-attendance",
                           "attend"
                         ) ? (

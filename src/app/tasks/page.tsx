@@ -23,8 +23,6 @@ import API_BASE_URL from "@/config/baseURL";
 import { useAuth } from "@/context/AuthContext";
 import withAdminAuth from "@/components/withAdminAuth";
 import SideBar from "@/components/SideBar";
-import { fetchUser, getLoggedUserData } from "@/context/adminAuth";
-import { IUser } from "@/types/types";
 
 interface Comment {
   _id: string;
@@ -57,8 +55,7 @@ const MemberTasks: React.FC = () => {
   const [user, setUser] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
   const [startTime, setStartTime] = useState<string>("");
-  const { loggedMember } = useAuth();
-  const [userData, setUserData] = useState<IUser>();
+  const { fetchLoggedUser, loggedUser } = useAuth();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [comment, setComment] = useState<string>("");
   const [reply, setReply] = useState<{
@@ -66,11 +63,11 @@ const MemberTasks: React.FC = () => {
     text: string;
   } | null>(null);
   useEffect(() => {
-    const fetchUserData = async () => {
-      await fetchUser();
-      setUserData(await getLoggedUserData());
+    const fetchloggedUser = async () => {
+      await fetchLoggedUser();
+     
     };
-    fetchUserData();
+    fetchloggedUser();
   }, []);
   useEffect(() => {
     fetchTasks();
@@ -111,7 +108,7 @@ const MemberTasks: React.FC = () => {
       await axios.post(`${API_BASE_URL}/task`, {
         task,
         user,
-        manager: userData?._id,
+        manager: loggedUser?._id,
 
         endTime,
         startTime,
@@ -155,7 +152,7 @@ const MemberTasks: React.FC = () => {
     try {
       await axios.post(`${API_BASE_URL}/task/comment/${taskId}`, {
         text: comment,
-        user: userData?._id,
+        user: loggedUser?._id,
       });
       setComment("");
       fetchTasks();
@@ -169,7 +166,7 @@ const MemberTasks: React.FC = () => {
     try {
       await axios.post(`${API_BASE_URL}/task/comment/reply/${commentId}`, {
         text: reply.text,
-        user: userData?._id,
+        user: loggedUser?._id,
       });
       setReply(null);
       fetchTasks();
