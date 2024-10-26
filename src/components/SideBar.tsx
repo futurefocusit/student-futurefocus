@@ -29,14 +29,31 @@ const SideBar = () => {
   const { logout } = useAuth();
 
   const menuItems = [
-    { label: "Dashboard", icon: FaTachometerAlt, href: "/" },
-    { label: "Students", icon: FaUser, href: "/students" },
-    { label: "Payment", icon: FaMoneyBill, href: "/payment" },
-    { label: "Transaction", icon: FaExchangeAlt, href: "/transactions" },
-    { label: "Attendances", icon: FaCalendarCheck, href: "/attendance" },
-    { label: "Cashflow", icon: FaMoneyBillAlt, href: "/cashflow" },
-    { label: "staff Attendance", icon: FaClock, href: "/attendance/staff" },
-    { label: "Tasks", icon: FaTasks, href: "/tasks" },
+    { label: "Dashboard", icon: FaTachometerAlt, href: "/", admin: true },
+    { label: "Students", icon: FaUser, href: "/students", admin: true },
+    { label: "Payment", icon: FaMoneyBill, href: "/payment", admin: true },
+    {
+      label: "Transaction",
+      icon: FaExchangeAlt,
+      href: "/transactions",
+      admin: true,
+    },
+    {
+      label: "Attendances",
+      icon: FaCalendarCheck,
+      href: "/attendance",
+      admin: true,
+    },
+    { label: "Cashflow", icon: FaMoneyBillAlt, href: "/cashflow", admin: true },
+    {
+      label: "staff Attendance",
+      icon: FaClock,
+      href: "/attendance/staff",
+      admin: true,
+    },
+    { label: "Tasks", icon: FaTasks, href: "/tasks", admin: true },
+    { label: "My Task", icon: FaTasks, href: "/staff/task",},
+    { label: "My Attendance", icon: FaTasks, href: "/staff",  },
   ];
 
   useEffect(() => {
@@ -107,24 +124,29 @@ const SideBar = () => {
             </button>
           </div>
           <div className="">
-            {menuItems.map((item, index) => (
-              <Link
-                key={index}
-                href={item.href}
-                className={`flex items-center px-4 py-2 mt-2 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white ${
-                  isExpanded ? "" : "justify-center"
-                }`}
-                onClick={() => setIsOpen(false)}
-              >
-                <item.icon className="w-5 h-5" />
-                <span
-                  className={`mx-4 font-medium ${isExpanded ? "" : "hidden"}`}
+            {menuItems
+              .filter(
+                (item) => !item.admin || (item.admin && loggedUser?.isAdmin)
+              )
+              .map((item, index) => (
+                <Link
+                  key={index}
+                  href={item.href}
+                  className={`flex items-center px-4 py-2 mt-2 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white ${
+                    isExpanded ? "" : "justify-center"
+                  }`}
+                  onClick={() => setIsOpen(false)}
                 >
-                  {item.label}
-                </span>
-              </Link>
-            ))}
+                  <item.icon className="w-5 h-5" />
+                  <span
+                    className={`mx-4 font-medium ${isExpanded ? "" : "hidden"}`}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              ))}
           </div>
+
           <div className="px-4">
             <a
               href="https://www.futurefocus.co.rw/admin"
