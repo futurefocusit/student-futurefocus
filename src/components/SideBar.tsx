@@ -14,10 +14,12 @@ import {
   FaMoneyBillAlt,
   FaClock,
   FaTasks,
+  FaClipboardList,
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
-import { FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
+import { FaPenClip, FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
 import { TeamMember } from "@/types/types";
+import { MdEventAvailable } from "react-icons/md";
 
 const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -52,8 +54,8 @@ const SideBar = () => {
       admin: true,
     },
     { label: "Tasks", icon: FaTasks, href: "/tasks", admin: true },
-    { label: "My Task", icon: FaTasks, href: "/staff/task",},
-    { label: "My Attendance", icon: FaTasks, href: "/staff",  },
+    { label: "My Task", icon: FaClipboardList, href: "/staff/task" },
+    { label: "My Attendance", icon: MdEventAvailable, href: "/staff" },
   ];
 
   useEffect(() => {
