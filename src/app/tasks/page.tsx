@@ -207,6 +207,8 @@ const MemberTasks: React.FC = () => {
               <TextField
                 autoFocus
                 margin="dense"
+                multiline
+                variant="outlined"
                 label="Task description"
                 fullWidth
                 value={task}
