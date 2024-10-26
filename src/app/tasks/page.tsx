@@ -76,12 +76,12 @@ const MemberTasks: React.FC = () => {
   const statusColor = (status: string) => {
     switch (status) {
       case "started":
-        return "#153cec";
-      case "completed":
-        return "#36c622";
+        return "#85aae6";
+      case "#85e6c2":
+        return "#e685df";
 
       default:
-        return "#272033";
+        return "#e685df";
     }
   };
   const fetchTasks = async () => {
@@ -267,7 +267,9 @@ const MemberTasks: React.FC = () => {
             gap: "16px",
           }}
         >
-          {tasks.map((t) => (
+          {tasks.length===0?
+          <p>no task availbale</p>:
+          tasks.map((t) => (
             <Card key={t._id}>
               <CardHeader
                 title={t.task}
