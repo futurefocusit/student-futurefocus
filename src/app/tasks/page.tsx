@@ -17,13 +17,24 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Box,
 } from "@mui/material";
-import { Send, Message, Check, Delete } from "@mui/icons-material";
+import {
+  Send,
+  Message,
+  Check,
+  Delete,
+  FormatBold,
+  FormatItalic,
+  FormatListBulleted,
+  FormatListNumbered,
+} from "@mui/icons-material";
 import API_BASE_URL from "@/config/baseURL";
 import { useAuth } from "@/context/AuthContext";
 import withAdminAuth from "@/components/withAdminAuth";
 import SideBar from "@/components/SideBar";
 
+// Types
 interface Comment {
   _id: string;
   text: string;
@@ -47,6 +58,140 @@ interface User {
   name: string;
 }
 
+// HTML Sanitizer
+const sanitizeHTML = (html: string): string => {
+  const temp = document.createElement("div");
+  temp.innerHTML = html;
+
+  const removeAttributes = (element: Element) => {
+    Array.from(element.attributes).forEach((attr) => {
+      if (!["class", "style"].includes(attr.name.toLowerCase())) {
+        element.removeAttribute(attr.name);
+      }
+    });
+  };
+
+  const allowedTags = new Set([
+    "P",
+    "DIV",
+    "SPAN",
+    "BR",
+    "B",
+    "I",
+    "U",
+    "UL",
+    "OL",
+    "LI",
+    "STRONG",
+    "EM",
+  ]);
+
+  const clean = (node: Node) => {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const element = node as Element;
+
+      if (!allowedTags.has(element.tagName)) {
+        const text = document.createTextNode(element.textContent || "");
+        element.parentNode?.replaceChild(text, element);
+        return;
+      }
+
+      removeAttributes(element);
+      Array.from(element.children).forEach((child) => clean(child));
+    }
+  };
+
+  Array.from(temp.children).forEach((child) => clean(child));
+  return temp.innerHTML;
+};
+
+// Rich Text Editor Component
+interface RichTextEditorProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
+  const handleFormat = (command: string) => {
+    try {
+      document.execCommand(command, false);
+      const editorElement = document.querySelector("[data-rich-editor]");
+      if (editorElement) {
+        const content = sanitizeHTML(editorElement.innerHTML);
+        onChange(content);
+      }
+    } catch (error) {
+      console.error("Format command failed:", error);
+    }
+  };
+
+  return (
+    <Box>
+      <Box
+        sx={{
+          mb: 1,
+          borderBottom: 1,
+          borderColor: "divider",
+          display: "flex",
+          gap: 1,
+        }}
+      >
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => handleFormat("bold")}
+          sx={{ minWidth: 40 }}
+        >
+          <FormatBold />
+        </Button>
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => handleFormat("italic")}
+          sx={{ minWidth: 40 }}
+        >
+          <FormatItalic />
+        </Button>
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => handleFormat("insertOrderedList")}
+          sx={{ minWidth: 40 }}
+        >
+          <FormatListNumbered />
+        </Button>
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => handleFormat("insertUnorderedList")}
+          sx={{ minWidth: 40 }}
+        >
+          <FormatListBulleted />
+        </Button>
+      </Box>
+      <Box
+        contentEditable
+        data-rich-editor
+        dangerouslySetInnerHTML={{ __html: value }}
+        onInput={(e) => onChange(sanitizeHTML(e.currentTarget.innerHTML))}
+        sx={{
+          border: 1,
+          borderColor: "grey.300",
+          borderRadius: 1,
+          p: 2,
+          minHeight: 200,
+          overflowY: "auto",
+          "&:focus": {
+            outline: "none",
+            borderColor: "primary.main",
+          },
+        }}
+      />
+    </Box>
+  );
+};
+
+// Main Component
 const MemberTasks: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -62,28 +207,30 @@ const MemberTasks: React.FC = () => {
     commentId: string;
     text: string;
   } | null>(null);
+
   useEffect(() => {
     const fetchloggedUser = async () => {
       await fetchLoggedUser();
-     
     };
     fetchloggedUser();
   }, []);
+
   useEffect(() => {
     fetchTasks();
     fetchUsers();
   }, []);
+
   const statusColor = (status: string) => {
     switch (status) {
       case "started":
         return "#85aae6";
-      case "#85e6c2":
-        return "#e685df";
-
+      case "completed":
+        return "#85e6c2";
       default:
         return "#e685df";
     }
   };
+
   const fetchTasks = async () => {
     try {
       const res = await axios.get<Task[]>(`${API_BASE_URL}/task`);
@@ -109,7 +256,6 @@ const MemberTasks: React.FC = () => {
         task,
         user,
         manager: loggedUser?._id,
-
         endTime,
         startTime,
       });
@@ -200,21 +346,19 @@ const MemberTasks: React.FC = () => {
             setIsFormOpen(false);
             resetForm();
           }}
+          maxWidth="md"
+          fullWidth
         >
           <DialogTitle>Assign New Task</DialogTitle>
           <DialogContent>
             <form onSubmit={handleSubmit}>
-              <TextField
-                autoFocus
-                margin="dense"
-                multiline
-                variant="outlined"
-                label="Task description"
-                fullWidth
-                value={task}
-                onChange={(e) => setTask(e.target.value)}
-                required
-              />
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                  Task Description
+                </Typography>
+                <RichTextEditor value={task} onChange={setTask} />
+              </Box>
+
               <FormControl fullWidth margin="dense">
                 <InputLabel id="user-select-label">Assign to User</InputLabel>
                 <Select
@@ -230,6 +374,7 @@ const MemberTasks: React.FC = () => {
                   ))}
                 </Select>
               </FormControl>
+
               <TextField
                 margin="dense"
                 label="Start Time"
@@ -238,7 +383,9 @@ const MemberTasks: React.FC = () => {
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
                 required
+                InputLabelProps={{ shrink: true }}
               />
+
               <TextField
                 margin="dense"
                 label="End Time"
@@ -247,7 +394,9 @@ const MemberTasks: React.FC = () => {
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
                 required
+                InputLabelProps={{ shrink: true }}
               />
+
               <DialogActions>
                 <Button onClick={() => setIsFormOpen(false)} color="primary">
                   Cancel
@@ -267,49 +416,59 @@ const MemberTasks: React.FC = () => {
             gap: "16px",
           }}
         >
-          {tasks.length===0?
-          <p>no task availbale</p>:
-          tasks.map((t) => (
-            <Card key={t._id}>
-              <CardHeader
-                title={t.task}
-                subheader={`Assigned to: ${t.user?.name} | Status: ${t.status}`}
-                style={{
-                  backgroundColor: statusColor(t.status),
-                }}
-              />
-              <CardContent>
-                <Typography variant="body2">
-                  Start: {new Date(t.startTime).toLocaleString()} <br />
-                  End: {new Date(t.endTime).toLocaleString()}
-                </Typography>
-                <Button variant="outlined" onClick={() => setSelectedTask(t)}>
-                  <Message style={{ marginRight: "2px" }} />
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="success"
-                  onClick={() => handleMarkAsDone(t._id)}
-                  style={{ marginLeft: "8px" }}
-                >
-                  <Check style={{ marginRight: "8px" }} />
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="error"
-                  onClick={() => handleDeleteTask(t._id)}
-                  style={{ marginLeft: "8px" }}
-                >
-                  <Delete style={{ marginRight: "8px" }} />
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+          {tasks.length === 0 ? (
+            <p>no task availbale</p>
+          ) : (
+            tasks.map((t) => (
+              <Card key={t._id}>
+                <CardHeader
+                  title={
+                    <div
+                      dangerouslySetInnerHTML={{ __html: sanitizeHTML(t.task) }}
+                    />
+                  }
+                  subheader={`Assigned to: ${t.user?.name} | Status: ${t.status}`}
+                  style={{
+                    backgroundColor: statusColor(t.status),
+                  }}
+                />
+                <CardContent>
+                  <Typography variant="body2">
+                    Start: {new Date(t.startTime).toLocaleString()} <br />
+                    End: {new Date(t.endTime).toLocaleString()}
+                  </Typography>
+                  <Button variant="outlined" onClick={() => setSelectedTask(t)}>
+                    <Message style={{ marginRight: "2px" }} />
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="success"
+                    onClick={() => handleMarkAsDone(t._id)}
+                    style={{ marginLeft: "8px" }}
+                  >
+                    <Check style={{ marginRight: "8px" }} />
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() => handleDeleteTask(t._id)}
+                    style={{ marginLeft: "8px" }}
+                  >
+                    <Delete style={{ marginRight: "8px" }} />
+                  </Button>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
 
         {selectedTask && (
           <Dialog open={!!selectedTask} onClose={() => setSelectedTask(null)}>
-            <DialogTitle>{selectedTask.task}</DialogTitle>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: sanitizeHTML(selectedTask.task),
+              }}
+            />
             <DialogContent>
               <div style={{ marginBottom: "16px" }}>
                 {selectedTask.comments?.map((comment) => (

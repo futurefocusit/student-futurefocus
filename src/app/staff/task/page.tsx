@@ -61,7 +61,51 @@ const MemberTasks: React.FC = () => {
   useEffect(() => {
     fetchTasks();
   }, []);
+const sanitizeHTML = (html: string): string => {
+  const temp = document.createElement("div");
+  temp.innerHTML = html;
 
+  const removeAttributes = (element: Element) => {
+    Array.from(element.attributes).forEach((attr) => {
+      if (!["class", "style"].includes(attr.name.toLowerCase())) {
+        element.removeAttribute(attr.name);
+      }
+    });
+  };
+
+  const allowedTags = new Set([
+    "P",
+    "DIV",
+    "SPAN",
+    "BR",
+    "B",
+    "I",
+    "U",
+    "UL",
+    "OL",
+    "LI",
+    "STRONG",
+    "EM",
+  ]);
+
+  const clean = (node: Node) => {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const element = node as Element;
+
+      if (!allowedTags.has(element.tagName)) {
+        const text = document.createTextNode(element.textContent || "");
+        element.parentNode?.replaceChild(text, element);
+        return;
+      }
+
+      removeAttributes(element);
+      Array.from(element.children).forEach((child) => clean(child));
+    }
+  };
+
+  Array.from(temp.children).forEach((child) => clean(child));
+  return temp.innerHTML;
+};
   const handleAddComment = async (taskId: string) => {
     try {
       await axios.post(`${API_BASE_URL}/task/comment/${taskId}`, {
@@ -69,7 +113,7 @@ const MemberTasks: React.FC = () => {
         user: loggedUser?._id,
       });
       setComment("");
-      await fetchTasks(); // Refresh tasks after adding a comment
+      await fetchTasks(); 
     } catch (error) {
       console.error("Error adding comment:", error);
     }
@@ -125,7 +169,13 @@ const MemberTasks: React.FC = () => {
           {tasks.map((t) => (
             <Card key={t._id}>
               <CardHeader
-                title={t.task}
+                title={
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHTML(t.task),
+                    }}
+                  />
+                }
                 subheader={`Assigned by: ${t.manager?.name} | Status: ${t.status}`}
                 style={{ backgroundColor: statusColor(t.status) }}
               />
@@ -152,7 +202,13 @@ const MemberTasks: React.FC = () => {
 
         {selectedTask && (
           <Dialog open={!!selectedTask} onClose={() => setSelectedTask(null)}>
-            <DialogTitle>{selectedTask.task}</DialogTitle>
+            <DialogTitle>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHTML(selectedTask.task),
+                }}
+              />
+            </DialogTitle>
             <DialogContent>
               <div style={{ marginBottom: "16px" }}>
                 {selectedTask.comments?.map((comment) => (
