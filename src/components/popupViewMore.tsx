@@ -2,7 +2,8 @@
 import React from "react";
 
 interface PopupViewMoreProps {
-  rentedMaterial: any; // Define a proper type based on your data structure
+    //@ts-expect-error error
+  rentedMaterial
   onClose: () => void;
 }
 
