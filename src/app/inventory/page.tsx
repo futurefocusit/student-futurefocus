@@ -9,6 +9,7 @@ import PopupRentForm, {
 import API_BASE_URL from "@/config/baseURL";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
+import withAdminAuth from "@/components/withAdminAuth";
 
 const MaterialManagement: React.FC = () => {
   const { fetchLoggedUser, loggedUser } = useAuth();
@@ -263,4 +264,4 @@ const MaterialManagement: React.FC = () => {
   );
 };
 
-export default MaterialManagement;
+export default withAdminAuth(MaterialManagement);
