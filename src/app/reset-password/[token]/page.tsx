@@ -54,13 +54,13 @@ const ResetPasswordPage = () => {
       );
       toast.success(response.data.message);
       window.location.href = "/admin/login";
-    } catch (error: any) {
+    } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         toast.error(error.response.data.message);
       } else {
         toast.error("Failed! Try again");
       }
-      console.error(error.message);
+
     } finally {
       setIsLoading(false);
     }

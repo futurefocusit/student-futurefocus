@@ -25,7 +25,7 @@ const Page = () => {
      );
      toast.success(response.data.message)
   
-   } catch (error:any) {
+   } catch (error) {
     if(axios.isAxiosError(error) && error.response)
     {
   toast.error(error.response.data.message )
@@ -33,7 +33,7 @@ const Page = () => {
     else{
         toast.error('failed! try again')
     }
-    console.log(error.message)
+   
    }
    finally{
     setIsLoading(false)
