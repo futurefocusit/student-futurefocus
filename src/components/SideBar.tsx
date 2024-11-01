@@ -15,6 +15,7 @@ import {
   FaClock,
   FaTasks,
   FaClipboardList,
+  FaToolbox,
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import { FaPenClip, FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
@@ -34,6 +35,7 @@ const SideBar = () => {
     { label: "Dashboard", icon: FaTachometerAlt, href: "/", admin: true },
     { label: "Students", icon: FaUser, href: "/students", admin: true },
     { label: "Payment", icon: FaMoneyBill, href: "/payment", admin: true },
+    { label: "Inventory", icon: FaToolbox, href: "/inventory", admin: true },
     {
       label: "Transaction",
       icon: FaExchangeAlt,
