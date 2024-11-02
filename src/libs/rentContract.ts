@@ -33,7 +33,7 @@ const rentalTerms = [
 
   doc.setFontSize(10);
   doc.text(
-    `Ngewe Mr/Mrs ${renter.rendeeName} ufite ID No: ............. ..................na telephone ................................ `,
+    `Ngewe Mr/Mrs ${renter.rendeeName} ufite ID No: ................................na telephone ................................ `,
     20,
     100
   );
@@ -77,17 +77,16 @@ const rentalTerms = [
     );
   });
 
-  // Signature Section
   doc.setFontSize(10);
   underlineText(doc, "Signatures:", 20, 230);
   doc.text("_____________________", 20, 240); 
   doc.text(`Renter's Signature: ${renter.rendeeName}`, 20, 250);
-  doc.text("_____________________", 140, 240); 
-  doc.text(`Owner's Signature: ${renter.render}`, 140, 250);
+  doc.text("_____________________", 150, 240); 
+  doc.text(`Owner's Signature:`, 140, 250);
+  doc.text(renter.render, 140, 260);
 
-  // Date
-  doc.text(`Date: ${new Date().toLocaleDateString()}`, 75, 260);
+  doc.text(`Date: ${new Date().toLocaleDateString()}`, 75, 280);
 
-  // Save PDF
+
   doc.save("rental_contract.pdf");
 };

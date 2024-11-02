@@ -62,7 +62,7 @@ export const PopupForm: React.FC<PopupFormProps> = ({ onClose, onSuccess,categor
           onChange={handleChange}
           placeholder="Serial Number"
           className="border p-2 mb-4 w-full"
-          required
+          
         />
         <input
           type="text"
@@ -71,7 +71,7 @@ export const PopupForm: React.FC<PopupFormProps> = ({ onClose, onSuccess,categor
           onChange={handleChange}
           placeholder="Type"
           className="border p-2 mb-4 w-full"
-          required
+        
         />
         <input
           type="number"
