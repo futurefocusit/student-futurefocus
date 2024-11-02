@@ -18,8 +18,7 @@ import {
   FaToolbox,
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
-import { FaPenClip, FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
-import { TeamMember } from "@/types/types";
+import { FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
 import { MdEventAvailable } from "react-icons/md";
 
 const SideBar = () => {

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Message from "@/components/message";
-import PopupRentForm, {
+import{
   PopupForm,
   PopupFormCategory,
 } from "@/components/inventoryPopup";
@@ -11,16 +11,21 @@ import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
 import withAdminAuth from "@/components/withAdminAuth";
 import SideBar from "@/components/SideBar";
+import Loader from "@/components/loader";
+import { ShoppingCart } from "lucide-react";
+import { useCart } from "@/context/cartContext";
+import Cart from "@/components/cart";
 
 const MaterialManagement: React.FC = () => {
   const { fetchLoggedUser, loggedUser } = useAuth();
+  const { addToCart, cartItems } = useCart();
   const [materials, setMaterials] = useState([]);
   const [category, setCategory] = useState([]);
   const [rentedMaterials, setRentedMaterials] = useState([]);
   const [showPopupNM, setShowPopupNM] = useState(false);
   const [showPopupNC, setShowPopupNC] = useState(false);
-  const [showPopupRent, setShowPopupRent] = useState(false);
-  const [selectedMaterial, setSelectedMaterial] = useState(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [showCart, setShowCart] = useState(false);
   const [message, setMessage] = useState<{ type: string; text: string } | null>(
     null
   );
@@ -28,60 +33,92 @@ const MaterialManagement: React.FC = () => {
     "materials" | "rented" | "category"
   >("materials");
 
-  const fetchMaterials = async () => {
-    try {
-      await fetchLoggedUser();
-      const response = await axios.get(`${API_BASE_URL}/inventory`);
-      setMaterials(response.data);
-    } catch (error) {
-      setMessage({ type: "error", text: "Failed to load materials" });
-    }
-  };
+const fetchMaterials = async () => {
+  try {
+    setLoading(true);
+    const response = await axios.get(`${API_BASE_URL}/inventory`);
+    setMaterials(response.data);
+    await fetchLoggedUser();
+  } catch (error) {
+    setMessage({ type: "error", text: "Failed to load materials" });
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const fetchCategory = async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/inventory/category`);
-      setCategory(response.data);
-    } catch (error) {
-      setMessage({ type: "error", text: "Failed to load category" });
-    }
-  };
+const fetchCategory = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/inventory/category`);
+    setCategory(response.data);
+  } catch (error) {
+    setMessage({ type: "error", text: "Failed to load category" });
+  }
+};
 
-  const fetchRented = async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/inventory/rent`);
-      setRentedMaterials(response.data);
-    } catch (error) {
-      setMessage({ type: "error", text: "Failed to load rented materials" });
-    }
-  };
-  const handleReturn = async (id:string) => {
-    try {
-     await axios.put(`${API_BASE_URL}/inventory/${id}`,{
-      receiver:loggedUser?._id
-     });
-     toast.success('item returned')
-    } catch (error) {
-      toast.error("failed to return item");
-    }
-  };
+const fetchRented = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/inventory/rent`);
+    setRentedMaterials(response.data);
+  } catch (error) {
+    setMessage({ type: "error", text: "Failed to load rented materials" });
+  }
+};
+const handleReturn = async (id: string) => {
+  try {
+    await axios.put(`${API_BASE_URL}/inventory/${id}`, {
+      receiver: loggedUser?._id,
+    });
+    toast.success("item returned");
+    await axios.get(`${API_BASE_URL}/inventory`);
+    await fetchRented();
+  } catch (error) {
+    toast.error("failed to return item");
+  }
+};
 
-  useEffect(() => {
-    fetchRented();
-    fetchMaterials();
-    fetchCategory();
-  }, []);
+useEffect(() => {
+  fetchRented();
+  fetchMaterials();
+  fetchCategory();
+}, []);
 
-  const handleRentSuccess = (message: string) => {
-    setMessage({ type: "success", text: message });
-    setShowPopupRent(false);
+const handleRentSuccess = (message: string) => {
+  setMessage({ type: "success", text: message });
+  // setShowPopupRent(false);
+};
+if (loading) {
+  return (
+    <div className="text-center mt-20">
+      <SideBar />
+      <Loader />
+    </div>
+  );
+}
+
+  const handleAddToCart = (material: any) => {
+    const amount = 1; // Default amount, you could add an input for this
+    if (material.amount < 1) {
+      toast.error("This item is out of stock");
+      return;
+    }
+    addToCart(material, amount);
+    toast.success("Added to cart");
   };
 
   return (
     <>
       <SideBar />
       <div className="p-4 mx-auto container">
-        <h1 className="text-2xl font-bold mb-4">Material Management</h1>
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">Material Management</h1>
+          <button
+            onClick={() => setShowCart(true)}
+            className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            <ShoppingCart size={20} />
+            <span>Cart ({cartItems.length})</span>
+          </button>
+        </div>
 
         {message && <Message type={message.type} text={message.text} />}
 
@@ -166,13 +203,10 @@ const MaterialManagement: React.FC = () => {
                     </td>
                     <td className="border border-gray-300 p-2">
                       <button
-                        onClick={() => {
-                          setSelectedMaterial(material);
-                          setShowPopupRent(true);
-                        }}
+                        onClick={() => handleAddToCart(material)}
                         className="bg-green-500 text-white px-2 py-1 rounded"
                       >
-                        Rent
+                        Add to Cart
                       </button>
                     </td>
                   </tr>
@@ -280,22 +314,27 @@ const MaterialManagement: React.FC = () => {
           <PopupForm
             categories={category as never}
             onClose={() => setShowPopupNM(false)}
-            onSuccess={handleRentSuccess}
+            onSuccess={() => {
+              fetchMaterials();
+              setShowPopupNM(false);
+            }}
           />
         )}
         {showPopupNC && (
           <PopupFormCategory
             categories={[]}
             onClose={() => setShowPopupNC(false)}
-            onSuccess={handleRentSuccess}
+            onSuccess={() => {
+              fetchCategory();
+              setShowPopupNC(false);
+            }}
           />
         )}
-        {showPopupRent && selectedMaterial && (
-          <PopupRentForm
-            loggedUser={loggedUser as { _id: string }}
-            material={selectedMaterial}
-            onClose={() => setShowPopupRent(false)}
-            onSuccess={handleRentSuccess}
+        {showCart && (
+          <Cart
+            isOpen={showCart}
+            onClose={() => setShowCart(false)}
+            loggedUser={loggedUser as { _id: string,name:string }}
           />
         )}
       </div>
