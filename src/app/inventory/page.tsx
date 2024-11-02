@@ -94,8 +94,8 @@ if (loading) {
     </div>
   );
 }
-
-  const handleAddToCart = (material: any) => {
+//@ts-expect-error eror
+  const handleAddToCart = (material) => {
     const amount = 1; // Default amount, you could add an input for this
     if (material.amount < 1) {
       toast.error("This item is out of stock");
