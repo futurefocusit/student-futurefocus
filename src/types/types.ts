@@ -66,6 +66,7 @@ export interface memberAttendanceRecord {
   _id: string;
   memberId: { name: string; position: string };
   email: string;
+  comment:string
   status: string;
   updatedAt: string;
   timeOut: string;

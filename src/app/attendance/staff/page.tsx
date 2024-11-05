@@ -189,6 +189,9 @@ await fetchLoggedUser()
                       <th className="border-b-2 border-gray-300 p-2 text-left">
                         Action
                       </th>
+                      <th className="border-b-2 border-gray-300 p-2 text-left">
+                        comment
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -241,6 +244,9 @@ await fetchLoggedUser()
                         ) : (
                           ""
                         )}
+                        <td>
+                          <p className="text-green-700 font-bold" >{record.comment}</p>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

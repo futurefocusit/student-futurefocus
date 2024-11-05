@@ -97,8 +97,8 @@ if (loading) {
 //@ts-expect-error eror
   const handleAddToCart = (material) => {
     const amount = 1; // Default amount, you could add an input for this
-    if (material.amount < 1) {
-      toast.error("This item is out of stock");
+    if (material.amount-material.rent> amount) {
+      toast.error("This item hit maximum");
       return;
     }
     addToCart(material, amount);
@@ -207,6 +207,18 @@ if (loading) {
                         className="bg-green-500 text-white px-2 py-1 rounded"
                       >
                         Add to Cart
+                      </button>
+                      <button
+                        onClick={() => handleAddToCart(material)}
+                        className="bg-red-500 text-white px-2 py-1 rounded"
+                      >
+                       delete
+                      </button>
+                      <button
+                        onClick={() => handleAddToCart(material)}
+                        className="bg-blue-500 text-white px-2 py-1 rounded"
+                      >
+                       update
                       </button>
                     </td>
                   </tr>

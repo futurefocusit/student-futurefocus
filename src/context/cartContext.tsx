@@ -8,6 +8,7 @@ export interface CartItem {
   category: {
     name: string;
   };
+  rent:number
   requestedAmount?: number;
 }
 
@@ -16,7 +17,7 @@ interface CartContextType {
   addToCart: (item: CartItem, amount: number) => void;
   removeFromCart: (itemId: string) => void;
   clearCart: () => void;
-  updateAmount: (itemId: string, amount: number) => void;
+  updateAmount: (itemId: string, amount: number,stock:number) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -48,7 +49,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     setCartItems([]);
   };
 
-  const updateAmount = (itemId: string, amount: number) => {
+  const updateAmount = (itemId: string, amount: number, stock:number) => {
+    if(amount<=0){
+  return 
+    }
     setCartItems((prev) =>
       prev.map((item) =>
         item._id === itemId ? { ...item, requestedAmount: amount } : item

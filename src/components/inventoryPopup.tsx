@@ -23,7 +23,7 @@ export const PopupForm: React.FC<PopupFormProps> = ({ onClose, onSuccess,categor
     console.log(error)
    }
  };
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement| HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
@@ -62,7 +62,6 @@ export const PopupForm: React.FC<PopupFormProps> = ({ onClose, onSuccess,categor
           onChange={handleChange}
           placeholder="Serial Number"
           className="border p-2 mb-4 w-full"
-          
         />
         <input
           type="text"
@@ -71,7 +70,6 @@ export const PopupForm: React.FC<PopupFormProps> = ({ onClose, onSuccess,categor
           onChange={handleChange}
           placeholder="Type"
           className="border p-2 mb-4 w-full"
-        
         />
         <input
           type="number"
@@ -86,18 +84,17 @@ export const PopupForm: React.FC<PopupFormProps> = ({ onClose, onSuccess,categor
         <select
           name="category"
           value={formData.category}
-          //@ts-expect-error ERROR
           onChange={handleChange}
           className="border p-2 mb-4 w-full"
-      
         >
-          {
-            categories.map((category, index) => (
-              //@ts-expect-error error
-              <option key={index} value={category._id}>{category.name}</option>
-              ))
-          }
-          </select>
+          {categories.map((category, index) => (
+            //@ts-expect-error error
+            <option key={index} value={category._id}>
+              {/*@ts-expect-error error */}
+              {category.name}
+            </option>
+          ))}
+        </select>
 
         <div className="flex justify-between">
           <button

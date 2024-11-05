@@ -466,6 +466,16 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
+            {hasPermission(loggedUser as TeamMember, "students", "update") ? (
+              <button
+                onClick={() => handleUpdateStudent(student)}
+                className="text-green-600 hover:text-green-900 ml-3"
+              >
+                Update
+              </button>
+            ) : (
+              ""
+            )}
           </>
         );
       case "accepted":
@@ -525,16 +535,7 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
-            {hasPermission(loggedUser as TeamMember, "students", "update") ? (
-              <button
-                onClick={() => handleUpdateStudent(student)}
-                className="text-green-600 hover:text-green-900 ml-3"
-              >
-                Update
-              </button>
-            ) : (
-              ""
-            )}
+            
             {hasPermission(loggedUser as TeamMember, "students", "start") ? (
               <button
                 onClick={() =>

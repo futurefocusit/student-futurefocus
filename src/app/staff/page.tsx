@@ -17,6 +17,7 @@ interface AttendanceRecord {
   updatedAt: string;
   createdAt: string;
   timeOut: string;
+  comment:string
 }
 
 type GroupedAttendance = {
@@ -24,10 +25,10 @@ type GroupedAttendance = {
 };
 
 const AttendancePage: React.FC = () => {
-  const { logout } = useAuth();
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const [comment,setcomment]=useState<string>('')
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -60,10 +61,21 @@ const AttendancePage: React.FC = () => {
       setIsLoading(false);
     }
   };
+  const handleComment=async(id:string)=>{
+    try {
+      await axios.put(`${API_BASE_URL}/member/comment/${id}`,
+       { comment}
+      )
+      toast.success('comment added')
+    } catch (error) {
+      toast.error("failed to add comment");
+      
+    }
+  }
 
   useEffect(() => {
     fetchAttendance();
-  }, [loggedUser]);
+  }, []);
 
   const markAttendance = async (recordId: string) => {
     if (!loggedUser) return;
@@ -144,7 +156,7 @@ const AttendancePage: React.FC = () => {
 
   return (
     <div>
-      <SideBar/>
+      <SideBar />
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Attendance Records</h1>
 
@@ -203,6 +215,9 @@ const AttendancePage: React.FC = () => {
                     <th className="border-b-2 border-gray-300 p-2 text-left">
                       Action
                     </th>
+                    <th className="border-b-2 border-gray-300 p-2 text-left">
+                      comment
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -246,6 +261,31 @@ const AttendancePage: React.FC = () => {
                               Leave
                             </button>
                           )}
+                      </td>
+                      <td className="border-b border-gray-200 p-2">
+                        {record.status === "absent" &&
+                          isToday(record.createdAt) && (
+                            <button
+                              onClick={() => markAttendance(record._id)}
+                              className="bg-blue-500 text-white px-2 py-1 rounded"
+                            >
+                              Attend
+                            </button>
+                          )}
+
+                        <input
+                          type="text"
+                          value={record.comment}
+                          placeholder="comment"
+                          onChange={(e) => setcomment(e.target.value)}
+                          className=" text-black px-2 py-1 rounded"
+                        />
+                        <button
+                          onClick={() => handleComment(record._id)}
+                          className="bg-blue-500 text-white px-2 py-1 rounded"
+                        >
+                          +
+                        </button>
                       </td>
                     </tr>
                   ))}

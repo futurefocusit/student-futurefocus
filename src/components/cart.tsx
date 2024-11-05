@@ -71,7 +71,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose, loggedUser }) => {
                       max={item.amount}
                       value={item.requestedAmount}
                       onChange={(e) =>
-                        updateAmount(item._id, parseInt(e.target.value))
+                        updateAmount(item._id, parseInt(e.target.value), item.amount-item.rent)
                       }
                       className="w-20 border rounded px-2 py-1"
                     />
