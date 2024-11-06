@@ -18,6 +18,7 @@ interface AttendanceRecord {
   createdAt: string;
   timeOut: string;
   comment:string
+  response:string
 }
 
 type GroupedAttendance = {
@@ -218,6 +219,9 @@ const AttendancePage: React.FC = () => {
                     <th className="border-b-2 border-gray-300 p-2 text-left">
                       comment
                     </th>
+                    <th className="border-b-2 border-gray-300 p-2 text-left">
+                      response
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -282,10 +286,13 @@ const AttendancePage: React.FC = () => {
                         />
                         <button
                           onClick={() => handleComment(record._id)}
-                          className="bg-blue-500 text-white px-2 py-1 rounded"
+                          className="bg-blue-500 text-white px-2 py-1 mx-10 rounded"
                         >
                           +
                         </button>
+                        <p className=" text-black px-2 py-1 rounded">
+                          {record.response}
+                        </p>
                       </td>
                     </tr>
                   ))}

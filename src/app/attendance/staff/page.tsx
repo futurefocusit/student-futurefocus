@@ -23,6 +23,8 @@ const AttendancePage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
+  const [response, setresponse] = useState<string>("");
+
 const {fetchLoggedUser,loggedUser}=useAuth()
 
   const fetchAttendance = async () => {
@@ -48,7 +50,14 @@ await fetchLoggedUser()
       setIsLoading(false);
     }
   };
-
+const handleResponse = async (id: string) => {
+  try {
+    await axios.put(`${API_BASE_URL}/member/response/${id}`, { response });
+    toast.success("comment added");
+  } catch (error) {
+    toast.error("failed to add comment");
+  }
+};
   useEffect(() => {
     fetchAttendance();
   }, []);
@@ -192,6 +201,9 @@ await fetchLoggedUser()
                       <th className="border-b-2 border-gray-300 p-2 text-left">
                         comment
                       </th>
+                      <th className="border-b-2 border-gray-300 p-2 text-left">
+                        response
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -245,7 +257,24 @@ await fetchLoggedUser()
                           ""
                         )}
                         <td>
-                          <p className="text-green-700 font-bold" >{record.comment}</p>
+                          <p className="text-green-700 font-bold">
+                            {record.comment}
+                          </p>
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            value={record.comment}
+                            placeholder="comment"
+                            onChange={(e) => setresponse(e.target.value)}
+                            className=" text-black px-2 py-1 rounded"
+                          />
+                          <button
+                            onClick={() => handleResponse(record._id)}
+                            className="bg-blue-500 text-white px-2 py-1 mx-10 rounded"
+                          >
+                            +
+                          </button>
                         </td>
                       </tr>
                     ))}
