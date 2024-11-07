@@ -264,8 +264,8 @@ const handleResponse = async (id: string) => {
                         <td>
                           <input
                             type="text"
-                            value={record.comment}
-                            placeholder="comment"
+                            value={record.response}
+                            placeholder="Response"
                             onChange={(e) => setresponse(e.target.value)}
                             className=" text-black px-2 py-1 rounded"
                           />

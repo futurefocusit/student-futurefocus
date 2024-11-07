@@ -70,6 +70,7 @@ export interface memberAttendanceRecord {
   status: string;
   updatedAt: string;
   timeOut: string;
+  response:string
 }
 export interface GroupedAttendance {
   [date: string]: {
