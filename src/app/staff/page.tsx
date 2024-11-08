@@ -67,9 +67,9 @@ const AttendancePage: React.FC = () => {
       await axios.put(`${API_BASE_URL}/member/comment/${id}`,
        { comment}
       )
-      toast.success('comment added')
+      toast.success('response added')
     } catch (error) {
-      toast.error("failed to add comment");
+      toast.error("failed to add response");
       
     }
   }

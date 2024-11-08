@@ -24,10 +24,10 @@ import {
   Message,
   Check,
   Delete,
-  FormatBold,
-  FormatItalic,
-  FormatListBulleted,
-  FormatListNumbered,
+  // FormatBold,
+  // FormatItalic,
+  // FormatListBulleted,
+  // FormatListNumbered,
 } from "@mui/icons-material";
 import API_BASE_URL from "@/config/baseURL";
 import { useAuth } from "@/context/AuthContext";
@@ -59,137 +59,94 @@ interface User {
 }
 
 // HTML Sanitizer
-const sanitizeHTML = (html: string): string => {
-  const temp = document.createElement("div");
-  temp.innerHTML = html;
 
-  const removeAttributes = (element: Element) => {
-    Array.from(element.attributes).forEach((attr) => {
-      if (!["class", "style"].includes(attr.name.toLowerCase())) {
-        element.removeAttribute(attr.name);
-      }
-    });
-  };
-
-  const allowedTags = new Set([
-    "P",
-    "DIV",
-    "SPAN",
-    "BR",
-    "B",
-    "I",
-    "U",
-    "UL",
-    "OL",
-    "LI",
-    "STRONG",
-    "EM",
-  ]);
-
-  const clean = (node: Node) => {
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      const element = node as Element;
-
-      if (!allowedTags.has(element.tagName)) {
-        const text = document.createTextNode(element.textContent || "");
-        element.parentNode?.replaceChild(text, element);
-        return;
-      }
-
-      removeAttributes(element);
-      Array.from(element.children).forEach((child) => clean(child));
-    }
-  };
-
-  Array.from(temp.children).forEach((child) => clean(child));
-  return temp.innerHTML;
-};
 
 // Rich Text Editor Component
-interface RichTextEditorProps {
-  value: string;
-  onChange: (value: string) => void;
-}
 
-const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
-  const handleFormat = (command: string) => {
-    try {
-      document.execCommand(command, false);
-      const editorElement = document.querySelector("[data-rich-editor]");
-      if (editorElement) {
-        const content = sanitizeHTML(editorElement.innerHTML);
-        onChange(content);
-      }
-    } catch (error) {
-      console.error("Format command failed:", error);
-    }
-  };
 
-  return (
-    <Box>
-      <Box
-        sx={{
-          mb: 1,
-          borderBottom: 1,
-          borderColor: "divider",
-          display: "flex",
-          gap: 1,
-        }}
-      >
-        <Button
-          variant="outlined"
-          size="small"
-          onClick={() => handleFormat("bold")}
-          sx={{ minWidth: 40 }}
-        >
-          <FormatBold />
-        </Button>
-        <Button
-          variant="outlined"
-          size="small"
-          onClick={() => handleFormat("italic")}
-          sx={{ minWidth: 40 }}
-        >
-          <FormatItalic />
-        </Button>
-        <Button
-          variant="outlined"
-          size="small"
-          onClick={() => handleFormat("insertOrderedList")}
-          sx={{ minWidth: 40 }}
-        >
-          <FormatListNumbered />
-        </Button>
-        <Button
-          variant="outlined"
-          size="small"
-          onClick={() => handleFormat("insertUnorderedList")}
-          sx={{ minWidth: 40 }}
-        >
-          <FormatListBulleted />
-        </Button>
-      </Box>
-      <Box
-        contentEditable
-        data-rich-editor
-        dangerouslySetInnerHTML={{ __html: value }}
-        onInput={(e) => onChange(sanitizeHTML(e.currentTarget.innerHTML))}
-        sx={{
-          border: 1,
-          borderColor: "grey.300",
-          borderRadius: 1,
-          p: 2,
-          minHeight: 200,
-          overflowY: "auto",
-          "&:focus": {
-            outline: "none",
-            borderColor: "primary.main",
-          },
-        }}
-      />
-    </Box>
-  );
-};
+// const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
+//   const handleFormat = (command: string) => {
+//     try {
+//       document.execCommand(command, false);
+//       const editorElement = document.querySelector("[data-rich-editor]");
+//       if (editorElement) {
+//       const content = sanitizeHTML(editorElement.innerHTML);
+//       onChange(content);
+//       }
+//     } catch (error) {
+//       console.error("Format command failed:", error);
+//     }
+//   };
+//  const handleBeforeInput = (e: React.FormEvent<HTMLDivElement>) => {
+//     const inputText = e.currentTarget.textContent || "";
+//     const sanitizedText = sanitizeHTML(inputText);
+//     onChange(sanitizedText);
+//   };
+//   return (
+//     <Box>
+//       <Box
+//         sx={{
+//           mb: 1,
+//           borderBottom: 1,
+//           borderColor: "divider",
+//           display: "flex",
+//           gap: 1,
+//         }}
+//       >
+//         <Button
+//           variant="outlined"
+//           size="small"
+//           onClick={() => handleFormat("bold")}
+//           sx={{ minWidth: 40 }}
+//         >
+//           <FormatBold />
+//         </Button>
+//         <Button
+//           variant="outlined"
+//           size="small"
+//           onClick={() => handleFormat("italic")}
+//           sx={{ minWidth: 40 }}
+//         >
+//           <FormatItalic />
+//         </Button>
+//         <Button
+//           variant="outlined"
+//           size="small"
+//           onClick={() => handleFormat("insertOrderedList")}
+//           sx={{ minWidth: 40 }}
+//         >
+//           <FormatListNumbered />
+//         </Button>
+//         <Button
+//           variant="outlined"
+//           size="small"
+//           onClick={() => handleFormat("insertUnorderedList")}
+//           sx={{ minWidth: 40 }}
+//         >
+//           <FormatListBulleted />
+//         </Button>
+//       </Box>
+//       <Box
+//         contentEditable
+//         data-rich-editor
+//         dangerouslySetInnerHTML={{ __html: value }}
+//         onBeforeInput={handleBeforeInput}
+//         sx={{
+//           border: 1,
+//           borderColor: "grey.300",
+//           borderRadius: 1,
+//           p: 2,
+//           minHeight: 200,
+//           overflowY: "auto",
+//           "&:focus": {
+//             outline: "none",
+//             borderColor: "primary.main",
+//           },
+//         }}
+//       />
+//     </Box>
+//   );
+// };
 
 // Main Component
 const MemberTasks: React.FC = () => {
@@ -356,7 +313,13 @@ const MemberTasks: React.FC = () => {
                 <Typography variant="subtitle1" sx={{ mb: 1 }}>
                   Task Description
                 </Typography>
-                <RichTextEditor value={task} onChange={setTask} />
+                <TextField
+                  fullWidth
+                  multiline
+                  placeholder="enter task separated by comma(',')"
+                  value={task}
+                  onChange={(e) => setTask(e.target.value)}
+                />
               </Box>
 
               <FormControl fullWidth margin="dense">
@@ -423,9 +386,15 @@ const MemberTasks: React.FC = () => {
               <Card key={t._id}>
                 <CardHeader
                   title={
-                    <div
-                      dangerouslySetInnerHTML={{ __html: sanitizeHTML(t.task) }}
-                    />
+                    <div>
+                      {t.task.split(",").map((task, index) => (
+                        <p className="font-bold" key={index}>
+                          {index + 1}
+                          {". "}
+                          {task}
+                        </p>
+                      ))}
+                    </div>
                   }
                   subheader={`Assigned to: ${t.user?.name} | Status: ${t.status}`}
                   style={{
@@ -464,11 +433,16 @@ const MemberTasks: React.FC = () => {
 
         {selectedTask && (
           <Dialog open={!!selectedTask} onClose={() => setSelectedTask(null)}>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: sanitizeHTML(selectedTask.task),
-              }}
-            />
+            <div>
+              {selectedTask.task.split(",").map((task, index) => (
+                <p className="font-bold" key={index}>
+                  {index + 1}
+                  {". "}
+                  {task}
+                </p>
+              ))}
+            </div>
+
             <DialogContent>
               <div style={{ marginBottom: "16px" }}>
                 {selectedTask.comments?.map((comment) => (

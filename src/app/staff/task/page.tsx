@@ -170,11 +170,15 @@ const sanitizeHTML = (html: string): string => {
             <Card key={t._id}>
               <CardHeader
                 title={
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: sanitizeHTML(t.task),
-                    }}
-                  />
+                  <div>
+                    {t.task.split(",").map((task, index) => (
+                      <p className="font-bold" key={index}>
+                        {index + 1}
+                        {". "}
+                        {task}
+                      </p>
+                    ))}
+                  </div>
                 }
                 subheader={`Assigned by: ${t.manager?.name} | Status: ${t.status}`}
                 style={{ backgroundColor: statusColor(t.status) }}
@@ -203,11 +207,15 @@ const sanitizeHTML = (html: string): string => {
         {selectedTask && (
           <Dialog open={!!selectedTask} onClose={() => setSelectedTask(null)}>
             <DialogTitle>
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: sanitizeHTML(selectedTask.task),
-                }}
-              />
+              <div className="mx-auto" >
+                {selectedTask.task.split(",").map((task, index) => (
+                  <p className="font-bold" key={index}>
+                    {index + 1}
+                    {". "}
+                    {task}
+                  </p>
+                ))}
+              </div>
             </DialogTitle>
             <DialogContent>
               <div style={{ marginBottom: "16px" }}>
