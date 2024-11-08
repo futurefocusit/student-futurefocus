@@ -266,16 +266,7 @@ const AttendancePage: React.FC = () => {
                             </button>
                           )}
                       </td>
-                      <td className="border-b border-gray-200 p-2">
-                        {record.status === "absent" &&
-                          isToday(record.createdAt) && (
-                            <button
-                              onClick={() => markAttendance(record._id)}
-                              className="bg-blue-500 text-white px-2 py-1 rounded"
-                            >
-                              Attend
-                            </button>
-                          )}
+                      <td className="border-b flex border-gray-200 p-2">
 
                         <input
                           type="text"
