@@ -276,7 +276,7 @@ const AttendancePage: React.FC = () => {
                         />
                         <button
                           onClick={() => handleComment(record._id)}
-                          className="bg-blue-500 text-white px-2 py-1 mx-10 rounded"
+                          className="bg-blue-500 text-white px-2 py-1 mx-5 rounded"
                         >
                           +
                         </button>
