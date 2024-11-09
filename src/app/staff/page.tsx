@@ -267,11 +267,10 @@ const AttendancePage: React.FC = () => {
                           )}
                       </td>
                       <td className="border-b flex border-gray-200 p-2">
-
                         <input
                           type="text"
                           value={record.comment}
-                          placeholder="comment"
+                          placeholder="add comment"
                           onChange={(e) => setcomment(e.target.value)}
                           className=" text-black px-2 py-1 rounded"
                         />
@@ -281,7 +280,9 @@ const AttendancePage: React.FC = () => {
                         >
                           +
                         </button>
-                        <p className=" text-black px-2 py-1 rounded">
+                      </td>
+                      <td className="border-b  border-gray-200 p-2">
+                        <p className=" text-green-600 font-bold px-2 py-1 rounded">
                           {record.response}
                         </p>
                       </td>
