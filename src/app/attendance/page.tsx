@@ -198,7 +198,7 @@ const AttendancePage: React.FC = () => {
       {searchTerm && (
         <div className="text-sm text-gray-600 mb-4">
           Found {totalResults} {totalResults === 1 ? "student" : "students"}{" "}
-          matching `&quot{searchTerm}`&quot
+          matching {searchTerm}
         </div>
       )}
 
