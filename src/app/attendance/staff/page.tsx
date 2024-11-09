@@ -10,8 +10,6 @@ import { hasPermission } from "@/libs/hasPermission";
 import { memberAttendanceRecord, TeamMember } from "@/types/types";
 import { useAuth } from "@/context/AuthContext";
 
-
-
 type GroupedAttendance = {
   [key: string]: memberAttendanceRecord[];
 };
@@ -24,12 +22,12 @@ const AttendancePage: React.FC = () => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [response, setresponse] = useState<string>("");
-
-const {fetchLoggedUser,loggedUser}=useAuth()
+  const [nameSearch, setNameSearch] = useState<string>("");
+  const { fetchLoggedUser, loggedUser } = useAuth();
 
   const fetchAttendance = async () => {
     try {
-await fetchLoggedUser()
+      await fetchLoggedUser();
       const response = await axios.get<memberAttendanceRecord[]>(
         `${API_BASE_URL}/member/attendance`,
         {
@@ -50,14 +48,16 @@ await fetchLoggedUser()
       setIsLoading(false);
     }
   };
-const handleResponse = async (id: string) => {
-  try {
-    await axios.put(`${API_BASE_URL}/member/response/${id}`, { response });
-    toast.success("comment added");
-  } catch (error) {
-    toast.error("failed to add comment");
-  }
-};
+
+  const handleResponse = async (id: string) => {
+    try {
+      await axios.put(`${API_BASE_URL}/member/response/${id}`, { response });
+      toast.success("comment added");
+    } catch (error) {
+      toast.error("failed to add comment");
+    }
+  };
+
   useEffect(() => {
     fetchAttendance();
   }, []);
@@ -97,7 +97,10 @@ const handleResponse = async (id: string) => {
       const recordDate = new Date(record.updatedAt);
       const matchesStartDate = !startDate || recordDate >= new Date(startDate);
       const matchesEndDate = !endDate || recordDate <= new Date(endDate);
-      return matchesStatus && matchesStartDate && matchesEndDate;
+      const matchesName =
+        !nameSearch ||
+        record.memberId.name.toLowerCase().includes(nameSearch.toLowerCase());
+      return matchesStatus && matchesStartDate && matchesEndDate && matchesName;
     });
   };
 
@@ -132,6 +135,18 @@ const handleResponse = async (id: string) => {
           <h1 className="text-2xl font-bold mb-4">Attendance Records</h1>
 
           <div className="flex flex-wrap gap-4 mb-4">
+            <div className="flex-1">
+              <label className="block text-sm font-medium mb-1">
+                Search by Name
+              </label>
+              <input
+                type="text"
+                className="w-full p-2 border rounded"
+                placeholder="Search member name..."
+                value={nameSearch}
+                onChange={(e) => setNameSearch(e.target.value)}
+              />
+            </div>
             <div className="flex-1">
               <label className="block text-sm font-medium mb-1">Status</label>
               <select
@@ -179,7 +194,6 @@ const handleResponse = async (id: string) => {
                       <th className="border-b-2 border-gray-300 p-2 text-left">
                         #
                       </th>
-
                       <th className="border-b-2 border-gray-300 p-2 text-left">
                         Name
                       </th>
@@ -212,7 +226,6 @@ const handleResponse = async (id: string) => {
                         <td className="border-b border-gray-200 p-2">
                           {index + 1}
                         </td>
-
                         <td className="border-b border-gray-200 p-2">
                           {record.memberId.name}
                         </td>
@@ -267,7 +280,7 @@ const handleResponse = async (id: string) => {
                             value={record.response}
                             placeholder="Response"
                             onChange={(e) => setresponse(e.target.value)}
-                            className=" text-black px-2 py-1 rounded"
+                            className="text-black px-2 py-1 rounded"
                           />
                           <button
                             onClick={() => handleResponse(record._id)}
