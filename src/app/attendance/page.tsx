@@ -21,6 +21,7 @@ const AttendancePage: React.FC = () => {
   const [selectedShift, setSelectedShift] = useState<string | null>(null);
   const [availableShifts, setAvailableShifts] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [totalResults, setTotalResults] = useState<number>(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,7 +29,6 @@ const AttendancePage: React.FC = () => {
         setLoading(true);
         const response = await axios.get(`${API_BASE_URL}/students/attendance`);
         const data: AttendanceRecord[] = response.data;
-        console.log("Fetched Data:", data);
         groupAttendanceData(data);
       } catch (error) {
         console.error("Failed to fetch attendance data:", error);
@@ -41,11 +41,14 @@ const AttendancePage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    filterAttendance();
+    const debounceTimeout = setTimeout(() => {
+      filterAttendance();
+    }, 300);
+
+    return () => clearTimeout(debounceTimeout);
   }, [searchTerm, groupedAttendance, selectedDate, selectedShift]);
 
   const groupAttendanceData = (data: AttendanceRecord[]) => {
-    // Sort data from newest to oldest
     const sortedData = data.sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -80,13 +83,12 @@ const AttendancePage: React.FC = () => {
     const shiftArray = Array.from(shifts);
     changeIndex(shiftArray, 5, 2);
     changeIndex(shiftArray, 5, 3);
-
-    console.log(shiftArray);
     setAvailableShifts(shiftArray);
   };
 
   const filterAttendance = () => {
     const filtered: GroupedAttendance = {};
+    let resultCount = 0;
 
     Object.entries(groupedAttendance).forEach(([date, intakes]) => {
       const recordDate = new Date(date);
@@ -101,18 +103,18 @@ const AttendancePage: React.FC = () => {
         Object.entries(intakes).forEach(([intake, shifts]) => {
           Object.entries(shifts).forEach(([shift, records]) => {
             if (!selectedShift || shift === selectedShift) {
-              const filteredRecords = records.filter(
-                (record) =>
-                  record.studentId &&
-                  record.studentId.name
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase())
-              );
+              const filteredRecords = records.filter((record) => {
+                const studentName = record.studentId?.name || "";
+                return studentName
+                  .toLowerCase()
+                  .includes(searchTerm.toLowerCase().trim());
+              });
 
               if (filteredRecords.length > 0) {
                 filtered[date] = filtered[date] || {};
                 filtered[date][intake] = filtered[date][intake] || {};
                 filtered[date][intake][shift] = filteredRecords;
+                resultCount += filteredRecords.length;
               }
             }
           });
@@ -120,8 +122,10 @@ const AttendancePage: React.FC = () => {
       }
     });
 
+    setTotalResults(resultCount);
     setFilteredAttendance(filtered);
   };
+
   if (loading) {
     return (
       <div className="text-center mt-20">
@@ -130,48 +134,82 @@ const AttendancePage: React.FC = () => {
       </div>
     );
   }
+
   return (
     <div className="container mx-auto p-4">
       <SideBar />
       <h1 className="text-3xl font-bold mb-6">Attendance Records</h1>
-      <div className="mb-4 flex space-x-4">
-        <input
-          type="text"
-          placeholder="Search by student name"
-          className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <DatePicker
-          selected={selectedDate}
-          onChange={(date: Date | null) => setSelectedDate(date)}
-          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholderText="Select date"
-        />
-      </div>
-      <div className="mb-4 flex space-x-2 overflow-x-auto">
-        <button
-          className={`px-4 py-2 rounded-md ${
-            selectedShift === null ? "bg-blue-500 text-white" : "bg-gray-200"
-          }`}
-          onClick={() => setSelectedShift(null)}
-        >
-          All Shifts
-        </button>
-        {availableShifts.map((shift) => (
+
+      <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search by student name"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <button
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                onClick={() => setSearchTerm("")}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          <DatePicker
+            selected={selectedDate}
+            onChange={(date: Date | null) => setSelectedDate(date)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholderText="Select date"
+          />
+        </div>
+
+        <div className="flex flex-wrap gap-2">
           <button
-            key={shift}
-            className={`px-4 py-2 rounded-md ${
-              selectedShift === shift ? "bg-blue-500 text-white" : "bg-gray-200"
+            className={`px-4 py-2 rounded-md transition-colors ${
+              selectedShift === null
+                ? "bg-blue-500 text-white"
+                : "bg-gray-100 hover:bg-gray-200"
             }`}
-            onClick={() => setSelectedShift(shift)}
+            onClick={() => setSelectedShift(null)}
           >
-            {shift}
+            All Shifts
           </button>
-        ))}
+          {availableShifts.map((shift) => (
+            <button
+              key={shift}
+              className={`px-4 py-2 rounded-md transition-colors ${
+                selectedShift === shift
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-100 hover:bg-gray-200"
+              }`}
+              onClick={() => setSelectedShift(shift)}
+            >
+              {shift}
+            </button>
+          ))}
+        </div>
       </div>
+
+      {searchTerm && (
+        <div className="text-sm text-gray-600 mb-4">
+          Found {totalResults} {totalResults === 1 ? "student" : "students"}{" "}
+          matching "{searchTerm}"
+        </div>
+      )}
+
       {Object.entries(filteredAttendance).length === 0 ? (
-        <p>No attendance records found for the selected criteria.</p>
+        <div className="bg-gray-50 rounded-lg p-8 text-center">
+          <p className="text-gray-600">
+            {searchTerm
+              ? `No attendance records found for "${searchTerm}"`
+              : "No attendance records found for the selected criteria."}
+          </p>
+        </div>
       ) : (
         Object.entries(filteredAttendance).map(([date, intakes]) => (
           <div key={date} className="mb-8">
