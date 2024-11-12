@@ -405,6 +405,7 @@ const StudentManagement: React.FC = () => {
   const renderActionButtons = (student: Student) => {
     const commonButtons = (
       <>
+
         <button
           onClick={() => handleView(student)}
           className="text-indigo-600 hover:text-indigo-900 mr-3"
@@ -421,6 +422,7 @@ const StudentManagement: React.FC = () => {
         ) : (
           ""
         )}
+        
         {hasPermission(loggedUser as TeamMember, "students", "comment") ? (
           <div className="">
             <input
@@ -482,6 +484,16 @@ const StudentManagement: React.FC = () => {
         return (
           <>
             {commonButtons}
+            {hasPermission(loggedUser as TeamMember, "students", "attend") ? (
+              <button
+                onClick={() => handleUpdateStudent(student)}
+                className="text-green-600 hover:text-green-900 ml-3"
+              >
+                Update
+              </button>
+            ) : (
+              ""
+            )}
             {hasPermission(loggedUser as TeamMember, "students", "register") ? (
               <button
                 onClick={() =>
@@ -505,6 +517,16 @@ const StudentManagement: React.FC = () => {
         return (
           <>
             {commonButtons}
+            {hasPermission(loggedUser as TeamMember, "students", "attend") ? (
+              <button
+                onClick={() => handleUpdateStudent(student)}
+                className="text-green-600 hover:text-green-900 ml-3"
+              >
+                Update
+              </button>
+            ) : (
+              ""
+            )}
             {hasPermission(loggedUser as TeamMember, "payment", "pay") ? (
               <button
                 onClick={() => handleViewP(student, "pay")}
@@ -535,7 +557,7 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
-            
+
             {hasPermission(loggedUser as TeamMember, "students", "start") ? (
               <button
                 onClick={() =>
@@ -601,16 +623,7 @@ const StudentManagement: React.FC = () => {
             ) : (
               ""
             )}
-            {hasPermission(loggedUser as TeamMember, "students", "attend") ? (
-              <button
-                onClick={() => handleUpdateStudent(student)}
-                className="text-green-600 hover:text-green-900 ml-3"
-              >
-                Update
-              </button>
-            ) : (
-              ""
-            )}
+          
             {hasPermission(loggedUser as TeamMember, "students", "attend") ? (
               <button
                 onClick={() => handleAttend(student._id)}
