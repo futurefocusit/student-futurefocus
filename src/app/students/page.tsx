@@ -636,9 +636,29 @@ const StudentManagement: React.FC = () => {
             )}
           </>
         );
-      case "completed":
-      case "droppedout":
-        return commonButtons;
+        case "droppedout":return (
+          <>
+            {commonButtons}
+            {hasPermission(loggedUser as TeamMember, "students", "update") ? (
+              <button
+                onClick={() =>
+                  handleStatusChange(
+                    student._id,
+                    student.name,
+                    "started",
+                    loggedUser?.name as string
+                  )
+                }
+                className="text-green-600 hover:text-green-900 ml-3"
+              >
+              Reactivate
+              </button>
+            ) : (
+              ""
+            )}
+          </>
+        );
+       case "completed":
       default:
         return null;
     }
