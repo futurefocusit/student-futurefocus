@@ -42,7 +42,7 @@ interface Dashboard {
     started: number;
     registered: number;
     accepted: number;
-    droppedOut: number;
+    droppedout: number;
     completed: number;
   };
   totalPayments: number;
@@ -84,7 +84,7 @@ const Dashboard = () => {
       started: 0,
       registered: 0,
       accepted: 0,
-      droppedOut: 0,
+      droppedout: 0,
       completed: 0,
     },
     totalPayments: 0,
@@ -153,17 +153,17 @@ const Dashboard = () => {
       {
         label: "Pending",
         data: summary.shiftStudents.map((ss) => ss.pending),
-        backgroundColor: "rgba(255, 206, 86, 0.6)", 
+        backgroundColor: "rgba(255, 206, 86, 0.6)",
       },
       {
         label: "Accepted",
         data: summary.shiftStudents.map((ss) => ss.accepted),
-        backgroundColor: "rgba(75, 192, 192, 0.6)", 
+        backgroundColor: "rgba(75, 192, 192, 0.6)",
       },
       {
         label: "Registered",
         data: summary.shiftStudents.map((ss) => ss.registered),
-        backgroundColor: "rgba(54, 162, 235, 0.6)", 
+        backgroundColor: "rgba(54, 162, 235, 0.6)",
       },
       {
         label: "Started",
@@ -318,7 +318,7 @@ const Dashboard = () => {
         >
           <h3 className="text-lg font-semibold">Dropped Out Students</h3>
           <p className="text-2xl font-bold">
-            {summary.studentStatusCounts.droppedOut || 0}
+            {summary.studentStatusCounts.droppedout || 0}
           </p>
         </a>
         <a

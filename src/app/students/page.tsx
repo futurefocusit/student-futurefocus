@@ -566,7 +566,7 @@ const StudentManagement: React.FC = () => {
               Complete
             </button> */}
             {/* <button
-              onClick={() => handleStatusChange(student._id, "dropedout")}
+              onClick={() => handleStatusChange(student._id, "droppedout")}
               className="text-yellow-600 hover:text-yellow-900 ml-3"
             >
               Dropout
@@ -624,7 +624,7 @@ const StudentManagement: React.FC = () => {
           </>
         );
       case "completed":
-      case "dropedout":
+      case "droppedout":
         return commonButtons;
       default:
         return null;
@@ -675,7 +675,7 @@ const StudentManagement: React.FC = () => {
                 "registered",
                 "started",
                 "completed",
-                "dropedout",
+                "droppedout",
               ].map((status) => (
                 <button
                   key={status}
