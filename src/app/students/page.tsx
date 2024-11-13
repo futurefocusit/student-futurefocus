@@ -17,6 +17,7 @@ import { convertImageUrlToBase64 } from "@/libs/convertImage";
 // import { toast } from "react-toastify";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { sendMessage, smsInterface } from "@/libs/sendsms";
 const imageUrl = "/futurefocuslogo.png";
 
 interface Student {
@@ -52,6 +53,11 @@ interface GroupedStudents {
 }
 
 const StudentManagement: React.FC = () => {
+  const smsData: smsInterface = {
+    key: "XQ3TsNiDdca2/PHGg/StwBnSIzJHW8Mi6DdDxOjUGRHHOhPt0ZCSqzvyT+/0IKWCnAIzYJtTIRMIwmKTel6v5w==",
+    message: "you are admitted",
+    recipients: ["0787910406"],
+  };
   // const router = useRouter();
   const searchParams = useSearchParams();
   const filter = searchParams.get("filter");
@@ -142,9 +148,9 @@ const StudentManagement: React.FC = () => {
 
       if (newStatus === "registered") {
         generateRegisterStatementPdf(data, ourlogo);
-      }
-
-      await fetchStudents();
+      } else if (newStatus === "accepted") {
+        sendMessage(smsData);
+      } await fetchStudents();
       setPaymentMethod("");
       setStudentToRegister(null);
     } catch (error) {
