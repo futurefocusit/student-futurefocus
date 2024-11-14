@@ -95,7 +95,7 @@ const StudentManagement: React.FC = () => {
     user: loggedUser?.name,
     method: "",
   });
-  const closePopup = () => {setOpenMessage(false); setError(null), setSucces(null)};
+  const closePopup = () => {setOpenMessage(false); setError(null); setSucces(null)};
   const handleCheckboxChange = (event:React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     
@@ -726,7 +726,7 @@ const handleSend = async() => {
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
             Students
           </h2>
-          {hasPermission(loggedUser as TeamMember, "students", "register") && (
+          {hasPermission(loggedUser as TeamMember, "students", "sms") && (
             <button
               onClick={() => setOpenMessage(true)}
               className=" mx-auto text-blue-800 cursor-pointer"
