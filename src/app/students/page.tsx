@@ -14,10 +14,9 @@ import {
   generateStatementPdf,
 } from "@/libs/generateInvoice";
 import { convertImageUrlToBase64 } from "@/libs/convertImage";
-// import { toast } from "react-toastify";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { sendMessage, smsInterface } from "@/libs/sendsms";
+import { FaCommentSms} from "react-icons/fa6";
 const imageUrl = "/futurefocuslogo.png";
 
 interface Student {
@@ -53,12 +52,6 @@ interface GroupedStudents {
 }
 
 const StudentManagement: React.FC = () => {
-  const smsData: smsInterface = {
-    key: "XQ3TsNiDdca2/PHGg/StwBnSIzJHW8Mi6DdDxOjUGRHHOhPt0ZCSqzvyT+/0IKWCnAIzYJtTIRMIwmKTel6v5w==",
-    message: "you are admitted",
-    recipients: ["0787910406"],
-  };
-  // const router = useRouter();
   const searchParams = useSearchParams();
   const filter = searchParams.get("filter");
 
@@ -80,8 +73,10 @@ const StudentManagement: React.FC = () => {
   const [studentCounts, setStudentCounts] = useState<Record<string, number>>(
     {}
   );
-  const [openView, setOpenView] = useState(false)
-  const [openPay, setOpenPay] = useState(false)
+   const [message, setMessage] = useState("");
+  const [isOpenMessage, setOpenMessage] = useState(false);
+  const [openView, setOpenView] = useState(false);
+  const [openPay, setOpenPay] = useState(false);
   const [commentText, setComment] = useState({ comment: "" });
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -89,6 +84,7 @@ const StudentManagement: React.FC = () => {
   const [updateMode, setUpdateMode] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<string>("");
+  const [selectedValues, setSelectedValues] = useState<string[]>([]);
   const { fetchLoggedUser, loggedUser } = useAuth();
   const [studentToRegister, setStudentToRegister] = useState<{
     id: string;
@@ -99,7 +95,55 @@ const StudentManagement: React.FC = () => {
     user: loggedUser?.name,
     method: "",
   });
+  const closePopup = () => {setOpenMessage(false); setError(null), setSucces(null)};
+  const handleCheckboxChange = (event:React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    
+    if (event.target.checked) {
+      setSelectedValues(prev => [...prev, value]);
+    } else {
+      setSelectedValues(prev => prev.filter(item => item !== value));
+    }
+  };
 
+  const getAllPhoneNumbers = () => {
+    return Object.values(groupedStudents)
+      .flat()
+      .map((student) => student.phone);
+  };
+  const handleSelectAllChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.checked) {
+      setSelectedValues(getAllPhoneNumbers());
+    } else {
+      setSelectedValues([]);
+    }
+  };
+
+
+  const areAllSelected = () => {
+    const allPhones = getAllPhoneNumbers();
+    return allPhones.length > 0 && allPhones.every(phone => selectedValues.includes(phone));
+  };
+const handleSend = async() => {
+  try {
+    if (message.trim()) {
+      const response = await axios.post(`${API_BASE_URL}/others/sendmessage`, {
+        message,
+        recipients:selectedValues,
+      });
+      setSucces(response.data.message)
+      setMessage("");
+    } else {
+  setError('enter message please')
+    }
+  } catch (error) {
+  setError("internal server error");
+    
+  }
+ 
+};
   const handleFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -110,7 +154,7 @@ const StudentManagement: React.FC = () => {
   const handleViewP = (student: Student, type: string) => {
     setSelectedStudent(student);
     setType(type);
-    setOpenPay(true)
+    setOpenPay(true);
   };
   const getStudentCountByStatus = (
     students: Student[]
@@ -148,13 +192,12 @@ const StudentManagement: React.FC = () => {
 
       if (newStatus === "registered") {
         generateRegisterStatementPdf(data, ourlogo);
-      } else if (newStatus === "accepted") {
-        sendMessage(smsData);
-      } await fetchStudents();
+      }
+      await fetchStudents();
       setPaymentMethod("");
       setStudentToRegister(null);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       setSucces(null);
       setError("failed to change status");
     }
@@ -162,7 +205,7 @@ const StudentManagement: React.FC = () => {
 
   const handlePay = async (id: string) => {
     try {
-      setIsPaying(true)
+      setIsPaying(true);
       formData.user = loggedUser?.name;
       const response = await axios.post(
         `${API_BASE_URL}/payment/pay/${id}`,
@@ -177,8 +220,8 @@ const StudentManagement: React.FC = () => {
       console.log(error);
       setSucces(null);
       setError("Error happened! check payment and try again");
-    }finally{
-      setIsPaying(false)
+    } finally {
+      setIsPaying(false);
     }
   };
   const handleDiscount = async (id: string) => {
@@ -192,7 +235,7 @@ const StudentManagement: React.FC = () => {
 
       fetchPayment();
     } catch (error) {
-      console.log(error)
+      console.log(error);
       setError("Error happened! check payment and try again");
       setSucces(null);
     }
@@ -207,7 +250,7 @@ const StudentManagement: React.FC = () => {
       setError(null);
       fetchPayment();
     } catch (error) {
-      console.log(error)
+      console.log(error);
       setError("Error happened! check payment and try again");
       setSucces(null);
     }
@@ -245,7 +288,7 @@ const StudentManagement: React.FC = () => {
   const handleUpdateStudent = async (student: Student) => {
     setSelectedStudent(student);
     setUpdateMode(true);
-    console.log(student)
+    console.log(student);
   };
 
   const handleSaveUpdate = async () => {
@@ -315,18 +358,18 @@ const StudentManagement: React.FC = () => {
   };
 
   const handleView = (student: Student) => {
-    setOpenView(true)
+    setOpenView(true);
     setSelectedStudent(student);
   };
-  const handleDisableView=()=>{
+  const handleDisableView = () => {
     setOpenView(false);
     setSelectedStudent(null);
-  }
- 
-  const handleDisableViewP=()=>{
+  };
+
+  const handleDisableViewP = () => {
     setOpenPay(false);
     setSelectedStudent(null);
-  }
+  };
 
   const handleStatusChange = async (
     id: string,
@@ -356,7 +399,7 @@ const StudentManagement: React.FC = () => {
       setError(null);
       await fetchStudents();
     } catch (error) {
-      console.log(error)
+      console.log(error);
       setError(`Failed to attend student. Please try again.`);
       setError(null);
     }
@@ -411,7 +454,6 @@ const StudentManagement: React.FC = () => {
   const renderActionButtons = (student: Student) => {
     const commonButtons = (
       <>
-
         <button
           onClick={() => handleView(student)}
           className="text-indigo-600 hover:text-indigo-900 mr-3"
@@ -428,7 +470,7 @@ const StudentManagement: React.FC = () => {
         ) : (
           ""
         )}
-        
+
         {hasPermission(loggedUser as TeamMember, "students", "comment") ? (
           <div className="">
             <input
@@ -587,18 +629,6 @@ const StudentManagement: React.FC = () => {
         return (
           <>
             {commonButtons}
-            {/* <button
-              onClick={() => handleStatusChange(student._id, "completed")}
-              className="text-green-600 hover:text-green-900 ml-3"
-            >
-              Complete
-            </button> */}
-            {/* <button
-              onClick={() => handleStatusChange(student._id, "droppedout")}
-              className="text-yellow-600 hover:text-yellow-900 ml-3"
-            >
-              Dropout
-            </button> */}
             {hasPermission(loggedUser as TeamMember, "students", "update") ? (
               <button
                 onClick={() => handleUpdateStudent(student)}
@@ -652,7 +682,8 @@ const StudentManagement: React.FC = () => {
             )}
           </>
         );
-        case "droppedout":return (
+      case "droppedout":
+        return (
           <>
             {commonButtons}
             {hasPermission(loggedUser as TeamMember, "students", "update") ? (
@@ -667,14 +698,14 @@ const StudentManagement: React.FC = () => {
                 }
                 className="text-green-600 hover:text-green-900 ml-3"
               >
-              Reactivate
+                Reactivate
               </button>
             ) : (
               ""
             )}
           </>
         );
-       case "completed":
+      case "completed":
       default:
         return null;
     }
@@ -695,6 +726,14 @@ const StudentManagement: React.FC = () => {
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
             Students
           </h2>
+          {hasPermission(loggedUser as TeamMember, "students", "register") && (
+            <button
+              onClick={() => setOpenMessage(true)}
+              className=" mx-auto text-blue-800 cursor-pointer"
+            >
+              <FaCommentSms size={50} />
+            </button>
+          )}
           {hasPermission(loggedUser as TeamMember, "students", "register") && (
             <a
               href="/students/register-new"
@@ -766,9 +805,20 @@ const StudentManagement: React.FC = () => {
                 Intake: {intake}
               </h3>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 ">
+                <table className="min-w-full divide-y divide-gray-200 mx-14 lg:mx-0 ">
                   <thead className="bg-gray-50">
                     <tr>
+                      <th
+                        scope="col"
+                        className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        {" "}
+                        <input
+                          type="checkbox"
+                          checked={areAllSelected()}
+                          onChange={handleSelectAllChange}
+                        />
+                      </th>
                       <th
                         scope="col"
                         className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -804,6 +854,14 @@ const StudentManagement: React.FC = () => {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {intakeStudents.map((student, index) => (
                       <tr key={student._id}>
+                        <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap">
+                          <input
+                            type="checkbox"
+                            value={student.phone}
+                            checked={selectedValues.includes(student.phone)}
+                            onChange={handleCheckboxChange}
+                          />
+                        </td>
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">
                             {index + 1}
@@ -1197,6 +1255,35 @@ const StudentManagement: React.FC = () => {
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {isOpenMessage && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg w-96 shadow-lg">
+            <h3 className="text-lg font-semibold mb-4">Enter Your Message</h3>
+            <textarea
+              className="w-full p-2 border rounded-lg mb-4"
+              rows={4}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Type your message here..."
+            ></textarea>
+            <div className="flex justify-between">
+              <button
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                onClick={closePopup}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                onClick={handleSend}
+              >
+                Send
+              </button>
+            </div>
+            <p className={`${error?'text-red-500':"text-green-600"} font-bold text-xl animate-pulse text-center`}>{error||succes}</p>
           </div>
         </div>
       )}
