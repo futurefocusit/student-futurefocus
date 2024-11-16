@@ -219,8 +219,8 @@ const data:IInvoice = {
        <div  className="space-y-4">
          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
            <div>
-             <label className="block text-sm font-medium text-gray-700">
-               Full Name
+             <label className="block text-sm font-extrabold text-gray-700">
+              FULL NAME
              </label>
              <input
                type="text"
@@ -232,8 +232,8 @@ const data:IInvoice = {
              />
            </div>
            <div>
-             <label className="block text-sm font-medium text-gray-700">
-               Email
+             <label className="block text-sm font-extrabold text-gray-700">
+               EMAIL
              </label>
              <input
                type="email"
@@ -246,8 +246,8 @@ const data:IInvoice = {
            </div>
          </div>
          <div>
-           <label className="block text-sm font-medium text-gray-700">
-             Phone
+           <label className="block text-sm font-extrabold text-gray-700">
+             PHONE
            </label>
            <input
              type="tel"
@@ -259,8 +259,8 @@ const data:IInvoice = {
            />
          </div>
          <div>
-           <label className="block text-sm font-medium text-gray-700">
-             Select a Course
+           <label className="block text-sm font-extrabold text-gray-700">
+            SELECT COURSE
            </label>
            <select
              name="selectedCourse"
@@ -276,8 +276,8 @@ const data:IInvoice = {
            </select>
          </div>
          <div>
-           <label className="block text-sm font-medium text-gray-700">
-             Select a Shift
+           <label className="block text-sm font-extrabold text-gray-700">
+            SELECT SHIFT
            </label>
            <select
              name="selectedShift"
@@ -295,8 +295,8 @@ const data:IInvoice = {
            </select>
          </div>
          <div>
-           <label className="block text-sm font-medium text-gray-700">
-             Select an Intake
+           <label className="block text-sm font-extrabold text-gray-700">
+             SELECT INTAKE
            </label>
            <select
              name="intake"
@@ -316,8 +316,8 @@ const data:IInvoice = {
            </select>
          </div>
          <div>
-           <label className="block text-sm font-medium text-gray-700">
-            Payment Method
+           <label className="block text-sm font-extrabold text-gray-700">
+          PAYMENT METHOD
            </label>
            <input
              type="text"
@@ -331,9 +331,9 @@ const data:IInvoice = {
            {hasPermission(loggedUser as TeamMember, "students", "register") ? (
              <button
              onClick={()=>handleSubmit()}
-               className="inline-flex justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+               className="inline-flex justify-center px-4 py-2 border border-transparent text-sm font-extrabold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
              >
-               Submit
+              SUBMIT
              </button>
            ) : (
              ""
