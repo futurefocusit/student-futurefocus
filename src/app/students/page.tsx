@@ -74,6 +74,8 @@ const StudentManagement: React.FC = () => {
   const [studentCounts, setStudentCounts] = useState<Record<string, number>>(
     {}
   );
+  
+  const [char, Setchar] = useState(145);
   const [message, setMessage] = useState("");
   const [isOpenMessage, setOpenMessage] = useState(false);
   const [openView, setOpenView] = useState(false);
@@ -747,7 +749,7 @@ const StudentManagement: React.FC = () => {
               href="/students/register-new"
               className="px-4 py-2 bg-green-400 hover:bg-green-700 rounded-lg text-white font-bold"
             >
-              New
+              REGISTER NEW
             </a>
           )}
         </div>
@@ -1300,12 +1302,17 @@ const StudentManagement: React.FC = () => {
       {isOpenMessage && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg w-96 shadow-lg">
-            <h3 className="text-lg font-semibold mb-4">Enter Your Message</h3>
+            <h3 className="text-lg font-semibold mb-4 text-center">TYPE YOUR MESSAGE</h3>
+            <p className="text-end  test-sm text-blue-500"> {char} left</p>
             <textarea
               className="w-full p-2 border rounded-lg mb-4"
               rows={4}
+               maxLength={145}
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e) => {
+                setMessage(e.target.value)
+                 Setchar(char-1)
+              }}
               placeholder="Type your message here..."
             ></textarea>
             <div className="flex justify-between">
