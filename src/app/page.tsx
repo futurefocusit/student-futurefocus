@@ -264,79 +264,77 @@ const Dashboard = () => {
   return (
     <div className="flex flex-col md:items-center p-4">
       <SideBar />
-      <h1 className="text-3xl font-bold mb-4">Dashboard Summary</h1>
+      <h1 className="text-3xl font-bold mb-4">DASHBOARD</h1>
       {/* Overview Section with Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6  gap-4 w-full max-w-64 md:max-w-xl lg:max-w-6xl">
         {/* Student Status Cards */}
 
         <a
           href="/students"
-          className="bg-white p-6 rounded-lg shadow-md text-center"
+          className="text-white p-6 rounded-lg shadow-md text-center bg-yellow-800"
         >
-          <h3 className="text-lg font-semibold">Total Students</h3>
-          <p className="text-2xl font-bold">{summary.totalStudents}</p>
-        </a>
-        <a
-          href="/students"
-          className="bg-white p-6 rounded-lg shadow-md text-center"
-        >
-          <h3 className="text-lg font-semibold">Candidates</h3>
-          <p className="text-2xl font-bold">
+          <h3 className="text-lg font-semibold ">CANDIDATES</h3>
+          <p className="text-2xl font-bold ">
             {summary.studentStatusCounts.pending}
           </p>
         </a>
         <a
-          href="/students?filter=started"
-          className="bg-white p-6 rounded-lg shadow-md text-center"
+          href="/students?filter=accepted"
+          className="bg-blue-800 p-6 rounded-lg shadow-md text-white text-center"
         >
-          <h3 className="text-lg font-semibold">Active Students</h3>
+          <h3 className="text-lg font-semibold">ADMITTED</h3>
           <p className="text-2xl font-bold">
-            {summary.studentStatusCounts.started}
+            {summary.studentStatusCounts.accepted}
           </p>
         </a>
+
         <a
           href="/students?filter=registered"
-          className="bg-white p-6 rounded-lg shadow-md text-center"
+          className="bg-green-700 text-white p-6 rounded-lg shadow-md text-center"
         >
-          <h3 className="text-lg font-semibold">Registered Students</h3>
+          <h3 className="text-lg font-semibold">REGISTRED</h3>
           <p className="text-2xl font-bold">
             {summary.studentStatusCounts.registered}
           </p>
         </a>
         <a
-          href="/students?filter=accepted"
-          className="bg-white p-6 rounded-lg shadow-md text-center"
+          href="/students?filter=started"
+          className="text-white bg-green-500 p-6 rounded-lg shadow-md text-center"
         >
-          <h3 className="text-lg font-semibold">Admitted Students</h3>
+          <h3 className="text-lg font-semibold">ACTIVE</h3>
           <p className="text-2xl font-bold">
-            {summary.studentStatusCounts.accepted}
+            {summary.studentStatusCounts.started}
           </p>
         </a>
         <a
           href="/students?filter=droppedOut"
-          className="bg-white p-6 rounded-lg shadow-md text-center"
+          className="text-white p-6 rounded-lg shadow-md text-center bg-red-900"
         >
-          <h3 className="text-lg font-semibold">Dropped Out Students</h3>
+          <h3 className="text-lg font-semibold">DROPOUT </h3>
           <p className="text-2xl font-bold">
             {summary.studentStatusCounts.droppedout || 0}
           </p>
         </a>
         <a
           href="/students/?filter=completed"
-          className="bg-white p-6 rounded-lg shadow-md text-center"
+          className="text-white p-6 rounded-lg shadow-md text-center bg-green-950"
         >
-          <h3 className="text-lg font-semibold">Completed Students</h3>
+          <h3 className="text-lg font-semibold">COMPLETED </h3>
           <p className="text-2xl font-bold">
             {summary.studentStatusCounts.completed || 0}
           </p>
         </a>
 
-        {hasPermission(loggedUser as TeamMember, "dashboard", "view-dashboard") ? (
+        {hasPermission(
+          loggedUser as TeamMember,
+          "dashboard",
+          "view-dashboard"
+        ) ? (
           <a
             href="/payment"
-            className="bg-white p-6 rounded-lg shadow-md text-center"
+            className="text-white bg-red-950 p-6 rounded-lg shadow-md text-center"
           >
-            <h3 className="text-lg font-semibold">Unpaid Students</h3>
+            <h3 className="text-lg font-semibold ">NOT PAID</h3>
             <p className="text-2xl font-bold">
               {summary.paymentStatusCounts.unpaid}
             </p>
@@ -344,12 +342,16 @@ const Dashboard = () => {
         ) : (
           ""
         )}
-        {hasPermission(loggedUser as TeamMember, "dashboard", "view-dashboard") ? (
+        {hasPermission(
+          loggedUser as TeamMember,
+          "dashboard",
+          "view-dashboard"
+        ) ? (
           <a
             href="/payment"
-            className="bg-white p-6 rounded-lg shadow-md text-center"
+            className="text-white p-6 rounded-lg shadow-md text-center bg-yellow-500"
           >
-            <h3 className="text-lg font-semibold">Partial Paid Student</h3>
+            <h3 className="text-lg font-semibold">PARTIAL PAID </h3>
             <p className="text-2xl font-bold">
               {summary.paymentStatusCounts.partial}
             </p>
@@ -357,12 +359,16 @@ const Dashboard = () => {
         ) : (
           ""
         )}
-        {hasPermission(loggedUser as TeamMember, "dashboard", "view-dashboard") ? (
+        {hasPermission(
+          loggedUser as TeamMember,
+          "dashboard",
+          "view-dashboard"
+        ) ? (
           <a
             href="/payment"
-            className="bg-white p-6 rounded-lg shadow-md text-center"
+            className="text-white p-6 rounded-lg shadow-md text-center bg-green-700"
           >
-            <h3 className="text-lg font-semibold">completed Payments</h3>
+            <h3 className="text-lg font-semibold">FULL PAID</h3>
             <p className="text-2xl font-bold">
               {summary.paymentStatusCounts.paid}
             </p>
@@ -370,12 +376,23 @@ const Dashboard = () => {
         ) : (
           ""
         )}
-        {hasPermission(loggedUser as TeamMember, "dashboard", "view-dashboard") ? (
+        <a
+          href="/students"
+          className="bg-white p-6 rounded-lg shadow-md text-center"
+        >
+          <h3 className="text-lg font-semibold">TOTAL STUDENTS</h3>
+          <p className="text-2xl font-bold">{summary.totalStudents}</p>
+        </a>
+        {hasPermission(
+          loggedUser as TeamMember,
+          "dashboard",
+          "view-dashboard"
+        ) ? (
           <a
             href="/payment"
-            className="bg-white p-6 rounded-lg shadow-md text-center"
+            className="text-white bg-red-200 font-extrabold p-6 rounded-lg shadow-md text-center"
           >
-            <h3 className="text-lg font-semibold">Total Amount To Be Paid</h3>
+            <h3 className="text-lg font-semibold">TOTAL TO BE PAID</h3>
             <p className="text-2xl font-bold">
               {summary.totalAmountToBePaid.toLocaleString()}
             </p>
@@ -383,9 +400,13 @@ const Dashboard = () => {
         ) : (
           ""
         )}
-        {hasPermission(loggedUser as TeamMember, "dashboard", "view-dashboard") ? (
-          <a className="bg-white p-6 rounded-lg shadow-md text-center">
-            <h3 className="text-lg font-semibold">Total Amount Paid</h3>
+        {hasPermission(
+          loggedUser as TeamMember,
+          "dashboard",
+          "view-dashboard"
+        ) ? (
+          <a className="bg-green-800 text-white p-6 rounded-lg shadow-md text-center">
+            <h3 className="text-lg font-semibold ">TOTAL PAID</h3>
             <p className="text-2xl font-bold">
               {summary.totalAmountPaid.toLocaleString()}
             </p>
@@ -395,13 +416,17 @@ const Dashboard = () => {
         )}
       </div>
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl  mt-6">
-        <h2 className="text-2xl font-semibold mb-4">Students Statistics</h2>
+        <h2 className="text-2xl font-semibold text-center mb-4">STUDENT STATISTICS</h2>
         {/* @ts-expect-error error */}
         <Bar data={studentsData} options={options} />
       </div>
-      {hasPermission(loggedUser as TeamMember, "dashboard", "view-dashboard") ? (
+      {hasPermission(
+        loggedUser as TeamMember,
+        "dashboard",
+        "view-dashboard"
+      ) ? (
         <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mt-6">
-          <h2 className="text-2xl font-semibold mb-4">Payments Statistics</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-center">PAYMENT STATISTICS</h2>
           {/* @ts-expect-error error */}
           <Bar data={paymentsData} options={options} />
         </div>
@@ -409,9 +434,13 @@ const Dashboard = () => {
         ""
       )}
 
-      {hasPermission(loggedUser as TeamMember, "dashboard", "view-dashboard") ? (
+      {hasPermission(
+        loggedUser as TeamMember,
+        "dashboard",
+        "view-dashboard"
+      ) ? (
         <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mt-6">
-          <h2 className="text-2xl font-semibold mb-4">Monthly Cash Flow</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-center">MONTHLY CASHFLOW</h2>
           <Line data={cashflowData} options={{ responsive: true }} />
         </div>
       ) : (
