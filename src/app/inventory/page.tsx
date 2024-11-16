@@ -110,7 +110,7 @@ if (loading) {
       <SideBar />
       <div className="p-4 mx-auto container">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-center ">MATERIAL MANAGEMENT</h1>
+          <h1 className="text-2xl font-bold text-center ">INVENTORY MANAGEMENT</h1>
           <button
             onClick={() => setShowCart(true)}
             className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded"
