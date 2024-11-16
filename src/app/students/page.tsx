@@ -781,7 +781,7 @@ const handleSend = async() => {
                     : status === "started"
                     ? `ACTIVE `
                     : `${status.toUpperCase()}`}</p>
-                  <p className="items-start text-[] bg-blue-400 rounded-full p-1  font-extrabold">{studentCounts[status] || 0}</p>
+                  <p className="items-start text-[] bg-blue-400 rounded-full p-1 text-white font-extrabold">{studentCounts[status] || 0}</p>
                 </button>
               ))}
             </div>
