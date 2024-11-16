@@ -16,7 +16,8 @@ import {
 import { convertImageUrlToBase64 } from "@/libs/convertImage";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { FaCommentSms} from "react-icons/fa6";
+import { FaCommentSms } from "react-icons/fa6";
+import { stat } from "fs";
 const imageUrl = "/futurefocuslogo.png";
 
 interface Student {
@@ -73,7 +74,7 @@ const StudentManagement: React.FC = () => {
   const [studentCounts, setStudentCounts] = useState<Record<string, number>>(
     {}
   );
-   const [message, setMessage] = useState("");
+  const [message, setMessage] = useState("");
   const [isOpenMessage, setOpenMessage] = useState(false);
   const [openView, setOpenView] = useState(false);
   const [openPay, setOpenPay] = useState(false);
@@ -95,14 +96,18 @@ const StudentManagement: React.FC = () => {
     user: loggedUser?.name,
     method: "",
   });
-  const closePopup = () => {setOpenMessage(false); setError(null); setSucces(null)};
-  const handleCheckboxChange = (event:React.ChangeEvent<HTMLInputElement>) => {
+  const closePopup = () => {
+    setOpenMessage(false);
+    setError(null);
+    setSucces(null);
+  };
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    
+
     if (event.target.checked) {
-      setSelectedValues(prev => [...prev, value]);
+      setSelectedValues((prev) => [...prev, value]);
     } else {
-      setSelectedValues(prev => prev.filter(item => item !== value));
+      setSelectedValues((prev) => prev.filter((item) => item !== value));
     }
   };
 
@@ -121,29 +126,32 @@ const StudentManagement: React.FC = () => {
     }
   };
 
-
   const areAllSelected = () => {
     const allPhones = getAllPhoneNumbers();
-    return allPhones.length > 0 && allPhones.every(phone => selectedValues.includes(phone));
+    return (
+      allPhones.length > 0 &&
+      allPhones.every((phone) => selectedValues.includes(phone))
+    );
   };
-const handleSend = async() => {
-  try {
-    if (message.trim()) {
-      const response = await axios.post(`${API_BASE_URL}/others/sendmessage`, {
-        message,
-        recipients:selectedValues,
-      });
-      setSucces(response.data.message)
-      setMessage("");
-    } else {
-  setError('enter message please')
+  const handleSend = async () => {
+    try {
+      if (message.trim()) {
+        const response = await axios.post(
+          `${API_BASE_URL}/others/sendmessage`,
+          {
+            message,
+            recipients: selectedValues,
+          }
+        );
+        setSucces(response.data.message);
+        setMessage("");
+      } else {
+        setError("enter message please");
+      }
+    } catch (error) {
+      setError("internal server error");
     }
-  } catch (error) {
-  setError("internal server error");
-    
-  }
- 
-};
+  };
   const handleFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -768,20 +776,50 @@ const handleSend = async() => {
                 <button
                   key={status}
                   onClick={() => filterStudents(status)}
-                  className={`px-3 py-1 flex gap-1  text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
-                    activeFilter === status ? "bg-indigo-100" : ""
+                  className={`px-3 py-1 flex gap-1  text-xs sm:text-sm font-extrabold text-white   border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                    activeFilter === status ? "bg-green-20" : ""
+                  } ${
+                    status === "pending"
+                      ? "bg-yellow-600"
+                      : status === "accepted"
+                      ? "bg-blue-600"
+                      : status === "droppedout"
+                      ? "bg-red-600"
+                      : status === "registered"
+                      ? "bg-green-400"
+                      : status === "started"
+                      ? "bg-green-500"
+                      : "bg-green-900"
                   }`}
                 >
-                  <p className="pt-3 text-md ">{status === "PENDIND"
-                    ? `CANDIDATES  `
-                    : status === "accepted"
-                    ? `ADMITTED `
-                    : status === "droppedout"
-                    ? `DROPOUT`
-                    : status === "started"
-                    ? `ACTIVE `
-                    : `${status.toUpperCase()}`}</p>
-                  <p className="items-start text-[] bg-blue-400 rounded-full p-1 text-white font-extrabold">{studentCounts[status] || 0}</p>
+                  <p className="pt-3 text-md ">
+                    {status === "pending"
+                      ? `CANDIDATES  `
+                      : status === "accepted"
+                      ? `ADMITTED `
+                      : status === "droppedout"
+                      ? `DROPOUT`
+                      : status === "started"
+                      ? `ACTIVE `
+                      : `${status.toUpperCase()}`}
+                  </p>
+                  <p
+                    className={`items-start   bg-white rounded-full p-1 font-extrabold ${
+                      status === "pending"
+                        ? "text-yellow-600"
+                        : status === "accepted"
+                        ? "text-blue-600"
+                        : status === "droppedout"
+                        ? "text-red-600"
+                        : status === "registered"
+                        ? "text-green-400"
+                        : status === "started"
+                        ? "text-green-500"
+                        : "text-green-900"
+                    }`}
+                  >
+                    {studentCounts[status] || 0}
+                  </p>
                 </button>
               ))}
             </div>
