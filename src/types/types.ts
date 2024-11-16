@@ -23,6 +23,7 @@ export interface TeamMember {
   password: string;
   isAdmin: boolean;
   role: Role;
+  image:string
 }
 export interface TeamMemberLogin {
 

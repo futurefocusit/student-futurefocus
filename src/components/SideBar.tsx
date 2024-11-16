@@ -26,37 +26,38 @@ const SideBar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const { fetchLoggedUser, loggedUser } = useAuth();
-
-
   const { logout } = useAuth();
 
   const menuItems = [
     { label: "Dashboard", icon: FaTachometerAlt, href: "/", admin: true },
     { label: "Students", icon: FaUser, href: "/students", admin: true },
-    { label: "Payment", icon: FaMoneyBill, href: "/payment", admin: true },
-    { label: "Inventory", icon: FaToolbox, href: "/inventory", admin: true },
     {
-      label: "Transaction",
-      icon: FaExchangeAlt,
-      href: "/transactions",
-      admin: true,
-    },
-    {
-      label: "Attendances",
+      label: "Student Attendance",
       icon: FaCalendarCheck,
       href: "/attendance",
       admin: true,
     },
-    { label: "Cashflow", icon: FaMoneyBillAlt, href: "/cashflow", admin: true },
     {
       label: "staff Attendance",
       icon: FaClock,
       href: "/attendance/staff",
       admin: true,
     },
+    { label: "My Attendance", icon: MdEventAvailable, href: "/staff" },
+
     { label: "Tasks", icon: FaTasks, href: "/tasks", admin: true },
     { label: "My Task", icon: FaClipboardList, href: "/staff/task" },
-    { label: "My Attendance", icon: MdEventAvailable, href: "/staff" },
+
+    { label: "Payment", icon: FaMoneyBill, href: "/payment", admin: true },
+    {
+      label: "Transactions",
+      icon: FaExchangeAlt,
+      href: "/transactions",
+      admin: true,
+    },
+    { label: "Cashflow", icon: FaMoneyBillAlt, href: "/cashflow", admin: true },
+
+    { label: "Inventory", icon: FaToolbox, href: "/inventory", admin: true },
   ];
 
   useEffect(() => {
@@ -170,7 +171,7 @@ const SideBar = () => {
               </p>
             </button>
             <div className="flex flex-row ">
-              <FaUser className="rounded-full p-2 bg-gray-600 w-10 h-10 " />
+              <img src={loggedUser?.image} className="rounded-full  bg-gray-600 w-10 h-10 " />
               <span className="flex flex-col  items-center">
                 <p
                   className={`mx-4 text-sm text-white ${

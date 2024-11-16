@@ -377,7 +377,7 @@ const Dashboard = () => {
           >
             <h3 className="text-lg font-semibold">Total Amount To Be Paid</h3>
             <p className="text-2xl font-bold">
-              {summary.totalAmountToBePaid.toFixed(0)}
+              {summary.totalAmountToBePaid.toLocaleString()}
             </p>
           </a>
         ) : (
@@ -387,7 +387,7 @@ const Dashboard = () => {
           <a className="bg-white p-6 rounded-lg shadow-md text-center">
             <h3 className="text-lg font-semibold">Total Amount Paid</h3>
             <p className="text-2xl font-bold">
-              {summary.totalAmountPaid.toFixed(0)}
+              {summary.totalAmountPaid.toLocaleString()}
             </p>
           </a>
         ) : (
