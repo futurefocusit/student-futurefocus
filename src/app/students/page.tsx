@@ -1059,45 +1059,45 @@ const StudentManagement: React.FC = () => {
             <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
               <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg ">
                 <div className="bg-gray-50 p-6 h-96 overflow-scroll">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    Student Details
+                  <h3 className="text-lg font-extrabold text-center text-gray-900">
+                    STUDENT DETAILS
                   </h3>
                   <div className="mt-4 space-y-2">
-                    <p>
-                      <span className="font-semibold">Name:</span>{" "}
-                      {selectedStudent.name}
+                    <p className="flex">
+                      <span className="font-extrabold w-24">NAME</span>{" "}
+                      <span> {selectedStudent.name} </span>
                     </p>
-                    <p>
-                      <span className="font-semibold">Email:</span>{" "}
-                      {selectedStudent.email}
+                    <p className="flex">
+                      <span className="font-extrabold  w-24 ">EMAIL</span>{" "}
+                      <span> {selectedStudent.email}</span>
                     </p>
-                    <p>
-                      <span className="font-semibold">Phone:</span>{" "}
-                      {selectedStudent.phone}
+                    <p className="flex">
+                      <span className="font-extrabold w-24 ">PHONE</span>{" "}
+                      <span> {selectedStudent.phone}</span>
                     </p>
-                    <p>
-                      <span className="font-semibold">Intake:</span>{" "}
-                      {selectedStudent.intake}
+                    <p className="flex">
+                      <span className="font-extrabold w-24 ">INTAKE</span>{" "}
+                      <span>{selectedStudent.intake}</span>
                     </p>
-                    <p>
-                      <span className="font-semibold">Course:</span>{" "}
-                      {selectedStudent.selectedCourse}
+                    <p className="flex">
+                      <span className="font-extrabold w-24 ">COURSE</span>{" "}
+                      <span>{selectedStudent.selectedCourse}</span>
                     </p>
-                    <p>
-                      <span className="font-semibold">Message:</span>{" "}
-                      {selectedStudent.message}
+
+                    <p className="flex">
+                      <span className="font-extrabold w-24 ">SHIFT</span>{" "}
+                      <span> {selectedStudent.selectedShift}</span>
                     </p>
-                    <p>
-                      <span className="font-semibold">Shift:</span>{" "}
-                      {selectedStudent.selectedShift}
+                    <p className="flex">
+                      <span className="font-extrabold w-24 ">APPLIED</span>{" "}
+                      <span>{formatDate(selectedStudent.createdAt)}</span>
                     </p>
-                    <p>
-                      <span className="font-semibold">Applied on:</span>{" "}
-                      {formatDate(selectedStudent.createdAt)}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Status:</span>{" "}
-                      {selectedStudent.status}
+                    <p className="flex">
+                      <span className="font-extrabold w-24 ">STATUS</span>{" "}
+                      <span>
+                        {" "}
+                        <span> {selectedStudent.status}</span>
+                      </span>
                     </p>
                     {payment &&
                     payment.filter(
@@ -1112,9 +1112,9 @@ const StudentManagement: React.FC = () => {
                         )
                         .map((filteredPayment) => (
                           <div key={filteredPayment._id}>
-                            <p>
-                              <span className="font-semibold">
-                                Payment Status:
+                            <p className="flex items-center">
+                              <span className="font-extrabold w-24 ">
+                                 STATUS
                               </span>{" "}
                               <span
                                 className={`${
@@ -1125,34 +1125,38 @@ const StudentManagement: React.FC = () => {
                                     : filteredPayment.status === "paid"
                                     ? "bg-blue-700"
                                     : "bg-green-600"
-                                } font-extrabold text-white p-2 rounded-md`}
+                                } font-extrabold  text-white p-1 rounded-md`}
                               >
                                 {filteredPayment.status.toUpperCase()}
                               </span>
                             </p>
-                            <p>
-                              <span className="font-semibold">
-                                Total To pay:
+                            <p className="flex mt-1 " >
+                              <span className="font-extrabold w-24 ">
+                                 TO PAY
                               </span>{" "}
-                              <span className=" text-green-600 font-extrabold">
+                              <span className=" text-green-600 font-extrabold ">
                                 {new Intl.NumberFormat().format(
                                   filteredPayment.amountDue
                                 )}{" "}
                                 Frw
                               </span>
                             </p>
-                            <p>
-                              <span className="font-semibold">Total Paid:</span>{" "}
-                              <span className=" text-blue-600 font-extrabold">
+                            <p className="flex mt-1">
+                              <span className="font-extrabold w-24 ">
+                                 PAID
+                              </span>{" "}
+                              <span className=" text-blue-600 font-extrabold ">
                                 {new Intl.NumberFormat().format(
                                   filteredPayment.amountPaid
                                 )}{" "}
                                 Frw
                               </span>
                             </p>
-                            <p>
-                              <span className="font-semibold">Remaining:</span>{" "}
-                              <span className=" text-red-600 font-extrabold">
+                            <p className="flex mt-1">
+                              <span className="font-extrabold w-24  ">
+                                REMAINING
+                              </span>{" "}
+                              <span className=" text-red-600 font-extrabold ">
                                 {new Intl.NumberFormat().format(
                                   filteredPayment.amountDue -
                                     filteredPayment.amountPaid
@@ -1163,6 +1167,10 @@ const StudentManagement: React.FC = () => {
                           </div>
                         ))
                     )}
+                    <p className="flex">
+                      <span className="font-extrabold w-24">Message</span>{" "}
+                      {selectedStudent.message}
+                    </p>
                   </div>
                 </div>
                 <div className="bg-gray-50 p-4 flex justify-end">
@@ -1302,16 +1310,18 @@ const StudentManagement: React.FC = () => {
       {isOpenMessage && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg w-96 shadow-lg">
-            <h3 className="text-lg font-semibold mb-4 text-center">TYPE YOUR MESSAGE</h3>
+            <h3 className="text-lg font-semibold mb-4 text-center">
+              TYPE YOUR MESSAGE
+            </h3>
             <p className="text-end  test-sm text-blue-500"> {char} left</p>
             <textarea
               className="w-full p-2 border rounded-lg mb-4"
               rows={4}
-               maxLength={145}
+              maxLength={145}
               value={message}
               onChange={(e) => {
-                setMessage(e.target.value)
-                 Setchar(char-1)
+                setMessage(e.target.value);
+                Setchar(char - 1);
               }}
               placeholder="Type your message here..."
             ></textarea>
