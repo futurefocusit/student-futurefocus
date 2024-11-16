@@ -42,6 +42,9 @@ interface GroupedStudents {
 
 const StudentManagement: React.FC = () => {
   const [students, setStudents] = useState<Student[]>([]);
+  const [studentCounts, setStudentCounts] = useState<Record<string, number>>(
+    {}
+  );
   const [payment, setPayment] = useState<Payment[]>([]);
   const [groupedStudents, setGroupedStudents] = useState<GroupedStudents>({});
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +73,14 @@ const StudentManagement: React.FC = () => {
     user: loggedUser?.name,
     method: "",
   });
+   const getStudentCountByStatus = (
+     students: Student[]
+   ): Record<string, number> => {
+     return students.reduce((acc, student) => {
+       acc[student.status] = (acc[student.status] || 0) + 1;
+       return acc;
+     }, {} as Record<string, number>);
+   };
 
   const handleFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -89,6 +100,7 @@ const StudentManagement: React.FC = () => {
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
       setStudents(sortedStudents);
+      setStudentCounts(getStudentCountByStatus(sortedStudents))
       filterStudents(activeFilter, sortedStudents);
     } catch (error) {
       console.error("Error fetching student data:", error);
@@ -247,7 +259,7 @@ const StudentManagement: React.FC = () => {
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <div className="bg-gray-50 flex justify-between shadow-md rounded-lg px-2 items-center">
           <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
-            Student Payment
+            STUDENT PAYMENT
           </h2>
           {hasPermission(loggedUser as TeamMember, "students", "register") ? (
             <a
@@ -265,16 +277,54 @@ const StudentManagement: React.FC = () => {
         <div className="p-4 sm:p-6 space-y-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
             <div className="flex space-x-2 overflow-x-auto w-full sm:w-auto">
-              {["registered", "started", "completed", "droppedout"].map(
+              {["registered", "active", "dropout", "completed"].map(
                 (status) => (
                   <button
                     key={status}
-                    onClick={() => filterStudents(status)}
-                    className={`px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
-                      activeFilter === status ? "bg-indigo-100" : ""
-                    }`}
+                    onClick={() =>
+                      filterStudents(
+                        status === "active"
+                          ? "started"
+                          : status === "dropout"
+                          ? "droppedout"
+                          : status
+                      )
+                    }
+                    className={`px-4 py-2 text-sm font-medium text-white  gap-1  flex  border border-gray-300 rounded-md shadow-sm hover:bg-gray-500  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+                    
+                      ${activeFilter === status ? "bg-indigo-1i00" : ""}
+                     ${
+                       status === "completed"
+                         ? "bg-yellow-600"
+                         : status === "accepted"
+                         ? "bg-blue-600"
+                         : status === "dropout"
+                         ? "bg-red-900"
+                         : status === "registered"
+                         ? "bg-green-800"
+                         : status === "active"
+                         ? "bg-green-600"
+                         : "bg-green-900"
+                     }`}
                   >
-                    {status}
+                    <p>{status.toUpperCase()} </p>
+                    <p
+                      className={`items-start   bg-white rounded-full  w-5 h-5 text-center font-extrabold ${
+                        status === "completed"
+                          ? "text-yellow-600"
+                          : status === "accepted"
+                          ? "text-blue-600"
+                          : status === "dropout"
+                          ? "text-red-600"
+                          : status === "registered"
+                          ? "text-green-400"
+                          : status === "active"
+                          ? "text-green-500"
+                          : "text-green-900"
+                      }`}
+                    >
+                      {studentCounts[status==='active'?'started':status==='dropout'?'droppedout':status] || 0}
+                    </p>
                   </button>
                 )
               )}
@@ -305,9 +355,15 @@ const StudentManagement: React.FC = () => {
 
             return (
               <div key={intake} className="mt-8">
-                <h3 className="text-xl font-semibold mb-4">Intake: {intake}</h3>
+                <h3 className="text-xl font-semibold mb-4">
+                  INTAKE: {intake.toUpperCase()}
+                </h3>
                 <div className="overflow-x-auto">
-                  {hasPermission(loggedUser as TeamMember, "payment", "view") ? (
+                  {hasPermission(
+                    loggedUser as TeamMember,
+                    "payment",
+                    "view"
+                  ) ? (
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
@@ -573,9 +629,7 @@ const StudentManagement: React.FC = () => {
                     </span>
                     {type === "pay" ? (
                       <span className="flex gap-10 items-center mx-auto mb-3">
-                        <p className="font-extrabold">
-                          method of payment:
-                        </p>
+                        <p className="font-extrabold">method of payment:</p>
                         <input
                           name="method"
                           type="text"
@@ -585,7 +639,7 @@ const StudentManagement: React.FC = () => {
                         />
                       </span>
                     ) : (
-                     ""
+                      ""
                     )}
                   </div>
                 </div>

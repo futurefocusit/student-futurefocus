@@ -259,6 +259,7 @@ const MemberTasks: React.FC = () => {
       });
       setComment("");
       fetchTasks();
+      
     } catch (error) {
       console.error("Error adding comment:", error);
     }
@@ -283,7 +284,7 @@ const MemberTasks: React.FC = () => {
       <SideBar />
       <div style={{ maxWidth: "800px", margin: "0 auto", padding: "16px" }}>
         <Typography variant="h4" gutterBottom>
-          Admin Task Assignment
+         ADMIN TASK ASSIGNMENT
         </Typography>
 
         <Button

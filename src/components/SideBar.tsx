@@ -32,7 +32,7 @@ const SideBar = () => {
     { label: "DASHBOARD", icon: FaTachometerAlt, href: "/", admin: true },
     { label: "STUDENTS", icon: FaUser, href: "/students", admin: true },
     {
-      label: "STUDENTS ATTENDANCE",
+      label: "STUDENT ATTENDANCE",
       icon: FaCalendarCheck,
       href: "/attendance",
       admin: true,
@@ -50,7 +50,7 @@ const SideBar = () => {
 
     { label: "PAYMENT", icon: FaMoneyBill, href: "/payment", admin: true },
     {
-      label: "TRANSACTION",
+      label: "TRANSACTIONS",
       icon: FaExchangeAlt,
       href: "/transactions",
       admin: true,

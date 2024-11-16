@@ -109,8 +109,8 @@ if (loading) {
     <>
       <SideBar />
       <div className="p-4 mx-auto container">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Material Management</h1>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-bold text-center ">MATERIAL MANAGEMENT</h1>
           <button
             onClick={() => setShowCart(true)}
             className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded"
@@ -127,17 +127,15 @@ if (loading) {
             onClick={() => setShowPopupNC(true)}
             className="bg-green-500 text-white px-4 py-2 rounded"
           >
-            Add New Category
+            NEW CATEGORY
           </button>
           <button
             onClick={() => setShowPopupNM(true)}
             className="bg-green-500 text-white px-4 py-2 rounded"
           >
-            Add New Material
+            NEW MATERIAL
           </button>
-        </div>
-
-        <div className="flex gap-5 mb-4">
+       
           <button
             onClick={() => setActiveTab("materials")}
             className={`mr-2 px-4 py-2 rounded ${
@@ -146,7 +144,7 @@ if (loading) {
                 : "bg-gray-200"
             }`}
           >
-            Materials
+            MATERIALS
           </button>
           <button
             onClick={() => setActiveTab("rented")}
@@ -154,7 +152,7 @@ if (loading) {
               activeTab === "rented" ? "bg-blue-500 text-white" : "bg-gray-200"
             }`}
           >
-            Rented Materials
+            RENT MATERIALS
           </button>
           <button
             onClick={() => setActiveTab("category")}
@@ -164,21 +162,21 @@ if (loading) {
                 : "bg-gray-200"
             }`}
           >
-            Category
+            CATEGORY
           </button>
         </div>
 
         {activeTab === "materials" && (
           <div>
-            <h2 className="text-xl font-semibold mb-2">Materials</h2>
+            <h2 className="text-xl font-semibold mb-2">MATERIAL</h2>
             <table className="min-w-full border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-200">
-                  <th className="border border-gray-300 p-2">Material Name</th>
-                  <th className="border border-gray-300 p-2">Amount</th>
-                  <th className="border border-gray-300 p-2">Category</th>
-                  <th className="border border-gray-300 p-2">Rent</th>
-                  <th className="border border-gray-300 p-2">Action</th>
+                  <th className="border border-gray-300 p-2">MATERIAL NAME</th>
+                  <th className="border border-gray-300 p-2">AMOUNT</th>
+                  <th className="border border-gray-300 p-2">CATEGORY</th>
+                  <th className="border border-gray-300 p-2">RENT</th>
+                  <th className="border border-gray-300 p-2">ACTION</th>
                 </tr>
               </thead>
               <tbody>
@@ -201,7 +199,7 @@ if (loading) {
                       {/* @ts-expect-error error */}
                       {material.rent}
                     </td>
-                    <td className="border border-gray-300 p-2">
+                    <td className="border border-gray-300 p-2 flex gap-3">
                       <button
                         onClick={() => handleAddToCart(material)}
                         className="bg-green-500 text-white px-2 py-1 rounded"

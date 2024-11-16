@@ -132,7 +132,7 @@ const AttendancePage: React.FC = () => {
       <SideBar />
       {hasPermission(loggedUser as TeamMember, "staff-attendance", "view") ? (
         <div className="container mx-auto p-4">
-          <h1 className="text-2xl font-bold mb-4">Attendance Records</h1>
+          <h1 className="text-2xl font-bold mb-4 text-center">STAFF ATTENDANCE RECORDS</h1>
 
           <div className="flex flex-wrap gap-4 mb-4">
             <div className="flex-1">
@@ -195,28 +195,28 @@ const AttendancePage: React.FC = () => {
                         #
                       </th>
                       <th className="border-b-2 border-gray-300 p-2 text-left">
-                        Name
+                        NAME
                       </th>
                       <th className="border-b-2 border-gray-300 p-2 text-left">
-                        Role
+                        ROLE
                       </th>
                       <th className="border-b-2 border-gray-300 p-2 text-left">
-                        Status
+                        STATUS
                       </th>
                       <th className="border-b-2 border-gray-300 p-2 text-left">
-                        Time In
+                        TIME IN
                       </th>
                       <th className="border-b-2 border-gray-300 p-2 text-left">
-                        Time Out
+                        TIME OUT
                       </th>
                       <th className="border-b-2 border-gray-300 p-2 text-left">
-                        Action
+                        ACTION
                       </th>
                       <th className="border-b-2 border-gray-300 p-2 text-left">
-                        comment
+                        STAFF COMMENT
                       </th>
                       <th className="border-b-2 border-gray-300 p-2 text-left">
-                        response
+                        ADMIN COMMENT
                       </th>
                     </tr>
                   </thead>

@@ -157,7 +157,7 @@ const sanitizeHTML = (html: string): string => {
       <SideBar />
       <div style={{ maxWidth: "800px", margin: "0 auto", padding: "16px" }}>
         <Typography variant="h4" gutterBottom>
-          My Tasks
+        MY TASKS
         </Typography>
         <div
           style={{
@@ -170,7 +170,7 @@ const sanitizeHTML = (html: string): string => {
             <Card key={t._id}>
               <CardHeader
                 title={
-                  <div>
+                  <div className="text-white">
                     {t.task.split(",").map((task, index) => (
                       <p className="font-bold" key={index}>
                         {index + 1}
@@ -180,7 +180,11 @@ const sanitizeHTML = (html: string): string => {
                     ))}
                   </div>
                 }
-                subheader={`Assigned by: ${t.manager?.name} | Status: ${t.status}`}
+                subheader={
+                  <p  className="font-extrabold text-gray-300">
+                    Assigned by: {t.manager?.name} | Status: {t.status}
+                  </p>
+                }
                 style={{ backgroundColor: statusColor(t.status) }}
               />
               <CardContent>
@@ -207,7 +211,7 @@ const sanitizeHTML = (html: string): string => {
         {selectedTask && (
           <Dialog open={!!selectedTask} onClose={() => setSelectedTask(null)}>
             <DialogTitle>
-              <div className="mx-auto" >
+              <div className="mx-auto">
                 {selectedTask.task.split(",").map((task, index) => (
                   <p className="font-bold" key={index}>
                     {index + 1}

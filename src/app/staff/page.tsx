@@ -159,7 +159,7 @@ const AttendancePage: React.FC = () => {
     <div>
       <SideBar />
       <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">Attendance Records</h1>
+        <h1 className="text-2xl font-bold mb-4">MY ATTENDANCE RECORDS</h1>
 
         <div className="flex flex-wrap gap-4 mb-4">
           <div className="flex-1">
@@ -203,49 +203,49 @@ const AttendancePage: React.FC = () => {
               <h2 className="text-xl font-semibold mb-2">{date}</h2>
               <table className="min-w-full">
                 <thead>
-                  <tr>
-                    <th className="border-b-2 border-gray-300 p-2 text-left">
-                      Time In
+                  <tr className="flex justify-between ">
+                    <th className="border-b-2 border-gray-300 p-2">
+                      TIME IN
                     </th>
-                    <th className="border-b-2 border-gray-300 p-2 text-left">
-                      Time Out
+                    <th className="border-b-2 border-gray-300 p-2">
+                      TIME OUT
                     </th>
-                    <th className="border-b-2 border-gray-300 p-2 text-left">
-                      Status
+                    <th className="border-b-2 border-gray-300 p-2">
+                      STATUS
                     </th>
-                    <th className="border-b-2 border-gray-300 p-2 text-left">
-                      Action
+                    <th className="border-b-2 border-gray-300 p-2">
+                      ACTION
                     </th>
-                    <th className="border-b-2 border-gray-300 p-2 text-left">
-                      comment
+                    <th className="border-b-2 border-gray-300 p-2">
+                      COMMENT
                     </th>
-                    <th className="border-b-2 border-gray-300 p-2 text-left">
-                      response
+                    <th className="border-b-2 border-gray-300 p-2">
+                      RESPONSE
                     </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody >
                   {records.map((record) => (
-                    <tr key={record._id}>
-                      <td className="border-b border-gray-200 p-2">
+                    <tr key={record._id} className="flex justify-between">
+                      <td className="border-b border-gray-200 p-2 ">
                         {record.status === "present" ||
                         record.status === "pending"
                           ? new Date(record.updatedAt).toLocaleTimeString()
                           : "----"}
                       </td>
-                      <td className="border-b border-gray-200 p-2">
+                      <td className="border-b border-gray-200 p-2 ">
                         {record.timeOut
                           ? new Date(record.timeOut).toLocaleTimeString()
                           : "---"}
                       </td>
                       <td
-                        className={`border-b border-gray-200 p-2 ${getStatusColor(
+                        className={`border-b border-gray-200 p-2  ${getStatusColor(
                           record.status
                         )}`}
                       >
                         {record.status}
                       </td>
-                      <td className="border-b border-gray-200 p-2">
+                      <td className="border-b border-gray-200 p-2 ">
                         {record.status === "absent" &&
                           isToday(record.createdAt) && (
                             <button
@@ -266,7 +266,7 @@ const AttendancePage: React.FC = () => {
                             </button>
                           )}
                       </td>
-                      <td className="border-b flex border-gray-200 p-2">
+                      <td className="border-b flex border-gray-200 p-2 ">
                         <input
                           type="text"
                           value={record.comment}
@@ -281,7 +281,7 @@ const AttendancePage: React.FC = () => {
                           +
                         </button>
                       </td>
-                      <td className="border-b  border-gray-200 p-2">
+                      <td className="border-b  border-gray-200 p-2 ">
                         <p className=" text-green-600 font-bold px-2 py-1 rounded">
                           {record.response}
                         </p>

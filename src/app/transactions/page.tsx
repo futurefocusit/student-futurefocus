@@ -111,7 +111,7 @@ const PaymentsPage: React.FC = () => {
 
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
-          Transactions
+         TRANSACTIONS
         </h2>
         <div className="p-4">
           <input
