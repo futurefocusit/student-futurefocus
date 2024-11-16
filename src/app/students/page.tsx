@@ -724,7 +724,7 @@ const handleSend = async() => {
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <div className="bg-gray-50 flex flex-col sm:flex-row justify-between items-center shadow-md rounded-lg p-4">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
-            Students
+            STUDENTS
           </h2>
           {hasPermission(loggedUser as TeamMember, "students", "sms") && (
             <button
@@ -768,19 +768,20 @@ const handleSend = async() => {
                 <button
                   key={status}
                   onClick={() => filterStudents(status)}
-                  className={`px-3 py-1 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                  className={`px-3 py-1 flex gap-1  text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
                     activeFilter === status ? "bg-indigo-100" : ""
                   }`}
                 >
-                  {status === "pending"
-                    ? `Candidates (${studentCounts[status] || 0}) `
+                  <p className="pt-3 text-md ">{status === "PENDIND"
+                    ? `CANDIDATES  `
                     : status === "accepted"
-                    ? `Admitted (${studentCounts[status] || 0})`
+                    ? `ADMITTED `
+                    : status === "droppedout"
+                    ? `DROPOUT`
                     : status === "started"
-                    ? `Active (${studentCounts[status] || 0})`
-                    : `${status.charAt(0).toUpperCase() + status.slice(1)} (${
-                        studentCounts[status] || 0
-                      })`}
+                    ? `ACTIVE `
+                    : `${status.toUpperCase()}`}</p>
+                  <p className="items-start text-[] bg-blue-400 rounded-full p-1  font-extrabold">{studentCounts[status] || 0}</p>
                 </button>
               ))}
             </div>
@@ -802,7 +803,7 @@ const handleSend = async() => {
           {Object.entries(groupedStudents).map(([intake, intakeStudents]) => (
             <div key={intake} className="mt-8">
               <h3 className="text-lg sm:text-xl font-semibold mb-4">
-                Intake: {intake}
+                INTAKE: {intake.toUpperCase()}
               </h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200 mx-14 lg:mx-0 ">
@@ -1283,7 +1284,13 @@ const handleSend = async() => {
                 Send
               </button>
             </div>
-            <p className={`${error?'text-red-500':"text-green-600"} font-bold text-xl animate-pulse text-center`}>{error||succes}</p>
+            <p
+              className={`${
+                error ? "text-red-500" : "text-green-600"
+              } font-bold text-xl animate-pulse text-center`}
+            >
+              {error || succes}
+            </p>
           </div>
         </div>
       )}
