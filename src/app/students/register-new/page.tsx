@@ -203,7 +203,7 @@ const data:IInvoice = {
          Back
        </a>
        <h2 className="text-2xl font-bold mb-4 text-gray-900 text-center">
-         Fill the Form Correctly
+        FILL OUT THE FORM
        </h2>
        {submissionResult && (
          <div
