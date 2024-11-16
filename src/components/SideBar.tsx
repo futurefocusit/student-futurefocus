@@ -29,35 +29,35 @@ const SideBar = () => {
   const { logout } = useAuth();
 
   const menuItems = [
-    { label: "Dashboard", icon: FaTachometerAlt, href: "/", admin: true },
-    { label: "Students", icon: FaUser, href: "/students", admin: true },
+    { label: "DASHBOARD", icon: FaTachometerAlt, href: "/", admin: true },
+    { label: "STUDENTS", icon: FaUser, href: "/students", admin: true },
     {
-      label: "Student Attendance",
+      label: "STUDENTS ATTENDANCE",
       icon: FaCalendarCheck,
       href: "/attendance",
       admin: true,
     },
     {
-      label: "staff Attendance",
+      label: "STAFF ATTENDANCE",
       icon: FaClock,
       href: "/attendance/staff",
       admin: true,
     },
-    { label: "My Attendance", icon: MdEventAvailable, href: "/staff" },
+    { label: "MY ATTENDANCE", icon: MdEventAvailable, href: "/staff" },
 
-    { label: "Tasks", icon: FaTasks, href: "/tasks", admin: true },
-    { label: "My Task", icon: FaClipboardList, href: "/staff/task" },
+    { label: "TASK", icon: FaTasks, href: "/tasks", admin: true },
+    { label: "MY TASK", icon: FaClipboardList, href: "/staff/task" },
 
-    { label: "Payment", icon: FaMoneyBill, href: "/payment", admin: true },
+    { label: "PAYMENT", icon: FaMoneyBill, href: "/payment", admin: true },
     {
-      label: "Transactions",
+      label: "TRANSACTION",
       icon: FaExchangeAlt,
       href: "/transactions",
       admin: true,
     },
-    { label: "Cashflow", icon: FaMoneyBillAlt, href: "/cashflow", admin: true },
+    { label: "CASHFLOW", icon: FaMoneyBillAlt, href: "/cashflow", admin: true },
 
-    { label: "Inventory", icon: FaToolbox, href: "/inventory", admin: true },
+    { label: "INVENTORY", icon: FaToolbox, href: "/inventory", admin: true },
   ];
 
   useEffect(() => {
@@ -106,7 +106,7 @@ const SideBar = () => {
           ref={sidebarRef}
           className={` flex flex-col h-screen justify-between py-8 overflow-y-auto transition-all duration-300 ease-in-out ${
             isOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0 ${isExpanded ? "w-64" : "w-20"}`}
+          } md:translate-x-0 ${isExpanded ? "w-72" : "w-20"}`}
         >
           <div className="flex items-center justify-between mb-6 px-4">
             <h2
@@ -114,7 +114,7 @@ const SideBar = () => {
                 isExpanded ? "" : "hidden"
               }`}
             >
-              Menu
+              MENU
             </h2>
             <button
               onClick={toggleExpand}
