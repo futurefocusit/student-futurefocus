@@ -11,9 +11,12 @@ import { hasPermission } from "@/libs/hasPermission";
 import Loader from "@/components/loader";
 import { useAuth } from "@/context/AuthContext";
 import { TeamMember } from "@/types/types";
-import { FaArrowLeft } from "react-icons/fa";
-import { FaArrowRightFromBracket, FaArrowRightToBracket, FaRightFromBracket, FaRightToBracket, FaScaleBalanced } from "react-icons/fa6";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  FaRightFromBracket,
+  FaRightToBracket,
+  FaScaleBalanced,
+} from "react-icons/fa6";
+import ConfirmDeleteModal from "@/components/confirmPopupmodel";
 
 export interface CashflowType {
   type: string;
@@ -26,6 +29,9 @@ export interface CashflowType {
 }
 
 const PaymentsPage: React.FC = () => {
+  const [confirmModelOpen, SetConfirmModel] = useState(false);
+  const [action, setAction] = useState("");
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [cashflows, setCashflows] = useState<CashflowType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +61,10 @@ const PaymentsPage: React.FC = () => {
     createdAt: string; // ISO string format date
   }
 
-const filterCashflowByDate = (cashflows: CashflowType[], targetDate: string)=> {
+  const filterCashflowByDate = (
+    cashflows: CashflowType[],
+    targetDate: string
+  ) => {
     // Convert the target date to a Date object for comparison (ignoring time part)
     const targetDateObj = new Date(targetDate);
     targetDateObj.setHours(0, 0, 0, 0); // Reset the time to midnight
@@ -87,13 +96,12 @@ const filterCashflowByDate = (cashflows: CashflowType[], targetDate: string)=> {
       expenses,
       difference,
     };
-  }
+  };
 
-const timestamp = Date.now();
-const isoDate = new Date(timestamp).toISOString();
+  const timestamp = Date.now();
+  const isoDate = new Date(timestamp).toISOString();
 
   const result = filterCashflowByDate(cashflows, isoDate);
-  
 
   const fetchCashflows = async () => {
     try {
@@ -141,6 +149,10 @@ const isoDate = new Date(timestamp).toISOString();
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
+  const handleDeleteClick = (itemId: string) => {
+    setItemToDelete(itemId);
+    SetConfirmModel(true);
+  };
 
   const handleFormData = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -172,6 +184,8 @@ const isoDate = new Date(timestamp).toISOString();
       toast.error("failed to delete data");
       //@ts-expect-error error
       throw new Error(error);
+    }finally{
+      SetConfirmModel(false);
     }
   };
   const groupByDate = (data: CashflowType[]) => {
@@ -419,7 +433,12 @@ const isoDate = new Date(timestamp).toISOString();
                                   "delete"
                                 ) ? (
                                   <button
-                                    onClick={() => handleDelete(cashflow._id)}
+                                    onClick={() => {
+                                      handleDeleteClick(cashflow._id);
+                                      setAction(
+                                        ` delete ${cashflow.type} transaction`
+                                      );
+                                    }}
                                   >
                                     delete
                                   </button>
@@ -512,6 +531,13 @@ const isoDate = new Date(timestamp).toISOString();
             </div>
           </div>
         </div>
+      )}
+      {confirmModelOpen && (
+        <ConfirmDeleteModal
+          onConfirm={() => handleDelete(itemToDelete as string)}
+          onClose={() => SetConfirmModel(false)}
+          action={action}
+        />
       )}
     </div>
   );

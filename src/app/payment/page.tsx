@@ -12,6 +12,7 @@ import { convertImageUrlToBase64 } from "@/libs/convertImage";
 import Loader from "@/components/loader";
 import { useAuth } from "@/context/AuthContext";
 import { TeamMember } from "@/types/types";
+import ConfirmDeleteModal from "@/components/confirmPopupmodel";
 const imageUrl = "/futurefocuslogo.png";
 interface Student {
   _id: string;
@@ -45,6 +46,9 @@ const StudentManagement: React.FC = () => {
   const [studentCounts, setStudentCounts] = useState<Record<string, number>>(
     {}
   );
+  const [confirmModelOpen, SetConfirmModel] = useState(false);
+  const [action, setAction] = useState("");
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [payment, setPayment] = useState<Payment[]>([]);
   const [groupedStudents, setGroupedStudents] = useState<GroupedStudents>({});
   const [error, setError] = useState<string | null>(null);
@@ -166,8 +170,14 @@ const StudentManagement: React.FC = () => {
       toast.error("failed to delete data");
       //@ts-expect-error error
       throw new Error(error);
+    }finally{
+      SetConfirmModel(false)
     }
   };
+   const handleDeleteClick = (itemId: string) => {
+     setItemToDelete(itemId); // Set the item that will be deleted
+     SetConfirmModel(true); // Open the modal
+   };
   const handleDiscount = async (id: string) => {
     try {
       const response = await axios.put(
@@ -323,7 +333,13 @@ const StudentManagement: React.FC = () => {
                           : "text-green-900"
                       }`}
                     >
-                      {studentCounts[status==='active'?'started':status==='dropout'?'droppedout':status] || 0}
+                      {studentCounts[
+                        status === "active"
+                          ? "started"
+                          : status === "dropout"
+                          ? "droppedout"
+                          : status
+                      ] || 0}
                     </p>
                   </button>
                 )
@@ -525,7 +541,7 @@ const StudentManagement: React.FC = () => {
                                 "delete"
                               ) ? (
                                 <button
-                                  onClick={() => handleDelete(student._id)}
+                                  onClick={() =>{handleDeleteClick(student._id);setAction('delete payment')}}
                                   className="bg-red-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-red-900"
                                 >
                                   delete
@@ -669,6 +685,13 @@ const StudentManagement: React.FC = () => {
                 </div>
               </div>
             </div>
+          )}
+          {confirmModelOpen && (
+            <ConfirmDeleteModal
+              onConfirm={() => handleDelete(itemToDelete as string)}
+              onClose={() => SetConfirmModel(false)}
+              action={action}
+            />
           )}
         </div>
       </div>

@@ -63,6 +63,16 @@ interface Dashboard {
     completed: number;
     droppedout: number;
   }[];
+  departmentStudents: {
+    _id: string;
+    total: number;
+    pending: number;
+    accepted: number;
+    registered: number;
+    started: number;
+    completed: number;
+    droppedout: number;
+  }[];
   shiftPayments: {
     _id: string;
     totalPaid: number;
@@ -92,6 +102,7 @@ const Dashboard = () => {
     totalAmountPaid: 0,
     totalAmountToBePaid: 0,
     shiftStudents: [],
+    departmentStudents: [],
     shiftPayments: [],
     monthlyCashflows: [],
   });
@@ -149,6 +160,42 @@ const Dashboard = () => {
   // Students Chart Data
   const studentsData = {
     labels: summary.shiftStudents.map((ss) => ss._id),
+    datasets: [
+      {
+        label: "Pending",
+        data: summary.shiftStudents.map((ss) => ss.pending),
+        backgroundColor: "rgba(255, 206, 86, 0.6)",
+      },
+      {
+        label: "Accepted",
+        data: summary.shiftStudents.map((ss) => ss.accepted),
+        backgroundColor: "rgba(75, 192, 192, 0.6)",
+      },
+      {
+        label: "Registered",
+        data: summary.shiftStudents.map((ss) => ss.registered),
+        backgroundColor: "rgba(54, 162, 235, 0.6)",
+      },
+      {
+        label: "Started",
+        data: summary.shiftStudents.map((ss) => ss.started),
+        backgroundColor: "rgba(153, 102, 255, 0.6)",
+      },
+      {
+        label: "Completed",
+        data: summary.shiftStudents.map((ss) => ss.completed),
+        backgroundColor: "rgba(75, 192, 192, 0.6)",
+      },
+      {
+        label: "Dropped Out",
+        data: summary.shiftStudents.map((ss) => ss.droppedout),
+        backgroundColor: "rgba(255, 99, 132, 0.6)", // Red
+      },
+    ],
+  };
+  // Students Chart Data
+  const studentsDataCourse = {
+    labels: summary.departmentStudents.map((ss) => ss._id),
     datasets: [
       {
         label: "Pending",
@@ -416,9 +463,14 @@ const Dashboard = () => {
         )}
       </div>
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl  mt-6">
-        <h2 className="text-2xl font-semibold text-center mb-4">STUDENT STATISTICS</h2>
+        <h2 className="text-2xl font-semibold text-center mb-4">STUDENTS  STATISTICS BY SHIFT</h2>
         {/* @ts-expect-error error */}
         <Bar data={studentsData} options={options} />
+      </div>
+      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl  mt-6">
+        <h2 className="text-2xl font-semibold text-center mb-4">STUDENT  STATISTICS BY DEPARTMENT</h2>
+        {/* @ts-expect-error error */}
+        <Bar data={studentsDataCourse} options={options} />
       </div>
       {hasPermission(
         loggedUser as TeamMember,

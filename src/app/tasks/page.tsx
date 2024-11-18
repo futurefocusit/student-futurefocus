@@ -33,6 +33,7 @@ import API_BASE_URL from "@/config/baseURL";
 import { useAuth } from "@/context/AuthContext";
 import withAdminAuth from "@/components/withAdminAuth";
 import SideBar from "@/components/SideBar";
+import ConfirmDeleteModal from "@/components/confirmPopupmodel";
 
 // Types
 interface Comment {
@@ -58,99 +59,12 @@ interface User {
   name: string;
 }
 
-// HTML Sanitizer
 
-
-// Rich Text Editor Component
-
-
-// const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
-//   const handleFormat = (command: string) => {
-//     try {
-//       document.execCommand(command, false);
-//       const editorElement = document.querySelector("[data-rich-editor]");
-//       if (editorElement) {
-//       const content = sanitizeHTML(editorElement.innerHTML);
-//       onChange(content);
-//       }
-//     } catch (error) {
-//       console.error("Format command failed:", error);
-//     }
-//   };
-//  const handleBeforeInput = (e: React.FormEvent<HTMLDivElement>) => {
-//     const inputText = e.currentTarget.textContent || "";
-//     const sanitizedText = sanitizeHTML(inputText);
-//     onChange(sanitizedText);
-//   };
-//   return (
-//     <Box>
-//       <Box
-//         sx={{
-//           mb: 1,
-//           borderBottom: 1,
-//           borderColor: "divider",
-//           display: "flex",
-//           gap: 1,
-//         }}
-//       >
-//         <Button
-//           variant="outlined"
-//           size="small"
-//           onClick={() => handleFormat("bold")}
-//           sx={{ minWidth: 40 }}
-//         >
-//           <FormatBold />
-//         </Button>
-//         <Button
-//           variant="outlined"
-//           size="small"
-//           onClick={() => handleFormat("italic")}
-//           sx={{ minWidth: 40 }}
-//         >
-//           <FormatItalic />
-//         </Button>
-//         <Button
-//           variant="outlined"
-//           size="small"
-//           onClick={() => handleFormat("insertOrderedList")}
-//           sx={{ minWidth: 40 }}
-//         >
-//           <FormatListNumbered />
-//         </Button>
-//         <Button
-//           variant="outlined"
-//           size="small"
-//           onClick={() => handleFormat("insertUnorderedList")}
-//           sx={{ minWidth: 40 }}
-//         >
-//           <FormatListBulleted />
-//         </Button>
-//       </Box>
-//       <Box
-//         contentEditable
-//         data-rich-editor
-//         dangerouslySetInnerHTML={{ __html: value }}
-//         onBeforeInput={handleBeforeInput}
-//         sx={{
-//           border: 1,
-//           borderColor: "grey.300",
-//           borderRadius: 1,
-//           p: 2,
-//           minHeight: 200,
-//           overflowY: "auto",
-//           "&:focus": {
-//             outline: "none",
-//             borderColor: "primary.main",
-//           },
-//         }}
-//       />
-//     </Box>
-//   );
-// };
-
-// Main Component
 const MemberTasks: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
+    const [confirmModelOpen, SetConfirmModel] = useState(false);
+    const [action, setAction] = useState("");
+   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [task, setTask] = useState<string>("");
@@ -205,7 +119,10 @@ const MemberTasks: React.FC = () => {
       console.error("Error fetching users:", error);
     }
   };
-
+ const handleDeleteClick = (itemId: string) => {
+   setItemToDelete(itemId); // Set the item that will be deleted
+   SetConfirmModel(true); // Open the modal
+ };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -262,6 +179,8 @@ const MemberTasks: React.FC = () => {
       
     } catch (error) {
       console.error("Error adding comment:", error);
+    }finally{
+      setIsFormOpen(false)
     }
   };
 
@@ -284,7 +203,7 @@ const MemberTasks: React.FC = () => {
       <SideBar />
       <div style={{ maxWidth: "800px", margin: "0 auto", padding: "16px" }}>
         <Typography variant="h4" gutterBottom>
-         ADMIN TASK ASSIGNMENT
+          ADMIN TASK ASSIGNMENT
         </Typography>
 
         <Button
@@ -421,7 +340,7 @@ const MemberTasks: React.FC = () => {
                   <Button
                     variant="outlined"
                     color="error"
-                    onClick={() => handleDeleteTask(t._id)}
+                    onClick={() =>{ handleDeleteClick(t._id);setAction('delete taks')}}
                     style={{ marginLeft: "8px" }}
                   >
                     <Delete style={{ marginRight: "8px" }} />
@@ -519,6 +438,13 @@ const MemberTasks: React.FC = () => {
               </IconButton>
             </DialogContent>
           </Dialog>
+        )}
+        {confirmModelOpen && (
+          <ConfirmDeleteModal
+            onConfirm={() => handleDeleteTask(itemToDelete as string)}
+            onClose={() => SetConfirmModel(false)}
+            action={action}
+          />
         )}
       </div>
     </>

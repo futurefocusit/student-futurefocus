@@ -1,4 +1,5 @@
 "use client";
+import ConfirmDeleteModal from "@/components/confirmPopupmodel";
 import Loader from "@/components/loader";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
@@ -36,6 +37,9 @@ interface Payment {
 }
 
 const PaymentsPage: React.FC = () => {
+   const [confirmModelOpen, SetConfirmModel] = useState(false);
+   const [action, setAction] = useState("");
+   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,6 +77,13 @@ const PaymentsPage: React.FC = () => {
       //@ts-expect-error error
       throw new Error(error);
     }
+    finally{
+       SetConfirmModel(false);
+    }
+  };
+  const handleDeleteClick = (itemId: string) => {
+    setItemToDelete(itemId);
+    SetConfirmModel(true);
   };
   const filteredPayments = payments
     .filter(
@@ -111,7 +122,7 @@ const PaymentsPage: React.FC = () => {
 
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
-         TRANSACTIONS
+          TRANSACTIONS
         </h2>
         <div className="p-4">
           <input
@@ -192,7 +203,12 @@ const PaymentsPage: React.FC = () => {
                             "transaction",
                             "delete"
                           ) ? (
-                            <button onClick={() => handleDelete(payment._id)}>
+                            <button
+                              onClick={() => {
+                                handleDeleteClick(payment._id);
+                                setAction("delete transaction");
+                              }}
+                            >
                               delete
                             </button>
                           ) : (
@@ -212,6 +228,13 @@ const PaymentsPage: React.FC = () => {
           </div>
         </div>
       </div>
+      {confirmModelOpen && (
+        <ConfirmDeleteModal
+          onConfirm={() => handleDelete(itemToDelete as string)}
+          onClose={() => SetConfirmModel(false)}
+          action={action}
+        />
+      )}
     </div>
   );
 };

@@ -18,6 +18,7 @@ import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { FaCommentSms } from "react-icons/fa6";
 import { stat } from "fs";
+import ConfirmDeleteModal from "@/components/confirmPopupmodel";
 const imageUrl = "/futurefocuslogo.png";
 
 interface Student {
@@ -62,6 +63,8 @@ const StudentManagement: React.FC = () => {
   } else {
     defaultFilter = "pending";
   }
+  const [confirmModelOpen,SetConfirmModel]=useState(false)
+  const [confirmStatusModelOpen,SetConfirmStatusModel]=useState(false)
   const [students, setStudents] = useState<Student[]>([]);
   const [payment, setPayment] = useState<Payment[]>([]);
   const [groupedStudents, setGroupedStudents] = useState<GroupedStudents>({});
@@ -79,6 +82,7 @@ const StudentManagement: React.FC = () => {
   const [message, setMessage] = useState("");
   const [isOpenMessage, setOpenMessage] = useState(false);
   const [openView, setOpenView] = useState(false);
+  const [action,setAction]=useState('')
   const [openPay, setOpenPay] = useState(false);
   const [commentText, setComment] = useState({ comment: "" });
   const [courses, setCourses] = useState<Course[]>([]);
@@ -88,7 +92,10 @@ const StudentManagement: React.FC = () => {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
+   const [item, setItem] = useState<string | null>(null);
+   const [items, setItems] = useState({itemId:"",name:"",status:''});
   const { fetchLoggedUser, loggedUser } = useAuth();
+
   const [studentToRegister, setStudentToRegister] = useState<{
     id: string;
     name: string;
@@ -103,6 +110,14 @@ const StudentManagement: React.FC = () => {
     setError(null);
     setSucces(null);
   };
+   const handleDeleteClick = (itemId: string) => {
+     setItem(itemId);
+     SetConfirmModel(true); 
+   };
+   const handleStatusClick = (itemId: string,name:string,status:string) => {
+     setItems({itemId,name,status});   
+     SetConfirmStatusModel(true); 
+   };
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
 
@@ -364,8 +379,10 @@ const StudentManagement: React.FC = () => {
     } catch (error) {
       console.error("Error deleting student:", error);
       setError("Failed to delete student. Please try again.");
+    }finally{
+      SetConfirmModel(false)
     }
-  };
+  }
 
   const handleView = (student: Student) => {
     setOpenView(true);
@@ -387,19 +404,22 @@ const StudentManagement: React.FC = () => {
     newStatus: string,
     user: string
   ) => {
-    if (newStatus === "registered") {
-      setStudentToRegister({ id, name });
-      setIsPaymentModalOpen(true);
-      return;
-    }
+    // if (newStatus === "registered") {
+    //   setStudentToRegister({ id, name });
+    //   setIsPaymentModalOpen(true);
+    //   return;
+    // }
 
     try {
       await processStatusChange(id, name, newStatus, user);
+      
     } catch (error) {
       console.error(`Error changing student status to ${newStatus}:`, error);
       setError(
         `Failed to change student status to ${newStatus}. Please try again.`
       );
+    }finally{
+      SetConfirmStatusModel(false);
     }
   };
   const handleAttend = async (id: string) => {
@@ -466,14 +486,14 @@ const StudentManagement: React.FC = () => {
       <>
         <button
           onClick={() => handleView(student)}
-          className="text-indigo-600 hover:text-indigo-900 mr-3"
+          className="text-indigo-600 font-extrabold hover:text-indigo-900 mr-3"
         >
           View
         </button>
         {hasPermission(loggedUser as TeamMember, "students", "delete") ? (
           <button
-            onClick={() => handleDelete(student._id)}
-            className="text-red-600 ml-3 hover:text-red-900"
+            onClick={() =>{ handleDeleteClick(student._id);setAction('delete student')}}
+            className="text-red-600 ml-3 font-extrabold hover:text-red-900"
           >
             Delete
           </button>
@@ -484,7 +504,7 @@ const StudentManagement: React.FC = () => {
         {hasPermission(loggedUser as TeamMember, "students", "comment") ? (
           <div className="">
             <input
-              className="p-1 bg-gray-200 border-2 border-gray-500 rounded-md"
+              className="p-1 bg-gray-200 border-2  border-gray-500 rounded-md"
               type="text"
               placeholder="type comment..."
               defaultValue={student.comment}
@@ -492,7 +512,7 @@ const StudentManagement: React.FC = () => {
             />
             <button
               onClick={() => handleSaveComment(student._id)}
-              className="text-blue-600 ml-3 hover:text-blue-900"
+              className="text-blue-600 ml-3 font-extrabold hover:text-blue-900"
             >
               save
             </button>
@@ -511,15 +531,10 @@ const StudentManagement: React.FC = () => {
 
             {hasPermission(loggedUser as TeamMember, "students", "admit") ? (
               <button
-                onClick={() =>
-                  handleStatusChange(
-                    student._id,
-                    student.name,
-                    "accepted",
-                    loggedUser?.name as string
-                  )
+                onClick={() =>{
+                 handleStatusClick(student._id, student.name, "accepted"); setAction('admit student')}
                 }
-                className="text-green-600 hover:text-green-900 ml-3"
+                className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
                 Admit
               </button>
@@ -529,7 +544,7 @@ const StudentManagement: React.FC = () => {
             {hasPermission(loggedUser as TeamMember, "students", "update") ? (
               <button
                 onClick={() => handleUpdateStudent(student)}
-                className="text-green-600 hover:text-green-900 ml-3"
+                className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
                 Update
               </button>
@@ -545,7 +560,7 @@ const StudentManagement: React.FC = () => {
             {hasPermission(loggedUser as TeamMember, "students", "attend") ? (
               <button
                 onClick={() => handleUpdateStudent(student)}
-                className="text-green-600 hover:text-green-900 ml-3"
+                className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
                 Update
               </button>
@@ -555,14 +570,16 @@ const StudentManagement: React.FC = () => {
             {hasPermission(loggedUser as TeamMember, "students", "register") ? (
               <button
                 onClick={() =>
-                  handleStatusChange(
-                    student._id,
-                    student.name,
-                    "registered",
-                    loggedUser?.name as string
-                  )
+                  // handleStatusChange(
+                  //   student._id,
+                  //   student.name,
+                  //   "registered",
+                  //   loggedUser?.name as string
+                  // )
+                   {setStudentToRegister({ id:student._id, name:student.name });
+                    setIsPaymentModalOpen(true);}
                 }
-                className="text-blue-600 hover:text-blue-900 ml-3"
+                className="text-blue-600 font-extrabold hover:text-blue-900 ml-3"
               >
                 Register
               </button>
@@ -578,7 +595,7 @@ const StudentManagement: React.FC = () => {
             {hasPermission(loggedUser as TeamMember, "students", "attend") ? (
               <button
                 onClick={() => handleUpdateStudent(student)}
-                className="text-green-600 hover:text-green-900 ml-3"
+                className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
                 Update
               </button>
@@ -588,7 +605,7 @@ const StudentManagement: React.FC = () => {
             {hasPermission(loggedUser as TeamMember, "payment", "pay") ? (
               <button
                 onClick={() => handleViewP(student, "pay")}
-                className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
+                className="bg-green-700  text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
               >
                 Pay
               </button>
@@ -618,15 +635,11 @@ const StudentManagement: React.FC = () => {
 
             {hasPermission(loggedUser as TeamMember, "students", "start") ? (
               <button
-                onClick={() =>
-                  handleStatusChange(
-                    student._id,
-                    student.name,
-                    "started",
-                    loggedUser?.name as string
-                  )
-                }
-                className="text-green-600 hover:text-green-900 ml-3"
+                onClick={() => {
+                  handleStatusClick(student._id, student.name, "started");
+                  setAction("activate student");
+                }}
+                className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
                 Start
               </button>
@@ -642,7 +655,7 @@ const StudentManagement: React.FC = () => {
             {hasPermission(loggedUser as TeamMember, "students", "update") ? (
               <button
                 onClick={() => handleUpdateStudent(student)}
-                className="text-green-600 hover:text-green-900 ml-3"
+                className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
                 Update
               </button>
@@ -683,7 +696,7 @@ const StudentManagement: React.FC = () => {
             {hasPermission(loggedUser as TeamMember, "students", "attend") ? (
               <button
                 onClick={() => handleAttend(student._id)}
-                className="text-green-600 hover:text-green-900 ml-3"
+                className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
                 Attend
               </button>
@@ -706,7 +719,7 @@ const StudentManagement: React.FC = () => {
                     loggedUser?.name as string
                   )
                 }
-                className="text-green-600 hover:text-green-900 ml-3"
+                className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
                 Reactivate
               </button>
@@ -1064,36 +1077,36 @@ const StudentManagement: React.FC = () => {
                   </h3>
                   <div className="mt-4 space-y-2">
                     <p className="flex">
-                      <span className="font-extrabold w-24">NAME</span>{" "}
+                      <span className="font-extrabold w-28">NAME</span>{" "}
                       <span> {selectedStudent.name} </span>
                     </p>
                     <p className="flex">
-                      <span className="font-extrabold  w-24 ">EMAIL</span>{" "}
+                      <span className="font-extrabold  w-28 ">EMAIL</span>{" "}
                       <span> {selectedStudent.email}</span>
                     </p>
                     <p className="flex">
-                      <span className="font-extrabold w-24 ">PHONE</span>{" "}
+                      <span className="font-extrabold w-28 ">PHONE</span>{" "}
                       <span> {selectedStudent.phone}</span>
                     </p>
                     <p className="flex">
-                      <span className="font-extrabold w-24 ">INTAKE</span>{" "}
+                      <span className="font-extrabold w-28 ">INTAKE</span>{" "}
                       <span>{selectedStudent.intake}</span>
                     </p>
                     <p className="flex">
-                      <span className="font-extrabold w-24 ">COURSE</span>{" "}
+                      <span className="font-extrabold w-28 ">COURSE</span>{" "}
                       <span>{selectedStudent.selectedCourse}</span>
                     </p>
 
                     <p className="flex">
-                      <span className="font-extrabold w-24 ">SHIFT</span>{" "}
+                      <span className="font-extrabold w-28 ">SHIFT</span>{" "}
                       <span> {selectedStudent.selectedShift}</span>
                     </p>
                     <p className="flex">
-                      <span className="font-extrabold w-24 ">APPLIED</span>{" "}
+                      <span className="font-extrabold w-28 ">APPLIED</span>{" "}
                       <span>{formatDate(selectedStudent.createdAt)}</span>
                     </p>
                     <p className="flex">
-                      <span className="font-extrabold w-24 ">STATUS</span>{" "}
+                      <span className="font-extrabold w-28 ">STATUS</span>{" "}
                       <span>
                         {" "}
                         <span> {selectedStudent.status}</span>
@@ -1113,8 +1126,8 @@ const StudentManagement: React.FC = () => {
                         .map((filteredPayment) => (
                           <div key={filteredPayment._id}>
                             <p className="flex items-center">
-                              <span className="font-extrabold w-24 ">
-                                 STATUS
+                              <span className="font-extrabold w-28 ">
+                                STATUS
                               </span>{" "}
                               <span
                                 className={`${
@@ -1130,9 +1143,9 @@ const StudentManagement: React.FC = () => {
                                 {filteredPayment.status.toUpperCase()}
                               </span>
                             </p>
-                            <p className="flex mt-1 " >
-                              <span className="font-extrabold w-24 ">
-                                 TO PAY
+                            <p className="flex mt-1 ">
+                              <span className="font-extrabold w-28 ">
+                                TO PAY
                               </span>{" "}
                               <span className=" text-green-600 font-extrabold ">
                                 {new Intl.NumberFormat().format(
@@ -1142,9 +1155,7 @@ const StudentManagement: React.FC = () => {
                               </span>
                             </p>
                             <p className="flex mt-1">
-                              <span className="font-extrabold w-24 ">
-                                 PAID
-                              </span>{" "}
+                              <span className="font-extrabold w-28 ">PAID</span>{" "}
                               <span className=" text-blue-600 font-extrabold ">
                                 {new Intl.NumberFormat().format(
                                   filteredPayment.amountPaid
@@ -1153,7 +1164,7 @@ const StudentManagement: React.FC = () => {
                               </span>
                             </p>
                             <p className="flex mt-1">
-                              <span className="font-extrabold w-24  ">
+                              <span className="font-extrabold w-28  ">
                                 REMAINING
                               </span>{" "}
                               <span className=" text-red-600 font-extrabold ">
@@ -1167,9 +1178,9 @@ const StudentManagement: React.FC = () => {
                           </div>
                         ))
                     )}
-                    <p className="flex">
-                      <span className="font-extrabold w-24">Message</span>{" "}
-                      {selectedStudent.message}
+                    <p className="flex flex-col">
+                      <span className="font-extrabold w-28">Message</span>{" "}
+                      <p> {selectedStudent.message}</p>
                     </p>
                   </div>
                 </div>
@@ -1216,14 +1227,15 @@ const StudentManagement: React.FC = () => {
               <button
                 onClick={() => {
                   if (studentToRegister && paymentMethod) {
-                    processStatusChange(
-                      studentToRegister.id,
-                      studentToRegister.name,
-                      "registered",
-                      loggedUser?.name as string
-                    );
+                  
+                 handleStatusClick(
+                   studentToRegister.id,
+                   studentToRegister.name,
+                   "registered"
+                 ); setAction('register student')}
+                
                     setIsPaymentModalOpen(false);
-                  }
+                  
                 }}
                 disabled={!paymentMethod}
                 className={`inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md ${
@@ -1349,6 +1361,13 @@ const StudentManagement: React.FC = () => {
           </div>
         </div>
       )}
+      {confirmModelOpen &&( <ConfirmDeleteModal onConfirm={()=>handleDelete(item as string)} onClose={()=>SetConfirmModel(false)} action={action}/>)}
+      {confirmStatusModelOpen &&( <ConfirmDeleteModal onConfirm={()=> handleStatusChange(
+                    items.itemId,
+                    items.name,
+                    items.status,
+                    loggedUser?.name as string
+                  )} onClose={()=>SetConfirmStatusModel(false)} action={action}/>)}
     </div>
   );
 };
