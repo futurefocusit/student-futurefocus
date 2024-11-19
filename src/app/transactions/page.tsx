@@ -200,7 +200,7 @@ const PaymentsPage: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-red-700 hover:text-red-900">
+                        <div className="text-sm text-red-700 font-extrabold hover:text-red-900">
                           {hasPermission(
                             loggedUser as TeamMember,
                             "transaction",

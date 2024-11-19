@@ -662,7 +662,7 @@ const StudentManagement: React.FC = () => {
                 }}
                 className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
-                Start
+                activate
               </button>
             ) : (
               ""
@@ -994,12 +994,12 @@ const StudentManagement: React.FC = () => {
               <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg">
                 <div className="bg-gray-50 p-6 h-96 overflow-scroll">
                   <h3 className="text-lg font-medium text-gray-900">
-                    Update Student
+                   UPADATE STUDENT INFO
                   </h3>
                   <div className="mt-4 space-y-2">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        Select Course
+                      <label className="block text-sm font-extrabold text-gray-700">
+                      SELECT COURSE 
                       </label>
                       <select
                         value={selectedStudent.selectedCourse}
@@ -1039,7 +1039,7 @@ const StudentManagement: React.FC = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
-                        Select Shift
+                        SELECT SHIFT
                       </label>
                       <select
                         value={selectedStudent.selectedShift}
@@ -1065,7 +1065,7 @@ const StudentManagement: React.FC = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
-                        Select intake
+                        SELECT INTAKE
                       </label>
                       <input
                         type="text"
