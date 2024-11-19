@@ -173,6 +173,7 @@ const MemberTasks: React.FC = () => {
       console.error("Error deleting task:", error);
     }finally{
       setIsLoading(false);
+      SetConfirmModel(false)
 
     }
   };
