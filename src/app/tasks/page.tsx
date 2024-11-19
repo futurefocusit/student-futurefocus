@@ -444,6 +444,7 @@ const MemberTasks: React.FC = () => {
             onConfirm={() => handleDeleteTask(itemToDelete as string)}
             onClose={() => SetConfirmModel(false)}
             action={action}
+            loading={false}
           />
         )}
       </div>

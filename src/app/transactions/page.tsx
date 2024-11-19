@@ -233,6 +233,7 @@ const PaymentsPage: React.FC = () => {
           onConfirm={() => handleDelete(itemToDelete as string)}
           onClose={() => SetConfirmModel(false)}
           action={action}
+          loading={false}
         />
       )}
     </div>
