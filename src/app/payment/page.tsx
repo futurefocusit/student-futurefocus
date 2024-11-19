@@ -46,6 +46,7 @@ const StudentManagement: React.FC = () => {
   const [studentCounts, setStudentCounts] = useState<Record<string, number>>(
     {}
   );
+  const [loading,setIsLoading]=useState(false)
   const [confirmModelOpen, SetConfirmModel] = useState(false);
   const [action, setAction] = useState("");
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
@@ -57,7 +58,7 @@ const StudentManagement: React.FC = () => {
   const [commentText, setComment] = useState({ comment: "" });
   const [activeFilter, setActiveFilter] = useState<string>("registered");
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(true);
+  const [fetching, setIsFetching] = useState<boolean>(true);
   const { fetchLoggedUser, loggedUser } = useAuth();
   const setCommentText = (value: string) => {
     setComment((prev) => ({ ...prev, comment: value }));
@@ -96,7 +97,7 @@ const StudentManagement: React.FC = () => {
 
   const fetchStudents = async () => {
     try {
-      setLoading(true);
+      setIsFetching(true);
       const response = await axios.get<Student[]>(`${API_BASE_URL}/students`);
       await fetchLoggedUser();
       const sortedStudents = response.data.sort(
@@ -110,7 +111,7 @@ const StudentManagement: React.FC = () => {
       console.error("Error fetching student data:", error);
       setError("Failed to load student data. Please try again later.");
     } finally {
-      setLoading(false);
+      setIsFetching(false);
     }
   };
 
@@ -147,6 +148,7 @@ const StudentManagement: React.FC = () => {
 
   const handlePay = async (id: string) => {
     try {
+      setIsLoading(true)
       formData.user = loggedUser?.name;
       const response = await axios.post(
         `${API_BASE_URL}/payment/pay/${id}`,
@@ -159,10 +161,14 @@ const StudentManagement: React.FC = () => {
     } catch (error) {
       console.log(error);
       setError("Error happened! check payment and try again");
+    }finally{
+      setIsLoading(false)
     }
   };
   const handleDelete = async (id: string) => {
     try {
+      setIsLoading(true);
+
       const response = await axios.delete(`${API_BASE_URL}/payment/${id}`);
       toast.success(response.data.message);
       await fetchPayment();
@@ -172,6 +178,8 @@ const StudentManagement: React.FC = () => {
       throw new Error(error);
     }finally{
       SetConfirmModel(false)
+      setIsLoading(true);
+
     }
   };
    const handleDeleteClick = (itemId: string) => {
@@ -180,6 +188,7 @@ const StudentManagement: React.FC = () => {
    };
   const handleDiscount = async (id: string) => {
     try {
+      setIsLoading(true);
       const response = await axios.put(
         `${API_BASE_URL}/payment/discount/${id}`,
         formData
@@ -189,10 +198,15 @@ const StudentManagement: React.FC = () => {
     } catch (error) {
       console.log(error)
       setError("Error happened! check payment and try again");
+    }finally{
+      setIsLoading(true);
+
     }
   };
   const handleExtra = async (id: string) => {
     try {
+      setIsLoading(true);
+
       const response = await axios.put(
         `${API_BASE_URL}/payment/extra/${id}`,
         formData
@@ -202,6 +216,9 @@ const StudentManagement: React.FC = () => {
     } catch (error) {
       console.log(error)
       setError("Error happened! check payment and try again");
+    }finally{
+      setIsLoading(true);
+
     }
   };
 
@@ -254,7 +271,7 @@ const StudentManagement: React.FC = () => {
       remaining: totalDue - totalPaid,
     };
   };
-  if (loading) {
+  if (fetching) {
     return (
       <div className="text-center mt-20">
         <SideBar />
@@ -691,7 +708,7 @@ const StudentManagement: React.FC = () => {
               onConfirm={() => handleDelete(itemToDelete as string)}
               onClose={() => SetConfirmModel(false)}
               action={action}
-              loading={false}
+              loading={loading}
             />
           )}
         </div>

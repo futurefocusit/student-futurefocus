@@ -39,9 +39,10 @@ interface Payment {
 const PaymentsPage: React.FC = () => {
    const [confirmModelOpen, SetConfirmModel] = useState(false);
    const [action, setAction] = useState("");
+   const [loading,setIsLoading]=useState(false)
    const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [fetching, setIsFetching] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const { fetchLoggedUser, loggedUser } = useAuth();
@@ -59,7 +60,7 @@ const PaymentsPage: React.FC = () => {
       //@ts-expect-error error
       setError(error.message);
     } finally {
-      setLoading(false);
+      setIsFetching(false);
     }
   };
   useEffect(() => {
@@ -67,6 +68,7 @@ const PaymentsPage: React.FC = () => {
   }, []);
   const handleDelete = async (id: string) => {
     try {
+      setIsLoading(true)
       const response = await axios.delete(
         `${API_BASE_URL}/payment/transaction/${id}`
       );
@@ -79,6 +81,7 @@ const PaymentsPage: React.FC = () => {
     }
     finally{
        SetConfirmModel(false);
+       setIsLoading(false)
     }
   };
   const handleDeleteClick = (itemId: string) => {
@@ -98,7 +101,7 @@ const PaymentsPage: React.FC = () => {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
-  if (loading) {
+  if (fetching) {
     return (
       <div className="text-center mt-20">
         <SideBar />
@@ -233,7 +236,7 @@ const PaymentsPage: React.FC = () => {
           onConfirm={() => handleDelete(itemToDelete as string)}
           onClose={() => SetConfirmModel(false)}
           action={action}
-          loading={false}
+          loading={loading}
         />
       )}
     </div>

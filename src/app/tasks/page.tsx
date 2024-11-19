@@ -34,6 +34,7 @@ import { useAuth } from "@/context/AuthContext";
 import withAdminAuth from "@/components/withAdminAuth";
 import SideBar from "@/components/SideBar";
 import ConfirmDeleteModal from "@/components/confirmPopupmodel";
+import { useFormState } from "react-dom";
 
 // Types
 interface Comment {
@@ -74,6 +75,7 @@ const MemberTasks: React.FC = () => {
   const { fetchLoggedUser, loggedUser } = useAuth();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [comment, setComment] = useState<string>("");
+  const [loading,setIsLoading]=useState(false)
   const [reply, setReply] = useState<{
     commentId: string;
     text: string;
@@ -126,6 +128,7 @@ const MemberTasks: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setIsLoading(true)
       await axios.post(`${API_BASE_URL}/task`, {
         task,
         user,
@@ -138,6 +141,8 @@ const MemberTasks: React.FC = () => {
       fetchTasks();
     } catch (error) {
       console.error("Error assigning task:", error);
+    }finally{
+      setIsLoading(false)
     }
   };
 
@@ -161,15 +166,21 @@ const MemberTasks: React.FC = () => {
 
   const handleDeleteTask = async (taskId: string) => {
     try {
+      setIsLoading(true);
       await axios.delete(`${API_BASE_URL}/task/${taskId}`);
       fetchTasks();
     } catch (error) {
       console.error("Error deleting task:", error);
+    }finally{
+      setIsLoading(false);
+
     }
   };
 
   const handleAddComment = async (taskId: string) => {
     try {
+      setIsLoading(true);
+
       await axios.post(`${API_BASE_URL}/task/comment/${taskId}`, {
         text: comment,
         user: loggedUser?._id,
@@ -181,21 +192,27 @@ const MemberTasks: React.FC = () => {
       console.error("Error adding comment:", error);
     }finally{
       setIsFormOpen(false)
+      setIsLoading(false);
+
     }
   };
 
   const handleAddReply = async (commentId: string) => {
     if (!reply) return;
-    try {
-      await axios.post(`${API_BASE_URL}/task/comment/reply/${commentId}`, {
-        text: reply.text,
-        user: loggedUser?._id,
-      });
-      setReply(null);
-      fetchTasks();
-    } catch (error) {
-      console.error("Error adding reply:", error);
-    }
+      setIsLoading(true);
+      try {
+        await axios.post(`${API_BASE_URL}/task/comment/reply/${commentId}`, {
+          text: reply.text,
+          user: loggedUser?._id,
+        });
+        setReply(null);
+        fetchTasks();
+      } catch (error) {
+        console.error("Error adding reply:", error);
+      } finally {
+        setIsFormOpen(false);
+        setIsLoading(false);
+      }
   };
 
   return (
@@ -444,7 +461,7 @@ const MemberTasks: React.FC = () => {
             onConfirm={() => handleDeleteTask(itemToDelete as string)}
             onClose={() => SetConfirmModel(false)}
             action={action}
-            loading={false}
+            loading={loading}
           />
         )}
       </div>

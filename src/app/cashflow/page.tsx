@@ -1,6 +1,7 @@
 "use client";
 import API_BASE_URL from "@/config/baseURL";
 import axios from "axios";
+
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import DatePicker from "react-datepicker";
@@ -31,9 +32,10 @@ export interface CashflowType {
 const PaymentsPage: React.FC = () => {
   const [confirmModelOpen, SetConfirmModel] = useState(false);
   const [action, setAction] = useState("");
+  const [isLoading,setIsLoading]=useState(false)
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [cashflows, setCashflows] = useState<CashflowType[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [fetching, setIsFetching] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"income" | "expenses">("income");
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -116,7 +118,7 @@ const PaymentsPage: React.FC = () => {
       //@ts-expect-error ignore error
       setError(error.message);
     } finally {
-      setLoading(false);
+      setIsFetching(false);
     }
   };
 
@@ -177,6 +179,7 @@ const PaymentsPage: React.FC = () => {
   };
   const handleDelete = async (id: string) => {
     try {
+      setIsLoading(true)
       const response = await axios.delete(`${API_BASE_URL}/cashflow/${id}`);
       toast.success(response.data.message);
       await fetchCashflows();
@@ -186,6 +189,7 @@ const PaymentsPage: React.FC = () => {
       throw new Error(error);
     }finally{
       SetConfirmModel(false);
+      setIsLoading(false)
     }
   };
   const groupByDate = (data: CashflowType[]) => {
@@ -225,7 +229,7 @@ const PaymentsPage: React.FC = () => {
   const groupedCashflows = groupByDate(filteredCashflows);
   const monthlyTotals = calculateMonthlyTotals(filteredCashflows);
 
-  if (loading) {
+  if (fetching) {
     return (
       <div className="text-center mt-20">
         <SideBar />
@@ -537,7 +541,7 @@ const PaymentsPage: React.FC = () => {
           onConfirm={() => handleDelete(itemToDelete as string)}
           onClose={() => SetConfirmModel(false)}
           action={action}
-          loading={false}
+          loading={isLoading}
         />
       )}
     </div>
