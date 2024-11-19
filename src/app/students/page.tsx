@@ -732,14 +732,18 @@ const StudentManagement: React.FC = () => {
             {commonButtons}
             {hasPermission(loggedUser as TeamMember, "students", "update") ? (
               <button
-                onClick={() =>
-                  handleStatusChange(
-                    student._id,
-                    student.name,
-                    "started",
-                    loggedUser?.name as string
-                  )
-                }
+                // onClick={() =>
+                //   handleStatusChange(
+                //     student._id,
+                //     student.name,
+                //     "started",
+                //     loggedUser?.name as string
+                //   )
+                // }
+                onClick={() => {
+                  handleStatusClick(student._id, student.name, "started");
+                  setAction("reactivate student");
+                }}
                 className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
                 Reactivate
@@ -806,8 +810,8 @@ const StudentManagement: React.FC = () => {
                 "accepted",
                 "registered",
                 "started",
-                "completed",
                 "droppedout",
+                "completed"
               ].map((status) => (
                 <button
                   key={status}
@@ -1293,15 +1297,15 @@ const StudentManagement: React.FC = () => {
             <div className="bg-gray-50  overflow-scroll">
               <h3 className="text-lg text-center bg-blue-600 text-white font-extrabold">
                 {type === "pay"
-                  ? "Pay School Fees"
+                  ? "PAY SCHOOL FEES"
                   : type === "discount"
-                  ? "Add Discount"
-                  : "Add Extra"}
+                  ? "ADD DISCOUNT"
+                  : "ADD EXTRA"}
               </h3>
               <div className="mt-4 flex  flex-col gap-5">
-                <span className="flex gap-10 items-center mx-auto mb-3">
+                <span className="flex gap-10 items-center justify-between mx-10 mb-3">
                   <label className="font-extrabold" htmlFor="amount">
-                    Amount:
+                    AMOUNT:
                   </label>
                   <input
                     name="amount"
@@ -1312,7 +1316,7 @@ const StudentManagement: React.FC = () => {
                   />
                 </span>
                 {type === "pay" ? (
-                  <span className="flex gap-10 items-center mx-auto mb-3">
+                  <span className="flex gap-10 items-center mx-10 justify-between mb-3">
                     <p className="font-extrabold">method of payment:</p>
                     <input
                       name="method"
@@ -1327,7 +1331,7 @@ const StudentManagement: React.FC = () => {
                 )}
               </div>
             </div>
-            <div className="bg-gray-50 p-4 flex justify-around">
+            <div className="bg-gray-50 p-4 flex justify-between  mx-5">
               <button
                 onClick={
                   type === "pay"
