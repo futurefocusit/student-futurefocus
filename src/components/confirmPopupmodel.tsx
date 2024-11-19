@@ -17,20 +17,23 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
   return (
     <div
       className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50"
-      onClick={onClose} 
+      onClick={onClose}
     >
       <div
         className="bg-white p-6 rounded-lg w-80 text-center"
-        onClick={(e) => e.stopPropagation()} 
+        onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-xl font-semibold text-gray-800">
-         {`Are you sure you want to ${action} ?`}
+          {`Are you sure you want to ${action} ?`}
         </h2>
         <div className="mt-4 flex justify-between">
           <button
-            onClick={onConfirm} 
+            onClick={onConfirm}
             disabled={loading}
-            className={`px-8 py-2  bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600`}
+          
+            className={`px-8 py-2 ${
+              loading ? "bg-gray-500 cursor-progress" : "bg-red-500"
+            }   text-white font-semibold rounded-lg hover:bg-red-600`}
           >
             Comfirm
           </button>
