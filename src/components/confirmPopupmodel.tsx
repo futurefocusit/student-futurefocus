@@ -4,13 +4,15 @@ import React from "react";
 interface ConfirmDeleteModalProps {
   onConfirm: () => void; // Function to confirm the delete action
   onClose: () => void; // Function to close the modal
-  action:string
+  action:string,
+  loading:boolean
 }
 
 const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
   onConfirm,
   onClose,
-  action
+  action,
+  loading
 }) => {
   return (
     <div
@@ -27,9 +29,10 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
         <div className="mt-4 flex justify-between">
           <button
             onClick={onConfirm} 
-            className="px-8 py-2  bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600"
+            disabled={loading}
+            className={`px-8 py-2  bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600`}
           >
-            Yes
+            {loading}
           </button>
           <button
             onClick={onClose}

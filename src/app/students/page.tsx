@@ -17,7 +17,6 @@ import { convertImageUrlToBase64 } from "@/libs/convertImage";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { FaCommentSms } from "react-icons/fa6";
-import { stat } from "fs";
 import ConfirmDeleteModal from "@/components/confirmPopupmodel";
 const imageUrl = "/futurefocuslogo.png";
 
@@ -83,6 +82,7 @@ const StudentManagement: React.FC = () => {
   const [isOpenMessage, setOpenMessage] = useState(false);
   const [openView, setOpenView] = useState(false);
   const [action,setAction]=useState('')
+  const [isloading,setIsLoading]= useState(false)
   const [openPay, setOpenPay] = useState(false);
   const [commentText, setComment] = useState({ comment: "" });
   const [courses, setCourses] = useState<Course[]>([]);
@@ -151,6 +151,7 @@ const StudentManagement: React.FC = () => {
     );
   };
   const handleSend = async () => {
+    setIsLoading(true)
     try {
       if (message.trim()) {
         const response = await axios.post(
@@ -167,6 +168,8 @@ const StudentManagement: React.FC = () => {
       }
     } catch (error) {
       setError("internal server error");
+    }finally{
+      setIsLoading(false)
     }
   };
   const handleFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -195,6 +198,7 @@ const StudentManagement: React.FC = () => {
     newStatus: string,
     user: string
   ) => {
+    setIsLoading(true)
     try {
       const ourlogo = await convertImageUrlToBase64(imageUrl as string);
       const data: IInvoice = {
@@ -225,6 +229,8 @@ const StudentManagement: React.FC = () => {
       console.log(error);
       setSucces(null);
       setError("failed to change status");
+    }finally{
+      setIsLoading(false)
     }
   };
 
@@ -267,6 +273,7 @@ const StudentManagement: React.FC = () => {
   };
   const handleExtra = async (id: string) => {
     try {
+      setIsLoading(true)
       const response = await axios.put(
         `${API_BASE_URL}/payment/extra/${id}`,
         formData
@@ -278,6 +285,8 @@ const StudentManagement: React.FC = () => {
       console.log(error);
       setError("Error happened! check payment and try again");
       setSucces(null);
+    }finally{
+      setIsLoading(false)
     }
   };
   const setCommentText = (value: string) => {
@@ -313,19 +322,21 @@ const StudentManagement: React.FC = () => {
   const handleUpdateStudent = async (student: Student) => {
     setSelectedStudent(student);
     setUpdateMode(true);
-    console.log(student);
+
   };
 
   const handleSaveUpdate = async () => {
     if (!selectedStudent) return;
 
     try {
+      setIsLoading(true)
       await axios.put(
         `${API_BASE_URL}/students/update/${selectedStudent._id}`,
         {
           selectedCourse: selectedStudent.selectedCourse,
           selectedShift: selectedStudent.selectedShift,
           intake: selectedStudent.intake,
+          name:selectedStudent.name
         }
       );
       setSucces("updated student successfully");
@@ -337,6 +348,8 @@ const StudentManagement: React.FC = () => {
       console.error("Error updating student:", error);
       setSucces(null);
       setError("Failed to update student. Please try again.");
+    }finally{
+      setIsLoading(false)
     }
   };
 
@@ -369,6 +382,7 @@ const StudentManagement: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     try {
+      setIsLoading(true)
       await axios.delete(`${API_BASE_URL}/students/${id}`);
       const updatedStudents = students.filter((student) => student._id !== id);
       setStudents(updatedStudents);
@@ -381,6 +395,7 @@ const StudentManagement: React.FC = () => {
       setError("Failed to delete student. Please try again.");
     }finally{
       SetConfirmModel(false)
+      setIsLoading(false)
     }
   }
 
@@ -424,6 +439,7 @@ const StudentManagement: React.FC = () => {
   };
   const handleAttend = async (id: string) => {
     try {
+      setIsLoading(true)
       await axios.put(`${API_BASE_URL}/students/attend/${id}`);
       setSucces("attend succesfully");
       setError(null);
@@ -432,6 +448,8 @@ const StudentManagement: React.FC = () => {
       console.log(error);
       setError(`Failed to attend student. Please try again.`);
       setError(null);
+    }finally{
+      setIsLoading(false)
     }
   };
 
@@ -470,6 +488,7 @@ const StudentManagement: React.FC = () => {
 
   const handleSaveComment = async (studentId: string) => {
     try {
+      setIsLoading(true)
       await axios.put(`${API_BASE_URL}/students/comment/${studentId}`, {
         comment: commentText.comment,
       });
@@ -478,6 +497,8 @@ const StudentManagement: React.FC = () => {
     } catch (error) {
       console.error("Error saving comment:", error);
       setError("Failed to save comment. Please try again.");
+    }finally{
+      setIsLoading(false)
     }
   };
 
@@ -1002,6 +1023,22 @@ const StudentManagement: React.FC = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
+                        NAME
+                      </label>
+                      <input
+                        type="text"
+                        value={selectedStudent.name}
+                        onChange={(e) =>
+                          setSelectedStudent({
+                            ...selectedStudent,
+                            name: e.target.value,
+                          })
+                        }
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
                         Select Shift
                       </label>
                       <select
@@ -1227,15 +1264,15 @@ const StudentManagement: React.FC = () => {
               <button
                 onClick={() => {
                   if (studentToRegister && paymentMethod) {
-                  
-                 handleStatusClick(
-                   studentToRegister.id,
-                   studentToRegister.name,
-                   "registered"
-                 ); setAction('register student')}
-                
-                    setIsPaymentModalOpen(false);
-                  
+                    handleStatusClick(
+                      studentToRegister.id,
+                      studentToRegister.name,
+                      "registered"
+                    );
+                    setAction("register student");
+                  }
+
+                  setIsPaymentModalOpen(false);
                 }}
                 disabled={!paymentMethod}
                 className={`inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md ${
@@ -1361,13 +1398,29 @@ const StudentManagement: React.FC = () => {
           </div>
         </div>
       )}
-      {confirmModelOpen &&( <ConfirmDeleteModal onConfirm={()=>handleDelete(item as string)} onClose={()=>SetConfirmModel(false)} action={action}/>)}
-      {confirmStatusModelOpen &&( <ConfirmDeleteModal onConfirm={()=> handleStatusChange(
-                    items.itemId,
-                    items.name,
-                    items.status,
-                    loggedUser?.name as string
-                  )} onClose={()=>SetConfirmStatusModel(false)} action={action}/>)}
+      {confirmModelOpen && (
+        <ConfirmDeleteModal
+          onConfirm={() => handleDelete(item as string)}
+          onClose={() => SetConfirmModel(false)}
+          loading={isloading}
+          action={action}
+        />
+      )}
+      {confirmStatusModelOpen && (
+        <ConfirmDeleteModal
+          onConfirm={() =>
+            handleStatusChange(
+              items.itemId,
+              items.name,
+              items.status,
+              loggedUser?.name as string
+            )
+          }
+          onClose={() => SetConfirmStatusModel(false)}
+          loading={isloading}
+          action={action}
+        />
+      )}
     </div>
   );
 };
