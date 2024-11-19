@@ -589,7 +589,7 @@ const StudentManagement: React.FC = () => {
                                     onClick={() =>
                                       handleSaveComment(student._id)
                                     }
-                                    className="text-blue-600 ml-3 hover:text-blue-900"
+                                    className="text-blue-600 ml-3 font-extrabold hover:text-blue-900"
                                   >
                                     save
                                   </button>
@@ -711,6 +711,14 @@ const StudentManagement: React.FC = () => {
               loading={loading}
             />
           )}
+          {/* {confirmSaveModelOpen && (
+            <ConfirmDeleteModal
+              onConfirm={() => handleSaveComment(itemToDelete as string)}
+              onClose={() => SetConfirmModel(false)}
+              action={action}
+              loading={loading}
+            />
+          )} */}
         </div>
       </div>
     </div>

@@ -203,30 +203,30 @@ const AttendancePage: React.FC = () => {
               <h2 className="text-xl font-semibold mb-2">{date}</h2>
               <table className="min-w-full">
                 <thead>
-                  <tr className="flex justify-between ">
-                    <th className="border-b-2 border-gray-300 p-2">
+                  <tr className=" grid grid-cols-6">
+                    <th className="border-b-2 border-gray-300 p-2 text-left">
                       TIME IN
                     </th>
-                    <th className="border-b-2 border-gray-300 p-2">
+                    <th className="border-b-2 border-gray-300 p-2 text-left">
                       TIME OUT
                     </th>
-                    <th className="border-b-2 border-gray-300 p-2">
+                    <th className="border-b-2 border-gray-300 p-2 text-left">
                       STATUS
                     </th>
-                    <th className="border-b-2 border-gray-300 p-2">
+                    <th className="border-b-2 border-gray-300 p-2 text-left">
                       ACTION
                     </th>
-                    <th className="border-b-2 border-gray-300 p-2">
+                    <th className="border-b-2 border-gray-300 p-2 text-left">
                       COMMENT
                     </th>
-                    <th className="border-b-2 border-gray-300 p-2">
+                    <th className="border-b-2 border-gray-300 p-2 text-left">
                       RESPONSE
                     </th>
                   </tr>
                 </thead>
-                <tbody >
+                <tbody>
                   {records.map((record) => (
-                    <tr key={record._id} className="flex justify-between">
+                    <tr key={record._id} className="grid grid-cols-6 gap-3 overflow-auto">
                       <td className="border-b border-gray-200 p-2 ">
                         {record.status === "present" ||
                         record.status === "pending"
