@@ -15,7 +15,7 @@ const withAdminAuth = <P extends object>(WrappedComponent: React.FC<P>) => {
           await fetchLoggedUser();
           
         } catch (error) {
-          console.error(error);
+          
           toast.error("You have been logged out.");
           window.location.href = "/login";
           return;
@@ -32,7 +32,7 @@ const withAdminAuth = <P extends object>(WrappedComponent: React.FC<P>) => {
         toast.error("Unauthorized access. Redirecting...");
         window.location.href = "/staff/task";
       }
-      console.log(loggedUser);
+
 
     }, [loading, loggedUser]);
 
