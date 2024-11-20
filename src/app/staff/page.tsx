@@ -266,7 +266,7 @@ const AttendancePage: React.FC = () => {
                             </button>
                           )}
                       </td>
-                      <td className="border-b flex border-gray-200 p-2 ">
+                      <td className="border-b flex flex-col gap-2 flex-wrap border-gray-200 p-2 ">
                         <input
                           type="text"
                           value={record.comment}
@@ -276,7 +276,7 @@ const AttendancePage: React.FC = () => {
                         />
                         <button
                           onClick={() => handleComment(record._id)}
-                          className="bg-blue-500 text-white px-2 py-1 mx-5 rounded"
+                          className="bg-blue-500 mx-auto text-white px-2 py-1 gap-2 rounded"
                         >
                           +
                         </button>
