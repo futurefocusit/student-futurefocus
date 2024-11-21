@@ -1404,7 +1404,7 @@ const StudentManagement: React.FC = () => {
               value={message}
               onChange={(e) => {
                 setMessage(e.target.value);
-                Setchar(char - 1);
+                Setchar(145-e.target.value.length);
               }}
               placeholder="Type your message here..."
             ></textarea>

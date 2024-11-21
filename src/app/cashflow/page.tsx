@@ -85,7 +85,7 @@ const PaymentsPage: React.FC = () => {
     filteredCashflows.forEach((cashflow) => {
       if (cashflow.type === "income") {
         income += cashflow.amount;
-      } else if (cashflow.type === "expense") {
+      } else if (cashflow.type === "expenses") {
         expenses += cashflow.amount;
       }
     });
