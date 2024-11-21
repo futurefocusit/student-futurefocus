@@ -64,6 +64,7 @@ const StudentManagement: React.FC = () => {
   }
   const [confirmModelOpen,SetConfirmModel]=useState(false)
   const [confirmStatusModelOpen,SetConfirmStatusModel]=useState(false)
+  const [confirmSaveModelOpen,SetConfirmSaveModel]=useState(false)
   const [students, setStudents] = useState<Student[]>([]);
   const [payment, setPayment] = useState<Payment[]>([]);
   const [groupedStudents, setGroupedStudents] = useState<GroupedStudents>({});
@@ -84,8 +85,9 @@ const StudentManagement: React.FC = () => {
   const [action,setAction]=useState('')
   const [isloading,setIsLoading]= useState(false)
   const [openPay, setOpenPay] = useState(false);
-  const [commentText, setComment] = useState({ comment: "" });
+  const [commentText, setComment] = useState({ comment: "" , student:''});
   const [courses, setCourses] = useState<Course[]>([]);
+  const [student,setStudent]=useState<string|null>('')
   const [loading, setLoading] = useState<boolean>(true);
   const [isPaying, setIsPaying] = useState<boolean>(false);
   const [updateMode, setUpdateMode] = useState(false);
@@ -486,14 +488,15 @@ const StudentManagement: React.FC = () => {
     groupStudentsByIntake(filteredStudents);
   };
 
-  const handleSaveComment = async (studentId: string) => {
+  const handleSaveComment = async (student:string) => {
     try {
       setIsLoading(true)
-      await axios.put(`${API_BASE_URL}/students/comment/${studentId}`, {
+      await axios.put(`${API_BASE_URL}/students/comment/${student}`, {
         comment: commentText.comment,
       });
       setError(null);
-      setSucces("comment savec");
+      setSucces("comment saved");
+      SetConfirmSaveModel(false);
     } catch (error) {
       console.error("Error saving comment:", error);
       setError("Failed to save comment. Please try again.");
@@ -509,14 +512,17 @@ const StudentManagement: React.FC = () => {
           onClick={() => handleView(student)}
           className="text-indigo-600 font-extrabold hover:text-indigo-900 mr-3"
         >
-          View
+          VIEW
         </button>
         {hasPermission(loggedUser as TeamMember, "students", "delete") ? (
           <button
-            onClick={() =>{ handleDeleteClick(student._id);setAction('delete student')}}
+            onClick={() => {
+              handleDeleteClick(student._id);
+              setAction("delete student");
+            }}
             className="text-red-600 ml-3 font-extrabold hover:text-red-900"
           >
-            Delete
+            DELETE
           </button>
         ) : (
           ""
@@ -532,10 +538,12 @@ const StudentManagement: React.FC = () => {
               onChange={(event) => setCommentText(event.target.value)}
             />
             <button
-              onClick={() => handleSaveComment(student._id)}
+              onClick={() =>{ SetConfirmSaveModel(true)
+                setStudent(student._id)
+                 setAction("save comment")}}
               className="text-blue-600 ml-3 font-extrabold hover:text-blue-900"
             >
-              save
+              SAVE
             </button>
           </div>
         ) : (
@@ -557,7 +565,7 @@ const StudentManagement: React.FC = () => {
                 }
                 className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
-                Admit
+                ADMIT
               </button>
             ) : (
               ""
@@ -567,7 +575,7 @@ const StudentManagement: React.FC = () => {
                 onClick={() => handleUpdateStudent(student)}
                 className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
-                Update
+                UPDATE
               </button>
             ) : (
               ""
@@ -583,7 +591,7 @@ const StudentManagement: React.FC = () => {
                 onClick={() => handleUpdateStudent(student)}
                 className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
-                Update
+                UPDATE
               </button>
             ) : (
               ""
@@ -602,7 +610,7 @@ const StudentManagement: React.FC = () => {
                 }
                 className="text-blue-600 font-extrabold hover:text-blue-900 ml-3"
               >
-                Register
+                REGISTER
               </button>
             ) : (
               ""
@@ -618,7 +626,7 @@ const StudentManagement: React.FC = () => {
                 onClick={() => handleUpdateStudent(student)}
                 className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
-                Update
+                UPDATE
               </button>
             ) : (
               ""
@@ -628,7 +636,7 @@ const StudentManagement: React.FC = () => {
                 onClick={() => handleViewP(student, "pay")}
                 className="bg-green-700  text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
               >
-                Pay
+                PAY
               </button>
             ) : (
               ""
@@ -662,7 +670,7 @@ const StudentManagement: React.FC = () => {
                 }}
                 className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
-                activate
+                ACTIVATE
               </button>
             ) : (
               ""
@@ -678,7 +686,7 @@ const StudentManagement: React.FC = () => {
                 onClick={() => handleUpdateStudent(student)}
                 className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
-                Update
+                UPDATE
               </button>
             ) : (
               ""
@@ -688,7 +696,7 @@ const StudentManagement: React.FC = () => {
                 onClick={() => handleViewP(student, "pay")}
                 className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
               >
-                Pay
+                PAY
               </button>
             ) : (
               ""
@@ -719,7 +727,7 @@ const StudentManagement: React.FC = () => {
                 onClick={() => handleAttend(student._id)}
                 className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
-                Attend
+                ATTEND
               </button>
             ) : (
               ""
@@ -746,7 +754,7 @@ const StudentManagement: React.FC = () => {
                 }}
                 className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
-                Reactivate
+                REACTIVATE
               </button>
             ) : (
               ""
@@ -811,7 +819,7 @@ const StudentManagement: React.FC = () => {
                 "registered",
                 "started",
                 "droppedout",
-                "completed"
+                "completed",
               ].map((status) => (
                 <button
                   key={status}
@@ -918,6 +926,18 @@ const StudentManagement: React.FC = () => {
                       </th>
                       <th
                         scope="col"
+                        className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
+                      >
+                        Course
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
+                      >
+                        Shifft
+                      </th>
+                      <th
+                        scope="col"
                         className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell"
                       >
                         Payment Status
@@ -950,13 +970,23 @@ const StudentManagement: React.FC = () => {
                           <div className="text-sm font-medium text-gray-900">
                             {student.name}
                           </div>
-                          <div className="text-xs text-gray-500 sm:hidden">
+                          {/* <div className="text-xs text-gray-500 sm:hidden">
                             {student.phone}
-                          </div>
+                          </div> */}
                         </td>
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
                           <div className="text-sm text-gray-900">
                             {student.phone}
+                          </div>
+                          </td>
+                        <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
+                          <div className="text-sm text-gray-900">
+                            {student.selectedCourse}
+                          </div>
+                        </td>
+                        <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
+                          <div className="text-sm text-gray-900">
+                            {student.selectedShift}
                           </div>
                         </td>
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden md:table-cell">
@@ -998,12 +1028,12 @@ const StudentManagement: React.FC = () => {
               <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg">
                 <div className="bg-gray-50 p-6 h-96 overflow-scroll">
                   <h3 className="text-lg font-medium text-gray-900">
-                   UPADATE STUDENT INFO
+                    UPADATE STUDENT INFO
                   </h3>
                   <div className="mt-4 space-y-2">
                     <div>
                       <label className="block text-sm font-extrabold text-gray-700">
-                      SELECT COURSE 
+                        SELECT COURSE
                       </label>
                       <select
                         value={selectedStudent.selectedCourse}
@@ -1421,6 +1451,14 @@ const StudentManagement: React.FC = () => {
             )
           }
           onClose={() => SetConfirmStatusModel(false)}
+          loading={isloading}
+          action={action}
+        />
+      )}
+      {confirmSaveModelOpen && student&&(
+        <ConfirmDeleteModal
+          onConfirm={() => handleSaveComment(student)}
+          onClose={() => SetConfirmSaveModel(false)}
           loading={isloading}
           action={action}
         />

@@ -65,7 +65,7 @@ export interface AttendanceRecord {
 }
 export interface memberAttendanceRecord {
   _id: string;
-  memberId: { name: string; position: string };
+  memberId: { name: string; position: string,phone:string };
   email: string;
   comment:string
   status: string;
@@ -79,4 +79,28 @@ export interface GroupedAttendance {
       [shift: string]: AttendanceRecord[];
     };
   };
+}
+export interface IPermission {
+  _id: string;
+  feature: Feature;
+  permission: string;
+}
+
+export interface IRole {
+  _id: string;
+  role: string;
+  permission: Permission[];
+}
+
+export interface IUser {
+  _id: string;
+  email: string;
+  name: string;
+  role: Role;
+  image: string;
+}
+export interface IFeature {
+  _id: string;
+  feature: string;
+  web: string;
 }

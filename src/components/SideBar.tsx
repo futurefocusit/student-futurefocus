@@ -16,9 +16,10 @@ import {
   FaTasks,
   FaClipboardList,
   FaToolbox,
+  FaCode,
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
-import { FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
+import { FaLockOpen, FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
 import { MdEventAvailable } from "react-icons/md";
 
 const SideBar = () => {
@@ -58,6 +59,18 @@ const SideBar = () => {
     { label: "CASHFLOW", icon: FaMoneyBillAlt, href: "/cashflow", admin: true },
 
     { label: "INVENTORY", icon: FaToolbox, href: "/inventory", admin: true },
+    {
+      label: "MANAGE ROLE",
+      icon: FaLockOpen,
+      href: "/manage-role",
+      admin: true,
+    },
+    {
+      label: "TECHUP PROGRAM",
+      icon: FaCode,
+      href: "/techups",
+      admin: true,
+    },
   ];
 
   useEffect(() => {

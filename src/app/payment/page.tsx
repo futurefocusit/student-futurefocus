@@ -291,9 +291,9 @@ const StudentManagement: React.FC = () => {
           {hasPermission(loggedUser as TeamMember, "students", "register") ? (
             <a
               href="/students/register-new"
-              className="p-2 bg-green-400 hover:bg-green-700 rounded-lg px-5 text-white font-bold"
+              className="p-2 bg-green-400 hover:bg-green-700 rounded-lg px-5 text-white font-extra-bold"
             >
-              New
+              NEW
             </a>
           ) : (
             ""
@@ -517,7 +517,7 @@ const StudentManagement: React.FC = () => {
                                   onClick={() => handleView(student, "pay")}
                                   className="bg-green-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-green-900"
                                 >
-                                  Pay
+                                  PAY
                                 </button>
                               ) : (
                                 ""
@@ -561,7 +561,7 @@ const StudentManagement: React.FC = () => {
                                   onClick={() =>{handleDeleteClick(student._id);setAction('delete payment')}}
                                   className="bg-red-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-red-900"
                                 >
-                                  delete
+                                  DELETE
                                 </button>
                               ) : (
                                 ""
@@ -591,7 +591,7 @@ const StudentManagement: React.FC = () => {
                                     }
                                     className="text-blue-600 ml-3 font-extrabold hover:text-blue-900"
                                   >
-                                    save
+                                    SAVE
                                   </button>
                                 </div>
                               ) : (

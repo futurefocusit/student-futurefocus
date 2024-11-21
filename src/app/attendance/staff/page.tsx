@@ -49,9 +49,9 @@ const AttendancePage: React.FC = () => {
     }
   };
 
-  const handleResponse = async (id: string) => {
+  const handleResponse = async (id: string,phone:string) => {
     try {
-      await axios.put(`${API_BASE_URL}/member/response/${id}`, { response });
+      await axios.put(`${API_BASE_URL}/member/response/${id}`, { response,phone });
       toast.success("comment added");
     } catch (error) {
       toast.error("failed to add comment");
@@ -283,7 +283,7 @@ const AttendancePage: React.FC = () => {
                             className="text-black px-2 py-1 rounded"
                           />
                           <button
-                            onClick={() => handleResponse(record._id)}
+                            onClick={() => handleResponse(record._id,record.memberId.phone)}
                             className="bg-blue-500 text-white px-2 py-1 mx-10 rounded"
                           >
                             +
