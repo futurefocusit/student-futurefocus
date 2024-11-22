@@ -28,7 +28,7 @@ interface Student {
   intake: string;
   selectedCourse: string;
   message: string;
-  selectedShift: string;
+  selectedShift: {_id:string,name:string};
   updatedAt: string;
   createdAt: string;
   status: string;
@@ -44,8 +44,9 @@ interface Payment {
 }
 
 interface Course {
+
   title: string;
-  shifts: string[];
+  shifts: {name:string,_id:string}[];
 }
 
 interface GroupedStudents {
@@ -978,7 +979,7 @@ const StudentManagement: React.FC = () => {
                           <div className="text-sm text-gray-900">
                             {student.phone}
                           </div>
-                          </td>
+                        </td>
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
                           <div className="text-sm text-gray-900">
                             {student.selectedCourse}
@@ -986,7 +987,7 @@ const StudentManagement: React.FC = () => {
                         </td>
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
                           <div className="text-sm text-gray-900">
-                            {student.selectedShift}
+                            {student.selectedShift?.name}
                           </div>
                         </td>
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden md:table-cell">
@@ -1041,9 +1042,10 @@ const StudentManagement: React.FC = () => {
                           setSelectedStudent({
                             ...selectedStudent,
                             selectedCourse: e.target.value,
+                            //@ts-expect-error error
                             selectedShift:
                               courses.find((c) => c.title === e.target.value)
-                                ?.shifts[0] || selectedStudent.selectedShift,
+                                ?.shifts[0] || selectedStudent.selectedShift._id,
                           })
                         }
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -1076,10 +1078,11 @@ const StudentManagement: React.FC = () => {
                         SELECT SHIFT
                       </label>
                       <select
-                        value={selectedStudent.selectedShift}
+                        value={selectedStudent.selectedShift?._id}
                         onChange={(e) =>
                           setSelectedStudent({
                             ...selectedStudent,
+                            //@ts-ignore
                             selectedShift: e.target.value,
                           })
                         }
@@ -1088,11 +1091,12 @@ const StudentManagement: React.FC = () => {
                         {courses
                           .find(
                             (course) =>
-                              course.title === selectedStudent.selectedCourse
+                              //@ts-ignore 
+                              course._id === selectedStudent.selectedCourse
                           )
-                          ?.shifts.map((shift) => (
-                            <option key={shift} value={shift}>
-                              {shift}
+                          ?.shifts?.map((shift) => (
+                            <option key={shift._id} value={shift._id}>
+                              {shift.name}
                             </option>
                           ))}
                       </select>
@@ -1170,7 +1174,7 @@ const StudentManagement: React.FC = () => {
 
                     <p className="flex">
                       <span className="font-extrabold w-28 ">SHIFT</span>{" "}
-                      <span> {selectedStudent.selectedShift}</span>
+                      <span> {selectedStudent.selectedShift.name}</span>
                     </p>
                     <p className="flex">
                       <span className="font-extrabold w-28 ">APPLIED</span>{" "}
@@ -1394,7 +1398,7 @@ const StudentManagement: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg w-96 shadow-lg">
             <h3 className="text-lg font-semibold mb-4 text-center">
-              TYPE YOUR MESSAGE
+              SEND MESSAGE  TO <p className="font-extrabold inline text-blue-500"> {selectedValues.length} </p> PEOPLE
             </h3>
             <p className="text-end  test-sm text-blue-500"> {char} left</p>
             <textarea
@@ -1404,7 +1408,7 @@ const StudentManagement: React.FC = () => {
               value={message}
               onChange={(e) => {
                 setMessage(e.target.value);
-                Setchar(145-e.target.value.length);
+                Setchar(145 - e.target.value.length);
               }}
               placeholder="Type your message here..."
             ></textarea>
@@ -1416,10 +1420,10 @@ const StudentManagement: React.FC = () => {
                 Cancel
               </button>
               <button
-                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                className={`${isloading?"cursor-progress":""} px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"`}
                 onClick={handleSend}
               >
-                Send
+                {isloading ? " Sending..." : " Send"}
               </button>
             </div>
             <p
@@ -1455,7 +1459,7 @@ const StudentManagement: React.FC = () => {
           action={action}
         />
       )}
-      {confirmSaveModelOpen && student&&(
+      {confirmSaveModelOpen && student && (
         <ConfirmDeleteModal
           onConfirm={() => handleSaveComment(student)}
           onClose={() => SetConfirmSaveModel(false)}
