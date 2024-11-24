@@ -983,13 +983,14 @@ const StudentManagement: React.FC = () => {
                         </td>
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
                           <div className="text-sm text-gray-900">
-                          {/*@ts-expect-error erro */}
+                            {/*@ts-expect-error erro */}
                             {student.selectedCourse?.title}
                           </div>
                         </td>
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
                           <div className="text-sm text-gray-900">
-                            {student.selectedShift?.start} {'-'} {student.selectedShift?.end}
+                            {student.selectedShift?.start} {"-"}{" "}
+                            {student.selectedShift?.end}
                           </div>
                         </td>
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden md:table-cell">
@@ -1044,7 +1045,7 @@ const StudentManagement: React.FC = () => {
                           setSelectedStudent({
                             ...selectedStudent,
                             selectedCourse: e.target.value,
-                          
+
                             selectedShift:
                               courses.find((c) => c._id === e.target.value)
                                 ?.shifts[0] || selectedStudent.selectedShift,
@@ -1084,7 +1085,7 @@ const StudentManagement: React.FC = () => {
                         onChange={(e) =>
                           setSelectedStudent({
                             ...selectedStudent,
-                            //@ts-ignore
+                            //@ts-expect-error error
                             selectedShift: e.target.value,
                           })
                         }
@@ -1093,7 +1094,6 @@ const StudentManagement: React.FC = () => {
                         {courses
                           .find(
                             (course) =>
-                              //@ts-ignore 
                               course._id === selectedStudent.selectedCourse
                           )
                           ?.shifts?.map((shift) => (
@@ -1401,7 +1401,12 @@ const StudentManagement: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg w-96 shadow-lg">
             <h3 className="text-lg font-semibold mb-4 text-center">
-              SEND MESSAGE  TO <p className="font-extrabold inline text-blue-500"> {selectedValues.length} </p> PEOPLE
+              SEND MESSAGE TO{" "}
+              <p className="font-extrabold inline text-blue-500">
+                {" "}
+                {selectedValues.length}{" "}
+              </p>{" "}
+              PEOPLE
             </h3>
             <p className="text-end  test-sm text-blue-500"> {char} left</p>
             <textarea
@@ -1423,7 +1428,9 @@ const StudentManagement: React.FC = () => {
                 Cancel
               </button>
               <button
-                className={`${isloading?"cursor-progress":""} px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"`}
+                className={`${
+                  isloading ? "cursor-progress" : ""
+                } px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"`}
                 onClick={handleSend}
               >
                 {isloading ? " Sending..." : " Send"}
