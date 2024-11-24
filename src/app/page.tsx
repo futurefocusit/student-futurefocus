@@ -19,9 +19,8 @@ import {
 } from "chart.js";
 import Loader from "@/components/loader";
 import { hasPermission } from "@/libs/hasPermission";
-import {  useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { TeamMember } from "@/types/types";
-
 
 ChartJS.register(
   LinearScale,
@@ -34,6 +33,44 @@ ChartJS.register(
   PointElement,
   Filler
 );
+
+interface ShiftStudentData {
+  _id: {
+    shiftId: string;
+    shiftName: string;
+  };
+  total: number;
+  pending: number;
+  accepted: number;
+  registered: number;
+  started: number;
+  completed: number;
+  droppedout: number;
+}
+
+interface DepartmentStudentData {
+  _id: {
+    courseId: string;
+    courseName: string;
+  };
+  total: number;
+  pending: number;
+  accepted: number;
+  registered: number;
+  started: number;
+  completed: number;
+  droppedout: number;
+}
+
+interface ShiftPaymentData {
+  _id: {
+    shiftId: string;
+    shiftName: string;
+  };
+  totalPaid: number;
+  totalDue: number;
+  totalUnpaid: number;
+}
 
 interface Dashboard {
   totalStudents: number;
@@ -53,32 +90,9 @@ interface Dashboard {
   };
   totalAmountPaid: number;
   totalAmountToBePaid: number;
-  shiftStudents: {
-    _id: string;
-    total: number;
-    pending: number;
-    accepted: number;
-    registered: number;
-    started: number;
-    completed: number;
-    droppedout: number;
-  }[];
-  departmentStudents: {
-    _id: string;
-    total: number;
-    pending: number;
-    accepted: number;
-    registered: number;
-    started: number;
-    completed: number;
-    droppedout: number;
-  }[];
-  shiftPayments: {
-    _id: string;
-    totalPaid: number;
-    totalDue: number;
-    totalUnpaid: number;
-  }[];
+  shiftStudents: ShiftStudentData[];
+  departmentStudents: DepartmentStudentData[];
+  shiftPayments: ShiftPaymentData[];
   monthlyCashflows: {
     _id: number;
     totalIncome: number;
@@ -109,7 +123,6 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { fetchLoggedUser, loggedUser } = useAuth();
-
 
   useEffect(() => {
     const fetchSummary = async () => {
@@ -145,7 +158,8 @@ const Dashboard = () => {
       </div>
     );
 
-  const shifts = summary.shiftStudents.map((ss) => ss._id);
+  const shifts = summary.shiftStudents.map((ss) => ss._id.shiftName);
+  const departments = summary.departmentStudents.map((ds) => ds._id.courseName);
 
   const cashflowMonths = summary.monthlyCashflows.map(
     (cf) => `Month ${cf._id}`
@@ -155,11 +169,9 @@ const Dashboard = () => {
     (cf) => cf.totalExpenses
   );
 
-  // In your Dashboard component
-
-  // Students Chart Data
+  // Students by Shift Chart Data
   const studentsData = {
-    labels: summary.shiftStudents.map((ss) => ss._id),
+    labels: shifts,
     datasets: [
       {
         label: "Pending",
@@ -189,43 +201,44 @@ const Dashboard = () => {
       {
         label: "Dropped Out",
         data: summary.shiftStudents.map((ss) => ss.droppedout),
-        backgroundColor: "rgba(255, 99, 132, 0.6)", // Red
+        backgroundColor: "rgba(255, 99, 132, 0.6)",
       },
     ],
   };
-  // Students Chart Data
+
+  // Students by Course/Department Chart Data
   const studentsDataCourse = {
-    labels: summary.departmentStudents.map((ss) => ss._id),
+    labels: departments,
     datasets: [
       {
         label: "Pending",
-        data: summary.shiftStudents.map((ss) => ss.pending),
+        data: summary.departmentStudents.map((ds) => ds.pending),
         backgroundColor: "rgba(255, 206, 86, 0.6)",
       },
       {
         label: "Accepted",
-        data: summary.shiftStudents.map((ss) => ss.accepted),
+        data: summary.departmentStudents.map((ds) => ds.accepted),
         backgroundColor: "rgba(75, 192, 192, 0.6)",
       },
       {
         label: "Registered",
-        data: summary.shiftStudents.map((ss) => ss.registered),
+        data: summary.departmentStudents.map((ds) => ds.registered),
         backgroundColor: "rgba(54, 162, 235, 0.6)",
       },
       {
         label: "Started",
-        data: summary.shiftStudents.map((ss) => ss.started),
+        data: summary.departmentStudents.map((ds) => ds.started),
         backgroundColor: "rgba(153, 102, 255, 0.6)",
       },
       {
         label: "Completed",
-        data: summary.shiftStudents.map((ss) => ss.completed),
+        data: summary.departmentStudents.map((ds) => ds.completed),
         backgroundColor: "rgba(75, 192, 192, 0.6)",
       },
       {
         label: "Dropped Out",
-        data: summary.shiftStudents.map((ss) => ss.droppedout),
-        backgroundColor: "rgba(255, 99, 132, 0.6)", // Red
+        data: summary.departmentStudents.map((ds) => ds.droppedout),
+        backgroundColor: "rgba(255, 99, 132, 0.6)",
       },
     ],
   };
@@ -247,25 +260,20 @@ const Dashboard = () => {
         callbacks: {
           //@ts-expect-error error
           footer: (tooltipItems) => {
-            const shift = tooltipItems[0].label;
+            const label = tooltipItems[0].label;
             const shiftData = summary.shiftStudents.find(
-              (ss) => ss._id === shift
+              (ss) => ss._id.shiftName === label
             );
-            return `Total: ${shiftData?.total || 0}`;
+            const departmentData = summary.departmentStudents.find(
+              (ds) => ds._id.courseName === label
+            );
+            return `Total: ${(shiftData || departmentData)?.total || 0}`;
           },
         },
       },
     },
   };
 
-  // In your JSX
-  <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mt-6">
-    <h2 className="text-2xl font-semibold mb-4">
-      Students by Shift and Status
-    </h2>
-    {/* @ts-expect-error error */}
-    <Bar data={studentsData} options={options} />
-  </div>;
   // Payments Chart Data
   const paymentsData = {
     labels: shifts,
@@ -463,12 +471,16 @@ const Dashboard = () => {
         )}
       </div>
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl  mt-6">
-        <h2 className="text-2xl font-semibold text-center mb-4">STUDENTS  STATISTICS BY SHIFT</h2>
+        <h2 className="text-2xl font-semibold text-center mb-4">
+          STUDENTS STATISTICS BY SHIFT
+        </h2>
         {/* @ts-expect-error error */}
         <Bar data={studentsData} options={options} />
       </div>
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl  mt-6">
-        <h2 className="text-2xl font-semibold text-center mb-4">STUDENT  STATISTICS BY DEPARTMENT</h2>
+        <h2 className="text-2xl font-semibold text-center mb-4">
+          STUDENT STATISTICS BY DEPARTMENT
+        </h2>
         {/* @ts-expect-error error */}
         <Bar data={studentsDataCourse} options={options} />
       </div>
@@ -478,7 +490,9 @@ const Dashboard = () => {
         "view-dashboard"
       ) ? (
         <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mt-6">
-          <h2 className="text-2xl font-semibold mb-4 text-center">PAYMENT STATISTICS</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-center">
+            PAYMENT STATISTICS
+          </h2>
           {/* @ts-expect-error error */}
           <Bar data={paymentsData} options={options} />
         </div>
@@ -492,7 +506,9 @@ const Dashboard = () => {
         "view-dashboard"
       ) ? (
         <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mt-6">
-          <h2 className="text-2xl font-semibold mb-4 text-center">MONTHLY CASHFLOW</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-center">
+            MONTHLY CASHFLOW
+          </h2>
           <Line data={cashflowData} options={{ responsive: true }} />
         </div>
       ) : (

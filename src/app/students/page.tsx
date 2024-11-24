@@ -26,9 +26,9 @@ interface Student {
   email: string;
   phone: string;
   intake: string;
-  selectedCourse: string;
+  selectedCourse: string
   message: string;
-  selectedShift: {_id:string,name:string};
+  selectedShift: {_id:string,name:string,start:string,end:string};
   updatedAt: string;
   createdAt: string;
   status: string;
@@ -46,7 +46,8 @@ interface Payment {
 interface Course {
 
   title: string;
-  shifts: {name:string,_id:string}[];
+  _id:string
+  shifts: {name:string,_id:string,start:string,end:string}[];
 }
 
 interface GroupedStudents {
@@ -982,12 +983,13 @@ const StudentManagement: React.FC = () => {
                         </td>
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
                           <div className="text-sm text-gray-900">
-                            {student.selectedCourse}
+                          {/*@ts-expect-error erro */}
+                            {student.selectedCourse?.title}
                           </div>
                         </td>
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
                           <div className="text-sm text-gray-900">
-                            {student.selectedShift?.name}
+                            {student.selectedShift?.start} {'-'} {student.selectedShift?.end}
                           </div>
                         </td>
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden md:table-cell">
@@ -1042,16 +1044,16 @@ const StudentManagement: React.FC = () => {
                           setSelectedStudent({
                             ...selectedStudent,
                             selectedCourse: e.target.value,
-                            //@ts-expect-error error
+                          
                             selectedShift:
-                              courses.find((c) => c.title === e.target.value)
-                                ?.shifts[0] || selectedStudent.selectedShift._id,
+                              courses.find((c) => c._id === e.target.value)
+                                ?.shifts[0] || selectedStudent.selectedShift,
                           })
                         }
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
                       >
                         {courses.map((course) => (
-                          <option key={course.title} value={course.title}>
+                          <option key={course.title} value={course._id}>
                             {course.title}
                           </option>
                         ))}
@@ -1169,12 +1171,13 @@ const StudentManagement: React.FC = () => {
                     </p>
                     <p className="flex">
                       <span className="font-extrabold w-28 ">COURSE</span>{" "}
-                      <span>{selectedStudent.selectedCourse}</span>
+                      {/* @ts-expect-error error */}
+                      <span>{selectedStudent?.selectedCourse?.title}</span>
                     </p>
 
                     <p className="flex">
                       <span className="font-extrabold w-28 ">SHIFT</span>{" "}
-                      <span> {selectedStudent.selectedShift.name}</span>
+                      <span> {selectedStudent.selectedShift?.name}</span>
                     </p>
                     <p className="flex">
                       <span className="font-extrabold w-28 ">APPLIED</span>{" "}
