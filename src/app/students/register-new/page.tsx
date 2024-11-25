@@ -14,7 +14,7 @@ const imageUrl = "/futurefocuslogo.png";
 
 interface Course {
   title: string;
-  shifts: string[];
+  shifts: {_id:string,name:string}[];
 }
 
 interface registrationData {
@@ -109,7 +109,7 @@ const Registration: React.FC = () => {
        if (selectedCourse) {
          setFormData((prevData) => ({
            ...prevData,
-           selectedShift: selectedCourse.shifts[0],
+           selectedShift: selectedCourse.shifts[0]._id,
          }));
        }
      }
@@ -157,7 +157,7 @@ const data:IInvoice = {
          email: "",
          phone: "",
          selectedCourse: courses.length > 0 ? courses[0].title : "",
-         selectedShift: courses.length > 0 ? courses[0].shifts[0] : "",
+         selectedShift: courses.length > 0 ? courses[0].shifts[0]._id : "",
          message: "",
          intake: intakes.length > 0 ? intakes[0].intake : "",
          user:loggedUser?.name,
@@ -288,8 +288,8 @@ const data:IInvoice = {
              {courses
                .find((course) => course.title === formData.selectedCourse)
                ?.shifts.map((shift) => (
-                 <option key={shift} value={shift}>
-                   {shift}
+                 <option key={shift._id} value={shift._id}>
+                   {shift.name}
                  </option>
                ))}
            </select>

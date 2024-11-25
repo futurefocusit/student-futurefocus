@@ -82,6 +82,7 @@ const StudentManagement: React.FC = () => {
   
   const [char, Setchar] = useState(145);
   const [message, setMessage] = useState("");
+  const [status, setStatus]=useState('pending')
   const [isOpenMessage, setOpenMessage] = useState(false);
   const [openView, setOpenView] = useState(false);
   const [action,setAction]=useState('')
@@ -825,7 +826,10 @@ const StudentManagement: React.FC = () => {
               ].map((status) => (
                 <button
                   key={status}
-                  onClick={() => filterStudents(status)}
+                  onClick={() => {
+                    filterStudents(status);
+                    setStatus(status);
+                  }}
                   className={`px-3 py-1 flex gap-1  text-xs sm:text-sm font-extrabold text-white   border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
                     activeFilter === status ? "bg-green-20" : ""
                   } ${
@@ -926,18 +930,18 @@ const StudentManagement: React.FC = () => {
                       >
                         Phone
                       </th>
-                      <th
-                        scope="col"
-                        className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
-                      >
-                        Course
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
-                      >
-                        Shifft
-                      </th>
+                      {status !== "pending" ? (
+                        <>
+                          <th
+                            scope="col"
+                            className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
+                          >
+                            Shifft
+                          </th>
+                        </>
+                      ) : (
+                        ""
+                      )}
                       <th
                         scope="col"
                         className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell"
@@ -981,18 +985,24 @@ const StudentManagement: React.FC = () => {
                             {student.phone}
                           </div>
                         </td>
-                        <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
-                          <div className="text-sm text-gray-900">
-                            {/*@ts-expect-error erro */}
-                            {student.selectedCourse?.title}
-                          </div>
-                        </td>
-                        <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
-                          <div className="text-sm text-gray-900">
-                            {student.selectedShift?.start} {"-"}{" "}
-                            {student.selectedShift?.end}
-                          </div>
-                        </td>
+                        {status !== "pending" ? (
+                          <>
+                            <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
+                              <div className="text-sm text-gray-900">
+                                {/*@ts-expect-error erro */}
+                                {student.selectedCourse?.title}
+                              </div>
+                            </td>
+                            <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
+                              <div className="text-sm text-gray-900">
+                                {student.selectedShift?.start} {"-"}{" "}
+                                {student.selectedShift?.end}
+                              </div>
+                            </td>
+                          </>
+                        ) : (
+                          ""
+                        )}
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden md:table-cell">
                           <div className="text-sm text-gray-900">
                             {payment &&
