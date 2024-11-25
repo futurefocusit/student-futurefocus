@@ -18,6 +18,7 @@ import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { FaCommentSms } from "react-icons/fa6";
 import ConfirmDeleteModal from "@/components/confirmPopupmodel";
+import { toast } from "react-toastify";
 const imageUrl = "/futurefocuslogo.png";
 
 interface Student {
@@ -66,6 +67,7 @@ const StudentManagement: React.FC = () => {
   }
   const [confirmModelOpen,SetConfirmModel]=useState(false)
   const [confirmStatusModelOpen,SetConfirmStatusModel]=useState(false)
+  const [confirmAttendModelOpen,SetConfirmAttendModel]=useState(false)
   const [confirmSaveModelOpen,SetConfirmSaveModel]=useState(false)
   const [students, setStudents] = useState<Student[]>([]);
   const [payment, setPayment] = useState<Payment[]>([]);
@@ -446,15 +448,16 @@ const StudentManagement: React.FC = () => {
     try {
       setIsLoading(true)
       await axios.put(`${API_BASE_URL}/students/attend/${id}`);
-      setSucces("attend succesfully");
+      toast.success("attend succesfully");
       setError(null);
       await fetchStudents();
     } catch (error) {
       console.log(error);
-      setError(`Failed to attend student. Please try again.`);
+     toast.error(`Failed to attend student. Please try again.`);
       setError(null);
     }finally{
       setIsLoading(false)
+      SetConfirmAttendModel(false)
     }
   };
 
@@ -727,7 +730,8 @@ const StudentManagement: React.FC = () => {
 
             {hasPermission(loggedUser as TeamMember, "students", "attend") ? (
               <button
-                onClick={() => handleAttend(student._id)}
+                onClick={() =>{SetConfirmAttendModel(true); setAction('Attend Student');
+                  setStudent(student._id)}}
                 className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
                 ATTEND
@@ -1483,6 +1487,14 @@ const StudentManagement: React.FC = () => {
         <ConfirmDeleteModal
           onConfirm={() => handleSaveComment(student)}
           onClose={() => SetConfirmSaveModel(false)}
+          loading={isloading}
+          action={action}
+        />
+      )}
+      {confirmAttendModelOpen && student && (
+        <ConfirmDeleteModal
+          onConfirm={() => handleAttend(student)}
+          onClose={() => SetConfirmAttendModel(false)}
           loading={isloading}
           action={action}
         />

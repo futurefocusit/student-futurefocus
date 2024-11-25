@@ -325,7 +325,7 @@ const PaymentsPage: React.FC = () => {
                   : "bg-gray-200 text-gray-800"
               } rounded-l`}
             >
-              INCOME
+             CASH IN
             </button>
             <button
               onClick={() => setFilter("expenses")}
@@ -335,7 +335,7 @@ const PaymentsPage: React.FC = () => {
                   : "bg-gray-200 text-gray-800"
               } rounded-r`}
             >
-              EXPENSES
+              CASH OUT
             </button>
           </div>
 
