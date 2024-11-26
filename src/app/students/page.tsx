@@ -805,6 +805,14 @@ const StudentManagement: React.FC = () => {
               REGISTER NEW
             </a>
           )}
+          {hasPermission(loggedUser as TeamMember, "students", "register") && (
+            <a
+              href="/past-student"
+              className="px-4 mx-10 py-2 bg-blue-400 hover:bg-blue-700 rounded-lg text-white font-bold"
+            >
+             PAST-STUDENT
+            </a>
+          )}
         </div>
         {error ||
           (succes && (
