@@ -227,10 +227,10 @@ const AttendancePage: React.FC = () => {
                           {index + 1}
                         </td>
                         <td className="border-b border-gray-200 p-2">
-                          {record.memberId.name}
+                          {record.memberId?.name}
                         </td>
                         <td className="border-b border-gray-200 p-2">
-                          {record.memberId.position}
+                          {record.memberId?.position}
                         </td>
                         <td
                           className={`border-b border-gray-200 p-2 ${getStatusColor(
