@@ -533,7 +533,32 @@ const StudentManagement: React.FC = () => {
         ) : (
           ""
         )}
-
+        {hasPermission(loggedUser as TeamMember, "students", "admit") ? (
+          <button
+            onClick={() => {
+              handleStatusClick(student._id, student.name, "completed");
+              setAction("admit student");
+            }}
+            className="text-green-600 font-extrabold hover:text-green-900 ml-3"
+          >
+            Comlete
+          </button>
+        ) : (
+          ""
+        )}
+        {hasPermission(loggedUser as TeamMember, "students", "admit") ? (
+          <button
+            onClick={() => {
+              handleStatusClick(student._id, student.name, "droppedout");
+              setAction("admit student");
+            }}
+            className="text-green-600 font-extrabold hover:text-green-900 ml-3"
+          >
+            Dropout
+          </button>
+        ) : (
+          ""
+        )}
         {hasPermission(loggedUser as TeamMember, "students", "comment") ? (
           <div className="">
             <input
@@ -544,9 +569,11 @@ const StudentManagement: React.FC = () => {
               onChange={(event) => setCommentText(event.target.value)}
             />
             <button
-              onClick={() =>{ SetConfirmSaveModel(true)
-                setStudent(student._id)
-                 setAction("save comment")}}
+              onClick={() => {
+                SetConfirmSaveModel(true);
+                setStudent(student._id);
+                setAction("save comment");
+              }}
               className="text-blue-600 ml-3 font-extrabold hover:text-blue-900"
             >
               SAVE
