@@ -492,8 +492,8 @@ const PaymentsPage: React.FC = () => {
                 id="type"
               >
                 <option value="">Select type</option>
-                <option value="income">Income</option>
-                <option value="expenses">Expenses</option>
+                <option value="income">Cash In </option>
+                <option value="expenses">Cash Out</option>
               </select>
               <input
                 name="amount"
