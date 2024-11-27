@@ -4,13 +4,13 @@ import axios from "axios";
 import API_BASE_URL from "@/config/baseURL";
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
-import { IInvoice, TeamMember } from "@/types/types";
+import { TeamMember } from "@/types/types";
 import { hasPermission } from "@/libs/hasPermission";
 import Loader from "@/components/loader";
-import { generateRegisterStatementPdf } from "@/libs/generateInvoice";
-import { convertImageUrlToBase64 } from "@/libs/convertImage";
+
 import { useAuth } from "@/context/AuthContext";
-const imageUrl = "/futurefocuslogo.png";
+import { toast } from "react-toastify";
+
 
 interface Course {
   _id: string;
@@ -133,9 +133,9 @@ const Past: React.FC = () => {
         }
       );
       if (response.data && response.data.message) {
-        setSubmissionResult(response.data.message);
+        toast.success(response.data.message);
       } else {
-        setSubmissionResult("student added successfully");
+        toast.success("student added successfully");
       }
 
       setFormData({
@@ -148,14 +148,16 @@ const Past: React.FC = () => {
         intake: intakes.length > 0 ? intakes[0].intake : "",
         user: loggedUser?.name,
         payment: "",
+  
       });
+      
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         const errorMessage =
           error.response.data.message || "An error occurred. Please try again.";
-        setSubmissionResult(errorMessage);
+        toast.error(errorMessage);
       } else {
-        setSubmissionResult("An unexpected error occurred. Please try again.");
+        toast.error("An unexpected error occurred. Please try again.");
       }
     }
   };
@@ -311,6 +313,7 @@ const Past: React.FC = () => {
             <p>completed</p>
             <input
               type="radio"
+              required
               value="completed"
               name="status"
               onChange={handleChange}

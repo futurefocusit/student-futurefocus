@@ -533,28 +533,28 @@ const StudentManagement: React.FC = () => {
         ) : (
           ""
         )}
-        {hasPermission(loggedUser as TeamMember, "students", "admit") ? (
+        {hasPermission(loggedUser as TeamMember, "students", "complete") ? (
           <button
             onClick={() => {
               handleStatusClick(student._id, student.name, "completed");
-              setAction("admit student");
+              setAction("complete student");
             }}
             className="text-green-600 font-extrabold hover:text-green-900 ml-3"
           >
-            Comlete
+            COMPLETE
           </button>
         ) : (
           ""
         )}
-        {hasPermission(loggedUser as TeamMember, "students", "admit") ? (
+        {hasPermission(loggedUser as TeamMember, "students", "dropout") ? (
           <button
             onClick={() => {
               handleStatusClick(student._id, student.name, "droppedout");
-              setAction("admit student");
+              setAction("drop student out");
             }}
             className="text-green-600 font-extrabold hover:text-green-900 ml-3"
           >
-            Dropout
+            DROPOUT
           </button>
         ) : (
           ""
