@@ -981,12 +981,14 @@ const StudentManagement: React.FC = () => {
                       ) : (
                         ""
                       )}
+                       {hasPermission(loggedUser as TeamMember, "payment", "pay") ? (
                       <th
                         scope="col"
                         className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell"
                       >
                         Payment Status
                       </th>
+                       ):("")}
                       <th
                         scope="col"
                         className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -1042,6 +1044,7 @@ const StudentManagement: React.FC = () => {
                         ) : (
                           ""
                         )}
+                         {hasPermission(loggedUser as TeamMember, "payment", "pay") ? (
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden md:table-cell">
                           <div className="text-sm text-gray-900">
                             {payment &&
@@ -1063,6 +1066,9 @@ const StudentManagement: React.FC = () => {
                             )}
                           </div>
                         </td>
+                        ) : (
+                          ""
+                          )}
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex  gap-2">
                             {renderActionButtons(student)}
