@@ -124,7 +124,7 @@ const Past: React.FC = () => {
     try {
       formData.user = loggedUser?.name;
       const response = await axios.post(
-        `${API_BASE_URL}/students/apply`,
+        `${API_BASE_URL}/students/past`,
         formData,
         {
           headers: {
