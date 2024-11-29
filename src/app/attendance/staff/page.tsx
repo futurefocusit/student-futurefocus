@@ -15,6 +15,7 @@ type GroupedAttendance = {
 };
 
 const AttendancePage: React.FC = () => {
+  const [location, setLocation] = useState({ latitude: "", longitude: "" });
   const [attendance, setAttendance] = useState<memberAttendanceRecord[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -48,7 +49,14 @@ const AttendancePage: React.FC = () => {
       setIsLoading(false);
     }
   };
-
+const getLocationFromIP = async () => {
+  const response = await fetch("https://ipapi.co/json/");
+  const data = await response.json();
+  setLocation({
+    latitude: data.latitude,
+    longitude: data.longitude,
+  });
+};
   const handleResponse = async (id: string,phone:string) => {
     try {
       await axios.put(`${API_BASE_URL}/member/response/${id}`, { response,phone });
@@ -60,20 +68,33 @@ const AttendancePage: React.FC = () => {
 
   useEffect(() => {
     fetchAttendance();
+    getLocationFromIP()
   }, []);
 
   const markAttendance = async (recordId: string) => {
     try {
-      await axios.put(`${API_BASE_URL}/member/approve-attend/${recordId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("ffa-team-member")}`,
-        },
-      });
+      await axios.put(
+        `${API_BASE_URL}/member/approve-attend/${recordId}`,
+        location,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("ffa-team-member")}`,
+          },
+        }
+      );
       toast.success("Attendance marked successfully!");
       await fetchAttendance();
     } catch (error) {
-      console.error("Error marking attendance:", error);
-      toast.error("Failed to mark attendance.");
+      //@ts-expect-error error
+      if (error.response) {
+        //@ts-expect-error error
+        toast.error(error.response.message);
+        //@ts-expect-error error
+      } else if (error.request) {
+        toast.error("failed to attend. try again");
+      } else {
+        toast.error("failed to attend. try again");
+      }
     }
   };
 

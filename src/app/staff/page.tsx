@@ -24,8 +24,8 @@ interface AttendanceRecord {
 type GroupedAttendance = {
   [key: string]: AttendanceRecord[];
 };
-
 const AttendancePage: React.FC = () => {
+  const [location,setLocation]= useState({latitude:"",longitude:""})
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -46,7 +46,7 @@ const AttendancePage: React.FC = () => {
         `${API_BASE_URL}/member/my-attendance/${loggedUser._id}`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("ffa-team-member")}`,
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
           },
         }
       );
@@ -73,37 +73,71 @@ const AttendancePage: React.FC = () => {
       
     }
   }
+   const getLocationFromIP = async () => {
+     const response = await fetch("https://ipapi.co/json/");
+     const data = await response.json();
+     setLocation({
+      latitude:data.latitude,
+      longitude:data.longitude
+     })
+     
+   };
 
   useEffect(() => {
     fetchAttendance();
+    getLocationFromIP()
+    console.log(location)
   }, []);
+
 
   const markAttendance = async (recordId: string) => {
     if (!loggedUser) return;
     try {
-      await axios.put(`${API_BASE_URL}/member/request-attend/${recordId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("ffa-team-member")}`,
-        },
-      });
+      await axios.put(
+        `${API_BASE_URL}/member/request-attend/${recordId}`,
+        location,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+          },
+        }
+      );
       toast.success("Attendance marked successfully!");
       await fetchAttendance();
     } catch (error) {
-      toast.error("Failed to mark attendance.");
+      //@ts-expect-error error
+      if (error.response) {
+        //@ts-expect-error error
+        toast.error(error.response.message);
+        //@ts-expect-error error
+      } else if (error.request) {
+        toast.error("failed to attend. try again");
+      } else {
+        toast.error("failed to attend. try again");
+      }
     }
   };
   const handleLeave = async (recordId: string) => {
     if (!loggedUser) return;
     try {
-      await axios.put(`${API_BASE_URL}/member/leave/${recordId}`, {
+      await axios.put(`${API_BASE_URL}/member/leave/${recordId}`,location, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("ffa-team-member")}`,
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
         },
       });
       toast.success("thank you for coming");
       await fetchAttendance();
     } catch (error) {
-      toast.error("Failed to leave. try again");
+      //@ts-expect-error error
+      if (error.response) {
+        //@ts-expect-error error
+        toast.error(error.response.message);
+        //@ts-expect-error error
+      } else if (error.request) {
+        toast.error("failed to leave. try again");
+      } else {
+        toast.error("failed to leave. try again");
+      }
     }
   };
 
