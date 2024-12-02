@@ -257,7 +257,8 @@ const PaymentsPage: React.FC = () => {
             CASHFLOW
           </h2>
         </div>
-        <div className=" flex  flex-col lg:flex-row justify-center w-1/4 gap-5">
+         {hasPermission(loggedUser as TeamMember, "cashflow", "view")?
+       ( <div className=" flex  flex-col lg:flex-row justify-center w-1/4 gap-5">
           <div className=" flex  flex-col gap-2 items-center lg:justify-start">
             <FaRightToBracket size={40} className="text-green-500" />
             <p className="text-lg font-extrabold text-green-500">
@@ -284,8 +285,8 @@ const PaymentsPage: React.FC = () => {
               {result.difference.toLocaleString()} {"Frw"}
             </p>
           </div>
-        </div>
-
+        </div>):""
+}
         <div className="flex justify-around p-4 flex-wrap gap-4">
           <DatePicker
             selected={selectedDate}
