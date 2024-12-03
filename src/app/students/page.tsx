@@ -520,6 +520,16 @@ const StudentManagement: React.FC = () => {
         >
           VIEW
         </button>
+        {hasPermission(loggedUser as TeamMember, "students", "attend") ? (
+          <button
+            onClick={() => handleUpdateStudent(student)}
+            className="text-green-600 font-extrabold hover:text-green-900 ml-3"
+          >
+            UPDATE
+          </button>
+        ) : (
+          ""
+        )}
         {hasPermission(loggedUser as TeamMember, "students", "delete") ? (
           <button
             onClick={() => {
@@ -562,7 +572,7 @@ const StudentManagement: React.FC = () => {
         {hasPermission(loggedUser as TeamMember, "students", "comment") ? (
           <div className="">
             <input
-              className="p-1 bg-gray-200 border-2  border-gray-500 rounded-md"
+              className="p-1 bg-gray-200 border-  2  border-gray-500 rounded-md"
               type="text"
               placeholder="type comment..."
               defaultValue={student.comment}
