@@ -9,6 +9,11 @@ import withMemberAuth from "@/components/withMemberAuth";
 import { isToday } from "@/libs/formatDate";
 import SideBar from "@/components/SideBar";
 
+interface ICharge{
+  type:string
+  amount:number
+  status:string
+}
 interface AttendanceRecord {
   _id: string;
   name: string;
@@ -19,7 +24,10 @@ interface AttendanceRecord {
   timeOut: string;
   comment:string
   response:string
+  charge:ICharge
+
 }
+
 
 type GroupedAttendance = {
   [key: string]: AttendanceRecord[];
@@ -237,7 +245,7 @@ const AttendancePage: React.FC = () => {
               <h2 className="text-xl font-semibold mb-2">{date}</h2>
               <table className="min-w-full">
                 <thead>
-                  <tr className=" grid grid-cols-6">
+                  <tr className=" grid grid-cols-7">
                     <th className="border-b-2 border-gray-300 p-2 text-left">
                       TIME IN
                     </th>
@@ -256,11 +264,14 @@ const AttendancePage: React.FC = () => {
                     <th className="border-b-2 border-gray-300 p-2 text-left">
                       RESPONSE
                     </th>
+                    <th className="border-b-2 border-gray-300 p-2 text-left">
+                      Reward 
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {records.map((record) => (
-                    <tr key={record._id} className="grid grid-cols-6 gap-3 overflow-auto">
+                    <tr key={record._id} className="grid grid-cols-7 gap-3 overflow-auto">
                       <td className="border-b border-gray-200 p-2 ">
                         {record.status === "present" ||
                         record.status === "pending"
@@ -319,6 +330,11 @@ const AttendancePage: React.FC = () => {
                         <p className=" text-green-600 font-bold px-2 py-1 rounded">
                           {record.response}
                         </p>
+                      </td>
+                      <td className="border-b  border-gray-200 p-2 ">
+                        {record?.charge?.amount?(<p className={` ${record?.charge?.amount>=0?'text-green-600':'text-red-600'} font-bold px-2 py-1 rounded`}>
+                          {record?.charge?.amount} {"frw"} 
+                        </p>):" "}
                       </td>
                     </tr>
                   ))}
