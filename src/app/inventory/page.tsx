@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Message from "@/components/message";
-import{
+import {
   PopupForm,
   PopupFormCategory,
 } from "@/components/inventoryPopup";
@@ -13,91 +13,100 @@ import withAdminAuth from "@/components/withAdminAuth";
 import SideBar from "@/components/SideBar";
 import Loader from "@/components/loader";
 import { ShoppingCart } from "lucide-react";
-import { useCart } from "@/context/cartContext";
+import { CartItem, useCart } from "@/context/cartContext";
 import Cart from "@/components/cart";
-
+interface IMaterial {
+  _id:string
+  materialName: string;
+  category: {name:string,_id:string};
+  amount: number;
+  SN:string,
+  type:string
+  rent: number;
+}
+export interface IMaterialRent {
+  _id:string
+  materialId: IMaterial;
+  render: {name:string,_id:string};
+  receiver: {name:string,_id:string};
+  rendeeName: String; 
+  returnDate: Date;
+  returnedDate: Date;
+  returned:boolean
+  amount: number;
+  cost: number;
+  createdAt:Date
+  
+}
 const MaterialManagement: React.FC = () => {
   const { fetchLoggedUser, loggedUser } = useAuth();
   const { addToCart, cartItems } = useCart();
-  const [materials, setMaterials] = useState([]);
+  const [materials, setMaterials] = useState<IMaterial[]>([]);
   const [category, setCategory] = useState([]);
-  const [rentedMaterials, setRentedMaterials] = useState([]);
+  const [rentedMaterials, setRentedMaterials] = useState<IMaterialRent[]>([]);
   const [showPopupNM, setShowPopupNM] = useState(false);
   const [showPopupNC, setShowPopupNC] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [showCart, setShowCart] = useState(false);
-  const [message, setMessage] = useState<{ type: string; text: string } | null>(
-    null
-  );
-  const [activeTab, setActiveTab] = useState<
-    "materials" | "rented" | "category"
-  >("materials");
+  const [message, setMessage] = useState<{ type: string; text: string } | null>(null);
+  const [activeTab, setActiveTab] = useState<"materials" | "rented" | "category">("materials");
 
-const fetchMaterials = async () => {
-  try {
-    setLoading(true);
-    const response = await axios.get(`${API_BASE_URL}/inventory`);
-    setMaterials(response.data);
-    await fetchLoggedUser();
-  } catch (error) {
-    setMessage({ type: "error", text: "Failed to load materials" });
-  } finally {
-    setLoading(false);
-  }
-};
+  const fetchMaterials = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API_BASE_URL}/inventory`);
+      setMaterials(response.data);
+      await fetchLoggedUser();
+    } catch (error) {
+      setMessage({ type: "error", text: "Failed to load materials" });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-const fetchCategory = async () => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/inventory/category`);
-    setCategory(response.data);
-  } catch (error) {
-    setMessage({ type: "error", text: "Failed to load category" });
-  }
-};
+  const fetchCategory = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/inventory/category`);
+      setCategory(response.data);
+    } catch (error) {
+      setMessage({ type: "error", text: "Failed to load category" });
+    }
+  };
 
-const fetchRented = async () => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/inventory/rent`);
-    setRentedMaterials(response.data);
-  } catch (error) {
-    setMessage({ type: "error", text: "Failed to load rented materials" });
-  }
-};
-const handleReturn = async (id: string) => {
-  try {
-    await axios.put(`${API_BASE_URL}/inventory/${id}`, {
-      receiver: loggedUser?._id,
-    });
-    toast.success("item returned");
-    await axios.get(`${API_BASE_URL}/inventory`);
-    await fetchRented();
-  } catch (error) {
-    toast.error("failed to return item");
-  }
-};
+  const fetchRented = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/inventory/rent`);
+      setRentedMaterials(response.data);
+    } catch (error) {
+      setMessage({ type: "error", text: "Failed to load rented materials" });
+    }
+  };
 
-useEffect(() => {
-  fetchRented();
-  fetchMaterials();
-  fetchCategory();
-}, []);
+  const handleReturn = async (id: string) => {
+    try {
+      await axios.put(`${API_BASE_URL}/inventory/${id}`, {
+        receiver: loggedUser?._id,
+      });
+      toast.success("Item returned");
+      await fetchRented();
+    } catch (error) {
+      toast.error("Failed to return item");
+    }
+  };
 
-const handleRentSuccess = (message: string) => {
-  setMessage({ type: "success", text: message });
-  // setShowPopupRent(false);
-};
-if (loading) {
-  return (
-    <div className="text-center mt-20">
-      <SideBar />
-      <Loader />
-    </div>
-  );
-}
-//@ts-expect-error eror
-  const handleAddToCart = (material) => {
-    const amount = 1; // Default amount, you could add an input for this
-    if (material.amount-material.rent> amount) {
+  useEffect(() => {
+    fetchRented();
+    fetchMaterials();
+    fetchCategory();
+  }, []);
+
+  const handleRentSuccess = (message: string) => {
+    setMessage({ type: "success", text: message });
+  };
+
+  const handleAddToCart = (material:CartItem) => {
+    const amount = 1; // Default amount
+    if (material.amount - material.rent < amount) {
       toast.error("This item hit maximum");
       return;
     }
@@ -105,12 +114,49 @@ if (loading) {
     toast.success("Added to cart");
   };
 
+  const handleUpdate = async (material:IMaterial) => {
+    try {
+      // Simulating the updated material's data. You may want to open a form for this.
+      const updatedMaterial = {
+        materialName: material.materialName, // Replace with updated values
+        amount: material.amount, // Replace with updated values
+        rent: material.rent, // Replace with updated values
+        category: material.category._id, // Replace with updated category ID
+      };
+      
+      await axios.patch(`${API_BASE_URL}/inventory/${material._id}`, updatedMaterial);
+      toast.success("Material updated successfully!");
+      fetchMaterials(); // Refetch materials to reflect changes
+    } catch (error) {
+      toast.error("Failed to update material.");
+    }
+  };
+
+  const handleDelete = async (material:IMaterial) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/inventory/${material._id}`);
+      toast.success("Material deleted successfully!");
+      fetchMaterials(); // Refetch materials to reflect changes
+    } catch (error) {
+      toast.error("Failed to delete material.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="text-center mt-20">
+        <SideBar />
+        <Loader />
+      </div>
+    );
+  }
+
   return (
     <>
       <SideBar />
       <div className="p-4 mx-auto container">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-center ">INVENTORY MANAGEMENT</h1>
+          <h1 className="text-2xl font-bold text-center">INVENTORY MANAGEMENT</h1>
           <button
             onClick={() => setShowCart(true)}
             className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded"
@@ -135,13 +181,10 @@ if (loading) {
           >
             NEW MATERIAL
           </button>
-       
           <button
             onClick={() => setActiveTab("materials")}
             className={`mr-2 px-4 py-2 rounded ${
-              activeTab === "materials"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200"
+              activeTab === "materials" ? "bg-blue-500 text-white" : "bg-gray-200"
             }`}
           >
             MATERIALS
@@ -157,9 +200,7 @@ if (loading) {
           <button
             onClick={() => setActiveTab("category")}
             className={`px-4 py-2 rounded ${
-              activeTab === "category"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200"
+              activeTab === "category" ? "bg-blue-500 text-white" : "bg-gray-200"
             }`}
           >
             CATEGORY
@@ -181,24 +222,11 @@ if (loading) {
               </thead>
               <tbody>
                 {materials.map((material) => (
-                  // @ts-expect-error error
                   <tr key={material._id} className="hover:bg-gray-100">
-                    <td className="border border-gray-300 p-2">
-                      {/* @ts-expect-error error */}
-                      {material.materialName}
-                    </td>
-                    <td className="border border-gray-300 p-2">
-                      {/* @ts-expect-error error */}
-                      {material.amount}
-                    </td>
-                    <td className="border border-gray-300 p-2">
-                      {/* @ts-expect-error error */}
-                      {material.category.name}
-                    </td>
-                    <td className="border border-gray-300 p-2">
-                      {/* @ts-expect-error error */}
-                      {material.rent}
-                    </td>
+                    <td className="border border-gray-300 p-2">{material.materialName}</td>
+                    <td className="border border-gray-300 p-2">{material.amount}</td>
+                    <td className="border border-gray-300 p-2">{material.category.name}</td>
+                    <td className="border border-gray-300 p-2">{material.rent}</td>
                     <td className="border border-gray-300 p-2 flex gap-3">
                       <button
                         onClick={() => handleAddToCart(material)}
@@ -207,16 +235,16 @@ if (loading) {
                         Add to Cart
                       </button>
                       <button
-                        onClick={() => handleAddToCart(material)}
+                        onClick={() => handleDelete(material)} // Corrected delete function
                         className="bg-red-500 text-white px-2 py-1 rounded"
                       >
-                       delete
+                        Delete
                       </button>
                       <button
-                        onClick={() => handleAddToCart(material)}
+                        onClick={() => handleUpdate(material)} // Corrected update function
                         className="bg-blue-500 text-white px-2 py-1 rounded"
                       >
-                       update
+                        Update
                       </button>
                     </td>
                   </tr>
@@ -244,44 +272,17 @@ if (loading) {
               </thead>
               <tbody>
                 {rentedMaterials.map((rented) => (
-                  //@ts-expect-error error
                   <tr key={rented._id} className="hover:bg-gray-100">
+                    <td className="border border-gray-300 p-2">{rented.materialId.materialName}</td>
+                    <td className="border border-gray-300 p-2">{rented.amount}</td>
+                    <td className="border border-gray-300 p-2">{rented.render.name}</td>
+                    <td className="border border-gray-300 p-2">{rented.rendeeName}</td>
+                    <td className="border border-gray-300 p-2">{new Date(rented.createdAt).toDateString()}</td>
+                    <td className="border border-gray-300 p-2">{new Date(rented?.returnDate)?.toDateString()}</td>
+                    <td className="border border-gray-300 p-2">{rented?.receiver?.name}</td>
                     <td className="border border-gray-300 p-2">
-                      {/* @ts-expect-error error */}
-                      {rented.materialId.materialName}
-                    </td>
-                    <td className="border border-gray-300 p-2">
-                      {/* @ts-expect-error error */}
-                      {rented.amount}
-                    </td>
-                    <td className="border border-gray-300 p-2">
-                      {/* @ts-expect-error error */}
-                      {rented.render.name}
-                    </td>
-                    <td className="border border-gray-300 p-2">
-                      {/* @ts-expect-error error */}
-                      {rented.rendeeName}
-                    </td>
-                    <td className="border border-gray-300 p-2">
-                      {/* @ts-expect-error error */}
-                      {new Date(rented.createdAt).toDateString()}
-                    </td>
-                    <td className="border border-gray-300 p-2">
-                      {/* @ts-expect-error error */}
-                      {new Date(rented?.returnDate)?.toDateString()}
-                    </td>
-                    <td className="border border-gray-300 p-2">
-                      {/* @ts-expect-error error */}
-                      {rented?.receiver?.name}
-                    </td>
-                    <td className="border border-gray-300 p-2">
-                      {/* @ts-expect-error error */}
-                      {rented.returned ? (
-                        //@ts-expect-error error
-                        new Date(rented?.returnedDate)?.toDateString()
-                      ) : (
+                      {rented.returned ? new Date(rented?.returnedDate)?.toDateString() : (
                         <button
-                          //@ts-expect-error error
                           onClick={() => handleReturn(rented._id)}
                           className="text-white bg-blue-700 p-2 rounded hover:bg-blue-500"
                         >
@@ -306,13 +307,9 @@ if (loading) {
                 </tr>
               </thead>
               <tbody>
-                {category.map((category) => (
-                  // @ts-expect-error error
+                {category.map((category:{name:string,_id:string}) => (
                   <tr key={category._id} className="hover:bg-gray-100">
-                    <td className="border border-gray-300 p-2">
-                      {/* @ts-expect-error error */}
-                      {category.name}
-                    </td>
+                    <td className="border border-gray-300 p-2">{category.name}</td>
                   </tr>
                 ))}
               </tbody>
@@ -344,7 +341,7 @@ if (loading) {
           <Cart
             isOpen={showCart}
             onClose={() => setShowCart(false)}
-            loggedUser={loggedUser as { _id: string,name:string }}
+            loggedUser={loggedUser as { _id: string; name: string }}
           />
         )}
       </div>
