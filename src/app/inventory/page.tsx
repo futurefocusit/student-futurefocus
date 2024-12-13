@@ -29,7 +29,7 @@ export interface IMaterialRent {
   materialId: IMaterial;
   render: {name:string,_id:string};
   receiver: {name:string,_id:string};
-  rendeeName: String; 
+  rendeeName: string; 
   returnDate: Date;
   returnedDate: Date;
   returned:boolean
