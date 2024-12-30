@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import API_BASE_URL from "@/config/baseURL";
-import { Search } from "lucide-react";
+import { Search } from 'lucide-react';
 import SideBar from "@/components/SideBar";
 import withAdminAuth from "@/components/withAdminAuth";
 import { IInvoice, TeamMember } from "@/types/types";
@@ -25,11 +25,12 @@ interface Student {
   _id: string;
   name: string;
   email: string;
+  referer: "default" | "cyd";
   phone: string;
   intake: string;
-  selectedCourse: string
+  selectedCourse: string;
   message: string;
-  selectedShift: {_id:string,name:string,start:string,end:string};
+  selectedShift: { _id: string; name: string; start: string; end: string };
   updatedAt: string;
   createdAt: string;
   status: string;
@@ -45,10 +46,9 @@ interface Payment {
 }
 
 interface Course {
-
   title: string;
-  _id:string
-  shifts: {name:string,_id:string,start:string,end:string}[];
+  _id: string;
+  shifts: { name: string; _id: string; start: string; end: string }[];
 }
 
 interface GroupedStudents {
@@ -65,10 +65,10 @@ const StudentManagement: React.FC = () => {
   } else {
     defaultFilter = "pending";
   }
-  const [confirmModelOpen,SetConfirmModel]=useState(false)
-  const [confirmStatusModelOpen,SetConfirmStatusModel]=useState(false)
-  const [confirmAttendModelOpen,SetConfirmAttendModel]=useState(false)
-  const [confirmSaveModelOpen,SetConfirmSaveModel]=useState(false)
+  const [confirmModelOpen, SetConfirmModel] = useState(false);
+  const [confirmStatusModelOpen, SetConfirmStatusModel] = useState(false);
+  const [confirmAttendModelOpen, SetConfirmAttendModel] = useState(false);
+  const [confirmSaveModelOpen, SetConfirmSaveModel] = useState(false);
   const [students, setStudents] = useState<Student[]>([]);
   const [payment, setPayment] = useState<Payment[]>([]);
   const [groupedStudents, setGroupedStudents] = useState<GroupedStudents>({});
@@ -78,30 +78,28 @@ const StudentManagement: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>(defaultFilter);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [type, setType] = useState("");
-  const [studentCounts, setStudentCounts] = useState<Record<string, number>>(
-    {}
-  );
-  
+  const [studentCounts, setStudentCounts] = useState<Record<string, number>>({});
   const [char, Setchar] = useState(145);
   const [message, setMessage] = useState("");
-  const [status, setStatus]=useState('pending')
+  const [status, setStatus] = useState("pending");
   const [isOpenMessage, setOpenMessage] = useState(false);
   const [openView, setOpenView] = useState(false);
-  const [action,setAction]=useState('')
-  const [isloading,setIsLoading]= useState(false)
+  const [action, setAction] = useState("");
+  const [isloading, setIsLoading] = useState(false);
   const [openPay, setOpenPay] = useState(false);
-  const [commentText, setComment] = useState({ comment: "" , student:''});
+  const [commentText, setComment] = useState({ comment: "", student: "" });
   const [courses, setCourses] = useState<Course[]>([]);
-  const [student,setStudent]=useState<string|null>('')
+  const [student, setStudent] = useState<string | null>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [isPaying, setIsPaying] = useState<boolean>(false);
   const [updateMode, setUpdateMode] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
-   const [item, setItem] = useState<string | null>(null);
-   const [items, setItems] = useState({itemId:"",name:"",status:''});
+  const [item, setItem] = useState<string | null>(null);
+  const [items, setItems] = useState({ itemId: "", name: "", status: "" });
   const { fetchLoggedUser, loggedUser } = useAuth();
+  const [refererFilter, setRefererFilter] = useState<string>("default");
 
   const [studentToRegister, setStudentToRegister] = useState<{
     id: string;
@@ -117,14 +115,14 @@ const StudentManagement: React.FC = () => {
     setError(null);
     setSucces(null);
   };
-   const handleDeleteClick = (itemId: string) => {
-     setItem(itemId);
-     SetConfirmModel(true); 
-   };
-   const handleStatusClick = (itemId: string,name:string,status:string) => {
-     setItems({itemId,name,status});   
-     SetConfirmStatusModel(true); 
-   };
+  const handleDeleteClick = (itemId: string) => {
+    setItem(itemId);
+    SetConfirmModel(true);
+  };
+  const handleStatusClick = (itemId: string, name: string, status: string) => {
+    setItems({ itemId, name, status });
+    SetConfirmStatusModel(true);
+  };
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
 
@@ -158,7 +156,7 @@ const StudentManagement: React.FC = () => {
     );
   };
   const handleSend = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       if (message.trim()) {
         const response = await axios.post(
@@ -175,8 +173,8 @@ const StudentManagement: React.FC = () => {
       }
     } catch (error) {
       setError("internal server error");
-    }finally{
-      setIsLoading(false)
+    } finally {
+      setIsLoading(false);
     }
   };
   const handleFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -205,7 +203,7 @@ const StudentManagement: React.FC = () => {
     newStatus: string,
     user: string
   ) => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const ourlogo = await convertImageUrlToBase64(imageUrl as string);
       const data: IInvoice = {
@@ -236,8 +234,8 @@ const StudentManagement: React.FC = () => {
       console.log(error);
       setSucces(null);
       setError("failed to change status");
-    }finally{
-      setIsLoading(false)
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -280,7 +278,7 @@ const StudentManagement: React.FC = () => {
   };
   const handleExtra = async (id: string) => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const response = await axios.put(
         `${API_BASE_URL}/payment/extra/${id}`,
         formData
@@ -292,8 +290,8 @@ const StudentManagement: React.FC = () => {
       console.log(error);
       setError("Error happened! check payment and try again");
       setSucces(null);
-    }finally{
-      setIsLoading(false)
+    } finally {
+      setIsLoading(false);
     }
   };
   const setCommentText = (value: string) => {
@@ -309,7 +307,6 @@ const StudentManagement: React.FC = () => {
       );
       setStudents(sortedStudents);
       setStudentCounts(getStudentCountByStatus(sortedStudents));
-      filterStudents(activeFilter, sortedStudents);
     } catch (error) {
       console.error("Error fetching student data:", error);
       setError("Failed to load student data. Please try again later.");
@@ -329,21 +326,20 @@ const StudentManagement: React.FC = () => {
   const handleUpdateStudent = async (student: Student) => {
     setSelectedStudent(student);
     setUpdateMode(true);
-
   };
 
   const handleSaveUpdate = async () => {
     if (!selectedStudent) return;
 
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       await axios.put(
         `${API_BASE_URL}/students/update/${selectedStudent._id}`,
         {
           selectedCourse: selectedStudent.selectedCourse,
           selectedShift: selectedStudent.selectedShift,
           intake: selectedStudent.intake,
-          name:selectedStudent.name
+          name: selectedStudent.name,
         }
       );
       setSucces("updated student successfully");
@@ -355,8 +351,8 @@ const StudentManagement: React.FC = () => {
       console.error("Error updating student:", error);
       setSucces(null);
       setError("Failed to update student. Please try again.");
-    }finally{
-      setIsLoading(false)
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -382,29 +378,34 @@ const StudentManagement: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchStudents();
+    fetchStudents()
+      .then(() => {
+        filterStudents(activeFilter, refererFilter);
+      });
     fetchPayment();
     fetchCourses();
   }, []);
 
   const handleDelete = async (id: string) => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       await axios.delete(`${API_BASE_URL}/students/${id}`);
-      const updatedStudents = students.filter((student) => student._id !== id);
+      const updatedStudents = students.filter(
+        (student) => student._id !== id
+      );
       setStudents(updatedStudents);
-      filterStudents(activeFilter, updatedStudents);
+      filterStudents(activeFilter, refererFilter, updatedStudents);
       setSelectedStudent(null);
       setError(null);
       setSucces("deleted student successfully");
     } catch (error) {
       console.error("Error deleting student:", error);
       setError("Failed to delete student. Please try again.");
-    }finally{
-      SetConfirmModel(false)
-      setIsLoading(false)
+    } finally {
+      SetConfirmModel(false);
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleView = (student: Student) => {
     setOpenView(true);
@@ -426,38 +427,34 @@ const StudentManagement: React.FC = () => {
     newStatus: string,
     user: string
   ) => {
-    // if (newStatus === "registered") {
-    //   setStudentToRegister({ id, name });
-    //   setIsPaymentModalOpen(true);
-    //   return;
-    // }
-
     try {
       await processStatusChange(id, name, newStatus, user);
-      
     } catch (error) {
-      console.error(`Error changing student status to ${newStatus}:`, error);
+      console.error(
+        `Error changing student status to ${newStatus}:`,
+        error
+      );
       setError(
         `Failed to change student status to ${newStatus}. Please try again.`
       );
-    }finally{
+    } finally {
       SetConfirmStatusModel(false);
     }
   };
   const handleAttend = async (id: string) => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       await axios.put(`${API_BASE_URL}/students/attend/${id}`);
       toast.success("attend succesfully");
       setError(null);
       await fetchStudents();
     } catch (error) {
       console.log(error);
-     toast.error(`Failed to attend student. Please try again.`);
+      toast.error(`Failed to attend student. Please try again.`);
       setError(null);
-    }finally{
-      setIsLoading(false)
-      SetConfirmAttendModel(false)
+    } finally {
+      setIsLoading(false);
+      SetConfirmAttendModel(false);
     }
   };
 
@@ -471,12 +468,15 @@ const StudentManagement: React.FC = () => {
 
   const filterStudents = (
     status: string,
+    referer: string,
     studentsData: Student[] = students
   ) => {
     setActiveFilter(status);
+    setRefererFilter(referer);
     setSearchTerm("");
     const filteredStudents = studentsData.filter(
-      (student) => student.status === status
+      (student) =>
+        student.status === status && (referer === "all" || student.referer === referer)
     );
     groupStudentsByIntake(filteredStudents);
   };
@@ -487,6 +487,7 @@ const StudentManagement: React.FC = () => {
     const filteredStudents = students.filter(
       (student) =>
         student.status === activeFilter &&
+        (refererFilter === "all" || student.referer === refererFilter) &&
         (student.name.toLowerCase().includes(searchValue) ||
           student.email.toLowerCase().includes(searchValue) ||
           student.phone.toLowerCase().includes(searchValue))
@@ -494,9 +495,9 @@ const StudentManagement: React.FC = () => {
     groupStudentsByIntake(filteredStudents);
   };
 
-  const handleSaveComment = async (student:string) => {
+  const handleSaveComment = async (student: string) => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       await axios.put(`${API_BASE_URL}/students/comment/${student}`, {
         comment: commentText.comment,
       });
@@ -506,8 +507,8 @@ const StudentManagement: React.FC = () => {
     } catch (error) {
       console.error("Error saving comment:", error);
       setError("Failed to save comment. Please try again.");
-    }finally{
-      setIsLoading(false)
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -603,9 +604,10 @@ const StudentManagement: React.FC = () => {
 
             {hasPermission(loggedUser as TeamMember, "students", "admit") ? (
               <button
-                onClick={() =>{
-                 handleStatusClick(student._id, student.name, "accepted"); setAction('admit student')}
-                }
+                onClick={() => {
+                  handleStatusClick(student._id, student.name, "accepted");
+                  setAction("admit student");
+                }}
                 className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
                 ADMIT
@@ -641,16 +643,10 @@ const StudentManagement: React.FC = () => {
             )}
             {hasPermission(loggedUser as TeamMember, "students", "register") ? (
               <button
-                onClick={() =>
-                  // handleStatusChange(
-                  //   student._id,
-                  //   student.name,
-                  //   "registered",
-                  //   loggedUser?.name as string
-                  // )
-                   {setStudentToRegister({ id:student._id, name:student.name });
-                    setIsPaymentModalOpen(true);}
-                }
+                onClick={() => {
+                  setStudentToRegister({ id: student._id, name: student.name });
+                  setIsPaymentModalOpen(true);
+                }}
                 className="text-blue-600 font-extrabold hover:text-blue-900 ml-3"
               >
                 REGISTER
@@ -767,8 +763,11 @@ const StudentManagement: React.FC = () => {
 
             {hasPermission(loggedUser as TeamMember, "students", "attend") ? (
               <button
-                onClick={() =>{SetConfirmAttendModel(true); setAction('Attend Student');
-                  setStudent(student._id)}}
+                onClick={() => {
+                  SetConfirmAttendModel(true);
+                  setAction("Attend Student");
+                  setStudent(student._id);
+                }}
                 className="text-green-600 font-extrabold hover:text-green-900 ml-3"
               >
                 ATTEND
@@ -784,14 +783,6 @@ const StudentManagement: React.FC = () => {
             {commonButtons}
             {hasPermission(loggedUser as TeamMember, "students", "update") ? (
               <button
-                // onClick={() =>
-                //   handleStatusChange(
-                //     student._id,
-                //     student.name,
-                //     "started",
-                //     loggedUser?.name as string
-                //   )
-                // }
                 onClick={() => {
                   handleStatusClick(student._id, student.name, "started");
                   setAction("reactivate student");
@@ -847,16 +838,15 @@ const StudentManagement: React.FC = () => {
               href="/past-student"
               className="px-4 mx-10 py-2 bg-blue-400 hover:bg-blue-700 rounded-lg text-white font-bold"
             >
-             PAST-STUDENT
+              PAST-STUDENT
             </a>
           )}
         </div>
         {error ||
           (succes && (
             <p
-              className={`${
-                error ? " text-red-600" : "text-green-500"
-              } p-4 text-center`}
+              className={`${error ? " text-red-600" : "text-green-500"
+                } p-4 text-center`}
             >
               {error}
             </p>
@@ -876,55 +866,70 @@ const StudentManagement: React.FC = () => {
                 <button
                   key={status}
                   onClick={() => {
-                    filterStudents(status);
+                    filterStudents(status, refererFilter);
                     setStatus(status);
                   }}
-                  className={`px-3 py-1 flex gap-1  text-xs sm:text-sm font-extrabold text-white   border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
-                    activeFilter === status ? "bg-green-20" : ""
-                  } ${
-                    status === "pending"
+                  className={`px-3 py-1 flex gap-1  text-xs sm:text-sm font-extrabold text-white   border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${activeFilter === status ? "bg-green-20" : ""
+                    } ${status === "pending"
                       ? "bg-yellow-600"
                       : status === "accepted"
-                      ? "bg-blue-600"
-                      : status === "droppedout"
-                      ? "bg-red-600"
-                      : status === "registered"
-                      ? "bg-green-400"
-                      : status === "started"
-                      ? "bg-green-500"
-                      : "bg-green-900"
-                  }`}
+                        ? "bg-blue-600"
+                        : status === "droppedout"
+                          ? "bg-red-600"
+                          : status === "registered"
+                            ? "bg-green-400"
+                            : status === "started"
+                              ? "bg-green-500"
+                              : "bg-green-900"
+                    }`}
                 >
                   <p className="pt-3 text-md ">
                     {status === "pending"
                       ? `CANDIDATES  `
                       : status === "accepted"
-                      ? `ADMITTED `
-                      : status === "droppedout"
-                      ? `DROPOUT`
-                      : status === "started"
-                      ? `ACTIVE `
-                      : `${status.toUpperCase()}`}
+                        ? `ADMITTED `
+                        : status === "droppedout"
+                          ? `DROPOUT`
+                          : status === "started"
+                            ? `ACTIVE `
+                            : `${status.toUpperCase()}`}
                   </p>
                   <p
-                    className={`items-start   bg-white rounded-full p-1 font-extrabold ${
-                      status === "pending"
-                        ? "text-yellow-600"
-                        : status === "accepted"
+                    className={`items-start   bg-white rounded-full p-1 font-extrabold ${status === "pending"
+                      ? "text-yellow-600"
+                      : status === "accepted"
                         ? "text-blue-600"
                         : status === "droppedout"
-                        ? "text-red-600"
-                        : status === "registered"
-                        ? "text-green-400"
-                        : status === "started"
-                        ? "text-green-500"
-                        : "text-green-900"
-                    }`}
+                          ? "text-red-600"
+                          : status === "registered"
+                            ? "text-green-400"
+                            : status === "started"
+                              ? "text-green-500"
+                              : "text-green-900"
+                      }`}
                   >
                     {studentCounts[status] || 0}
                   </p>
                 </button>
               ))}
+            </div>
+            <div className="flex items-center space-x-2 mt-4">
+              <label
+                htmlFor="refererFilter"
+                className="font-medium text-gray-700"
+              >
+                Filter by Referer:
+              </label>
+              <select
+                id="refererFilter"
+                value={refererFilter}
+                onChange={(e) => filterStudents(activeFilter, e.target.value)}
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              >
+                <option value="all">All</option>
+                <option value="default">Default</option>
+                <option value="cyd">CYD</option>
+              </select>
             </div>
             <div className="relative w-full sm:w-64">
               <input
@@ -952,8 +957,7 @@ const StudentManagement: React.FC = () => {
                     <tr>
                       <th
                         scope="col"
-                        className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
+                        className="px-3py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {" "}
                         <input
                           type="checkbox"
@@ -991,14 +995,14 @@ const StudentManagement: React.FC = () => {
                       ) : (
                         ""
                       )}
-                       {hasPermission(loggedUser as TeamMember, "payment", "pay") ? (
-                      <th
-                        scope="col"
-                        className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell"
-                      >
-                        Payment Status
-                      </th>
-                       ):("")}
+                      {hasPermission(loggedUser as TeamMember, "payment", "pay") ? (
+                        <th
+                          scope="col"
+                          className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell"
+                        >
+                          Payment Status
+                        </th>
+                      ) : ("")}
                       <th
                         scope="col"
                         className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -1027,9 +1031,6 @@ const StudentManagement: React.FC = () => {
                           <div className="text-sm font-medium text-gray-900">
                             {student.name}
                           </div>
-                          {/* <div className="text-xs text-gray-500 sm:hidden">
-                            {student.phone}
-                          </div> */}
                         </td>
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
                           <div className="text-sm text-gray-900">
@@ -1040,45 +1041,38 @@ const StudentManagement: React.FC = () => {
                           <>
                             <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
                               <div className="text-sm text-gray-900">
-                                {/*@ts-expect-error erro */}
-                                {student.selectedCourse?.title}
-                              </div>
-                            </td>
-                            <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
-                              <div className="text-sm text-gray-900">
-                                {student.selectedShift?.start} {"-"}{" "}
-                                {student.selectedShift?.end}
+                                {student.selectedShift?.start} {"-"} {student.selectedShift?.end}
                               </div>
                             </td>
                           </>
                         ) : (
                           ""
                         )}
-                         {hasPermission(loggedUser as TeamMember, "payment", "pay") ? (
-                        <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden md:table-cell">
-                          <div className="text-sm text-gray-900">
-                            {payment &&
-                            payment.filter(
-                              (payment) => payment.studentId === student._id
-                            ).length === 0 ? (
-                              <div>No payment info</div>
-                            ) : (
-                              payment &&
-                              payment
-                                .filter(
+                        {hasPermission(loggedUser as TeamMember, "payment", "pay") ? (
+                          <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden md:table-cell">
+                            <div className="text-sm text-gray-900">
+                              {payment &&
+                                payment.filter(
                                   (payment) => payment.studentId === student._id
-                                )
-                                .map((filteredPayment) => (
-                                  <div key={filteredPayment._id}>
-                                    {filteredPayment.status.toUpperCase()}
-                                  </div>
-                                ))
-                            )}
-                          </div>
-                        </td>
+                                ).length === 0 ? (
+                                <div>No payment info</div>
+                              ) : (
+                                payment &&
+                                payment
+                                  .filter(
+                                    (payment) => payment.studentId === student._id
+                                  )
+                                  .map((filteredPayment) => (
+                                    <div key={filteredPayment._id}>
+                                      {filteredPayment.status.toUpperCase()}
+                                    </div>
+                                  ))
+                              )}
+                            </div>
+                          </td>
                         ) : (
                           ""
-                          )}
+                        )}
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex  gap-2">
                             {renderActionButtons(student)}
@@ -1150,8 +1144,7 @@ const StudentManagement: React.FC = () => {
                         onChange={(e) =>
                           setSelectedStudent({
                             ...selectedStudent,
-                            //@ts-expect-error error
-                            selectedShift: e.target.value,
+                            selectedShift: courses.find((c) => c._id === selectedStudent.selectedCourse)?.shifts.find((s) => s._id === e.target.value) || selectedStudent.selectedShift,
                           })
                         }
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -1236,8 +1229,7 @@ const StudentManagement: React.FC = () => {
                     </p>
                     <p className="flex">
                       <span className="font-extrabold w-28 ">COURSE</span>{" "}
-                      {/* @ts-expect-error error */}
-                      <span>{selectedStudent?.selectedCourse?.title}</span>
+                      <span>{selectedStudent?.selectedCourse}</span>
                     </p>
 
                     <p className="flex">
@@ -1256,9 +1248,9 @@ const StudentManagement: React.FC = () => {
                       </span>
                     </p>
                     {payment &&
-                    payment.filter(
-                      (payment) => payment.studentId === selectedStudent._id
-                    ).length === 0 ? (
+                      payment.filter(
+                        (payment) => payment.studentId === selectedStudent._id
+                      ).length === 0 ? (
                       <div>No payment information found.</div>
                     ) : (
                       payment &&
@@ -1273,15 +1265,14 @@ const StudentManagement: React.FC = () => {
                                 STATUS
                               </span>{" "}
                               <span
-                                className={`${
-                                  filteredPayment.status === "unpaid"
-                                    ? "bg-red-600"
-                                    : filteredPayment.status === "partial"
+                                className={`${filteredPayment.status === "unpaid"
+                                  ? "bg-red-600"
+                                  : filteredPayment.status === "partial"
                                     ? "bg-red-400"
                                     : filteredPayment.status === "paid"
-                                    ? "bg-blue-700"
-                                    : "bg-green-600"
-                                } font-extrabold  text-white p-1 rounded-md`}
+                                      ? "bg-blue-700"
+                                      : "bg-green-600"
+                                  } font-extrabold  text-white p-1 rounded-md`}
                               >
                                 {filteredPayment.status.toUpperCase()}
                               </span>
@@ -1313,7 +1304,7 @@ const StudentManagement: React.FC = () => {
                               <span className=" text-red-600 font-extrabold ">
                                 {new Intl.NumberFormat().format(
                                   filteredPayment.amountDue -
-                                    filteredPayment.amountPaid
+                                  filteredPayment.amountPaid
                                 )}
                                 Frw
                               </span>
@@ -1381,11 +1372,10 @@ const StudentManagement: React.FC = () => {
                   setIsPaymentModalOpen(false);
                 }}
                 disabled={!paymentMethod}
-                className={`inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md ${
-                  !paymentMethod
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
-                }`}
+                className={`inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md ${!paymentMethod
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
+                  }`}
               >
                 Confirm
               </button>
@@ -1401,8 +1391,8 @@ const StudentManagement: React.FC = () => {
                 {type === "pay"
                   ? "PAY SCHOOL FEES"
                   : type === "discount"
-                  ? "ADD DISCOUNT"
-                  : "ADD EXTRA"}
+                    ? "ADD DISCOUNT"
+                    : "ADD EXTRA"}
               </h3>
               <div className="mt-4 flex  flex-col gap-5">
                 <span className="flex gap-10 items-center justify-between mx-10 mb-3">
@@ -1439,8 +1429,8 @@ const StudentManagement: React.FC = () => {
                   type === "pay"
                     ? () => handlePay(selectedStudent._id)
                     : type === "discount"
-                    ? () => handleDiscount(selectedStudent._id)
-                    : () => handleExtra(selectedStudent._id)
+                      ? () => handleDiscount(selectedStudent._id)
+                      : () => handleExtra(selectedStudent._id)
                 }
                 className="px-4 py-2 text-sm text-black font-extrabold hover:text-white bg-green-300 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
               >
@@ -1449,8 +1439,8 @@ const StudentManagement: React.FC = () => {
                     ? "Paying..."
                     : "Pay"
                   : type === "discount"
-                  ? "Add Discount"
-                  : "Add Extra"}
+                    ? "Add Discount"
+                    : "Add Extra"}
               </button>
               <button
                 onClick={() => handleDisableViewP()}
@@ -1493,18 +1483,16 @@ const StudentManagement: React.FC = () => {
                 Cancel
               </button>
               <button
-                className={`${
-                  isloading ? "cursor-progress" : ""
-                } px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"`}
+                className={`${isloading ? "cursor-progress" : ""
+                  } px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"`}
                 onClick={handleSend}
               >
                 {isloading ? " Sending..." : " Send"}
               </button>
             </div>
             <p
-              className={`${
-                error ? "text-red-500" : "text-green-600"
-              } font-bold text-xl animate-pulse text-center`}
+              className={`${error ? "text-red-500" : "text-green-600"
+                } font-bold text-xl animate-pulse text-center`}
             >
               {error || succes}
             </p>
@@ -1555,3 +1543,4 @@ const StudentManagement: React.FC = () => {
 };
 
 export default withAdminAuth(StudentManagement);
+

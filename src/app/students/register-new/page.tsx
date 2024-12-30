@@ -22,6 +22,7 @@ interface registrationData {
   name: string;
   email: string;
   phone: string;
+  referer:string
   selectedCourse: string;
   selectedShift: string;
   intake: string;
@@ -43,6 +44,7 @@ const Registration: React.FC = () => {
      selectedCourse: "",
      selectedShift: "",
      intake: "",
+     referer:'default',
      message: "",
      user: loggedUser?.name,
      payment: "cash",
@@ -155,6 +157,7 @@ const data:IInvoice = {
 
        setFormData({
          name: "",
+         referer:"default",
          email: "",
          phone: "",
          selectedCourse: courses.length > 0 ? courses[0].title : "",
@@ -314,6 +317,24 @@ const data:IInvoice = {
                  {intake.intake}
                </option>
              ))}
+           </select>
+         </div>
+         <div>
+           <label className="block text-sm font-extrabold text-gray-700">
+             Referer
+           </label>
+           <select
+             name="referer"
+             value={formData.referer}
+             onChange={handleChange}
+             required
+             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+           >
+             <option value="" disabled>
+               Select Referer(Required)
+             </option>
+             <option value="cyd">Cyd</option>
+             <option value="default">Future Focus</option>
            </select>
          </div>
          <div>
