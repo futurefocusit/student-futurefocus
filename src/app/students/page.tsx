@@ -28,7 +28,7 @@ interface Student {
   referer: "default" | "cyd";
   phone: string;
   intake: string;
-  selectedCourse: string;
+  selectedCourse: string
   message: string;
   selectedShift: { _id: string; name: string; start: string; end: string };
   updatedAt: string;
@@ -114,6 +114,20 @@ const StudentManagement: React.FC = () => {
     setOpenMessage(false);
     setError(null);
     setSucces(null);
+  };
+  const filterStudents = (
+    status: string,
+    referer: string,
+    studentsData: Student[] = students
+  ) => {
+    setActiveFilter(status);
+    setRefererFilter(referer);
+    setSearchTerm("");
+    const filteredStudents = studentsData.filter(
+      (student) =>
+        student.status === status && (referer === "all" || student.referer === referer)
+    );
+    groupStudentsByIntake(filteredStudents);
   };
   const handleDeleteClick = (itemId: string) => {
     setItem(itemId);
@@ -305,6 +319,7 @@ const StudentManagement: React.FC = () => {
         (a, b) =>
           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       );
+      filterStudents(activeFilter, refererFilter,sortedStudents);
       setStudents(sortedStudents);
       setStudentCounts(getStudentCountByStatus(sortedStudents));
     } catch (error) {
@@ -378,10 +393,8 @@ const StudentManagement: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchStudents()
-      .then(() => {
-        filterStudents(activeFilter, refererFilter);
-      });
+    // setActiveFilter("pending")
+    fetchStudents()      
     fetchPayment();
     fetchCourses();
   }, []);
@@ -466,20 +479,7 @@ const StudentManagement: React.FC = () => {
     });
   };
 
-  const filterStudents = (
-    status: string,
-    referer: string,
-    studentsData: Student[] = students
-  ) => {
-    setActiveFilter(status);
-    setRefererFilter(referer);
-    setSearchTerm("");
-    const filteredStudents = studentsData.filter(
-      (student) =>
-        student.status === status && (referer === "all" || student.referer === referer)
-    );
-    groupStudentsByIntake(filteredStudents);
-  };
+
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -1229,7 +1229,8 @@ const StudentManagement: React.FC = () => {
                     </p>
                     <p className="flex">
                       <span className="font-extrabold w-28 ">COURSE</span>{" "}
-                      <span>{selectedStudent?.selectedCourse}</span>
+                      {/* @ts-expect-error error */}
+                      <span>{selectedStudent?.selectedCourse.title}</span>
                     </p>
 
                     <p className="flex">
