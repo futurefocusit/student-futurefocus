@@ -15,7 +15,7 @@ interface Message {
   status: "read" | "unread"; 
 }
 
-const messagePage: React.FC = () => {
+const MessagePage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [filteredMessages, setFilteredMessages] = useState<Message[]>([]);
   const [activeTab, setActiveTab] = useState<string>("all"); // Active tab for filtering
@@ -147,4 +147,4 @@ const messagePage: React.FC = () => {
   );
 };
 
-export default withAdminAuth(messagePage);
+export default withAdminAuth(MessagePage);
