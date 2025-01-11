@@ -1,6 +1,6 @@
 "use client";
 import {  useAuth } from "@/context/AuthContext";
-import { TeamMember, TeamMemberLogin } from "@/types/types";
+import { TeamMemberLogin } from "@/types/types";
 import React, { FormEvent, useState } from "react";
 
 const LoginForm = () => {
@@ -34,7 +34,7 @@ const LoginForm = () => {
           <img src="/logo.png" alt="Logo" className="w-24 h-24 mx-auto" />
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <div>
           <div className="mb-4">
             <label
               htmlFor="email"
@@ -91,13 +91,13 @@ const LoginForm = () => {
             </a>
           </div>
           <button
-            type="submit"
+            onClick={handleSubmit}
             className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
             disabled={isLoading}
           >
             {isLoading ? "Logging in..." : "Login"}
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );

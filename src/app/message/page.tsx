@@ -78,9 +78,9 @@ const MessagePage: React.FC = () => {
                 ? "border-blue-500 font-bold"
                 : "border-transparent"
             }`}
-            onClick={() => setActiveTab("incident")}
+            onClick={() => setActiveTab("read")}
           >
-            Incidents
+           Read
           </button>
           <button
             className={`p-2 border-b-2 ${
@@ -88,9 +88,9 @@ const MessagePage: React.FC = () => {
                 ? "border-blue-500 font-bold"
                 : "border-transparent"
             }`}
-            onClick={() => setActiveTab("message")}
+            onClick={() => setActiveTab("unread")}
           >
-            Messages
+            UnRead
           </button>
         </div>
       </div>
@@ -98,9 +98,9 @@ const MessagePage: React.FC = () => {
         <table className="min-w-full border-collapse border border-gray-200">
           <thead>
             <tr>
+              <th className="border-b border-gray-300 p-4">Date</th>
               <th className="border-b border-gray-300 p-4">Name</th>
               <th className="border-b border-gray-300 p-4">Email</th>
-              <th className="border-b border-gray-300 p-4">Location</th>
               <th className="border-b border-gray-300 p-4">Message</th>
               <th className="border-b border-gray-300 p-4">Type</th>
         
@@ -125,9 +125,7 @@ const MessagePage: React.FC = () => {
                     <td className="border-b border-gray-300 p-4">
                       {incident.email}
                     </td>
-                    <td className="border-b border-gray-300 p-4">
-                      {incident.location}
-                    </td>
+                   
                     <td className="border-b border-gray-300 p-4">
                       {incident.message}
                     </td>
