@@ -133,7 +133,7 @@ const Past: React.FC = () => {
 
   // Form validation function
   const validateForm = () => {
-    const newErrors:any = {};
+    const newErrors = {name:'',email:"",phone:'',selectedCourse:"",selectedShift:"",intake:'',status:""};
 
     // Name validation
     if (!formData.name) newErrors.name = "Full Name is required";
