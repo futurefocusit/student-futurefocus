@@ -1,4 +1,3 @@
-//@ts-expect-error ignore type
 export const changeIndex=(array, currentIndex, newIndex) =>{
   if (!Array.isArray(array)) {
     throw new TypeError("Expected an array");

@@ -2,7 +2,6 @@
 import React from "react";
 
 interface PopupViewMoreProps {
-    //@ts-expect-error error
   rentedMaterial
   onClose: () => void;
 }
