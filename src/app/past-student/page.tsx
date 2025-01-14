@@ -46,7 +46,7 @@ const Past: React.FC = () => {
     message: "",
     user: loggedUser?.name,
     payment: "cash",
-    status:null
+    status:'completed'
   });
   const [intakes, setIntakes] = useState<{ _id: string; intake: string }[]>([]);
   const [submissionResult, setSubmissionResult] = useState<string | null>(null);
@@ -144,7 +144,7 @@ const Past: React.FC = () => {
         intake: intakes.length > 0 ? intakes[0].intake : "",
         user: loggedUser?.name,
         payment: "",
-        status:null
+        status:'completed'
   
       });
       
