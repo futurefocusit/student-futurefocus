@@ -28,6 +28,7 @@ interface registrationData {
   message: string;
   payment: string;
   user: string | undefined;
+  status:string|null
 }
 
 const Past: React.FC = () => {
@@ -45,6 +46,7 @@ const Past: React.FC = () => {
     message: "",
     user: loggedUser?.name,
     payment: "cash",
+    status:null
   });
   const [intakes, setIntakes] = useState<{ _id: string; intake: string }[]>([]);
   const [submissionResult, setSubmissionResult] = useState<string | null>(null);
@@ -110,15 +112,9 @@ const Past: React.FC = () => {
       }
     }
   };
-  // const handleSendMessage = async(id:string,message:string)=>{
-  //   const response = await axios.post(`${API_BASE_URL}/student/message/${id}`,{
-  //     message
-  //   })
 
-  // }
   const handleSubmit = async () => {
 
-    //  e.preventDefault();
     setSubmissionResult(null);
 
     try {
@@ -148,6 +144,7 @@ const Past: React.FC = () => {
         intake: intakes.length > 0 ? intakes[0].intake : "",
         user: loggedUser?.name,
         payment: "",
+        status:null
   
       });
       
