@@ -11,7 +11,6 @@ import Loader from "@/components/loader";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
 
-
 interface Course {
   _id: string;
   title: string;
@@ -28,7 +27,7 @@ interface registrationData {
   message: string;
   payment: string;
   user: string | undefined;
-  status:string|null
+  status: string | null;
 }
 
 const Past: React.FC = () => {
@@ -46,10 +45,21 @@ const Past: React.FC = () => {
     message: "",
     user: loggedUser?.name,
     payment: "cash",
-    status:'completed'
+    status: "completed",
   });
   const [intakes, setIntakes] = useState<{ _id: string; intake: string }[]>([]);
   const [submissionResult, setSubmissionResult] = useState<string | null>(null);
+
+  // Form validation state
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    selectedCourse: "",
+    selectedShift: "",
+    intake: "",
+    status: "",
+  });
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -62,7 +72,7 @@ const Past: React.FC = () => {
           setFormData((prevData) => ({
             ...prevData,
             selectedCourse: response.data[0].title,
-            selectedShift: response.data[0].shifts[0],
+            selectedShift: response.data[0].shifts[0]._id,
           }));
         }
         setLoading(false);
@@ -72,6 +82,7 @@ const Past: React.FC = () => {
         console.log(err);
       }
     };
+
     const getIntakes = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/others/intake`);
@@ -87,6 +98,7 @@ const Past: React.FC = () => {
         setError("Failed to load intakes.");
       }
     };
+
     getIntakes();
     fetchCourses();
   }, []);
@@ -111,11 +123,53 @@ const Past: React.FC = () => {
         }));
       }
     }
+
+    // Reset validation error for the specific field when user changes input
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
+    }));
+  };
+
+  // Form validation function
+  const validateForm = () => {
+    const newErrors: any = {};
+
+    // Name validation
+    if (!formData.name) newErrors.name = "Full Name is required";
+
+    // Email validation
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email is invalid";
+    }
+
+    // Phone validation
+    if (!formData.phone) newErrors.phone = "Phone number is required";
+    else if (!/^\d{10}$/.test(formData.phone)) {
+      newErrors.phone = "Phone number must be 10 digits";
+    }
+
+    // Course and shift validation
+    if (!formData.selectedCourse) newErrors.selectedCourse = "Course is required";
+    if (!formData.selectedShift) newErrors.selectedShift = "Shift is required";
+
+    // Intake validation
+    if (!formData.intake) newErrors.intake = "Intake is required";
+
+    // Status validation
+    if (!formData.status) newErrors.status = "Status is required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
-
     setSubmissionResult(null);
+
+    // Validate form
+    if (!validateForm()) return;
 
     try {
       formData.user = loggedUser?.name;
@@ -131,9 +185,10 @@ const Past: React.FC = () => {
       if (response.data && response.data.message) {
         toast.success(response.data.message);
       } else {
-        toast.success("student added successfully");
+        toast.success("Student added successfully");
       }
 
+      // Reset formData including clearing radio buttons (status)
       setFormData({
         name: "",
         email: "",
@@ -144,10 +199,9 @@ const Past: React.FC = () => {
         intake: intakes.length > 0 ? intakes[0].intake : "",
         user: loggedUser?.name,
         payment: "",
-        status:'completed'
-  
+        status: null, // Clear status field to reset radio button
       });
-      
+
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         const errorMessage =
@@ -214,6 +268,9 @@ const Past: React.FC = () => {
               required
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
+            {errors.name && (
+              <p className="text-sm text-red-600">{errors.name}</p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-extrabold text-gray-700">
@@ -222,11 +279,13 @@ const Past: React.FC = () => {
             <input
               type="email"
               name="email"
-              defaultValue="academic@futurefocus.rw"
               value={formData.email}
               onChange={handleChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
+            {errors.email && (
+              <p className="text-sm text-red-600">{errors.email}</p>
+            )}
           </div>
         </div>
         <div>
@@ -241,6 +300,9 @@ const Past: React.FC = () => {
             required
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
           />
+          {errors.phone && (
+            <p className="text-sm text-red-600">{errors.phone}</p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-extrabold text-gray-700">
@@ -258,6 +320,9 @@ const Past: React.FC = () => {
               </option>
             ))}
           </select>
+          {errors.selectedCourse && (
+            <p className="text-sm text-red-600">{errors.selectedCourse}</p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-extrabold text-gray-700">
@@ -277,6 +342,9 @@ const Past: React.FC = () => {
                 </option>
               ))}
           </select>
+          {errors.selectedShift && (
+            <p className="text-sm text-red-600">{errors.selectedShift}</p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-extrabold text-gray-700">
@@ -290,6 +358,9 @@ const Past: React.FC = () => {
             required
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
           />
+          {errors.intake && (
+            <p className="text-sm text-red-600">{errors.intake}</p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-extrabold text-gray-700">
@@ -317,6 +388,9 @@ const Past: React.FC = () => {
               className="mt-1   px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
+          {errors.status && (
+            <p className="text-sm text-red-600">{errors.status}</p>
+          )}
         </div>
         <div className="text-center">
           {hasPermission(loggedUser as TeamMember, "students", "register") ? (

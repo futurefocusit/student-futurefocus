@@ -797,6 +797,19 @@ const StudentManagement: React.FC = () => {
           </>
         );
       case "completed":
+        {hasPermission(loggedUser as TeamMember, "students", "dropout") ? (
+          <button
+            onClick={() => {
+              handleStatusClick(student._id, student.name, "droppedout");
+              setAction("drop student out");
+            }}
+            className="text-green-600 font-extrabold hover:text-green-900 ml-3"
+          >
+            DROPOUT
+          </button>
+        ) : (
+          ""
+        )}
       default:
         return null;
     }
