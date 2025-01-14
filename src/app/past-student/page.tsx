@@ -133,35 +133,45 @@ const Past: React.FC = () => {
 
   // Form validation function
   const validateForm = () => {
-    const newErrors = {name:'',email:"",phone:'',selectedCourse:"",selectedShift:"",intake:'',status:""};
-
-    // Name validation
+    const newErrors = {};
+//@ts-expect-error type rro
     if (!formData.name) newErrors.name = "Full Name is required";
 
     // Email validation
     if (!formData.email) {
+//@ts-expect-error type rro
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+//@ts-expect-error type rro
+
       newErrors.email = "Email is invalid";
     }
 
     // Phone validation
+//@ts-expect-error type rro
+
     if (!formData.phone) newErrors.phone = "Phone number is required";
     else if (!/^\d{10}$/.test(formData.phone)) {
+//@ts-expect-error type rro
       newErrors.phone = "Phone number must be 10 digits";
     }
 
     // Course and shift validation
+//@ts-expect-error type rro
     if (!formData.selectedCourse) newErrors.selectedCourse = "Course is required";
+//@ts-expect-error type rro
     if (!formData.selectedShift) newErrors.selectedShift = "Shift is required";
 
     // Intake validation
+//@ts-expect-error type rro
     if (!formData.intake) newErrors.intake = "Intake is required";
 
     // Status validation
+//@ts-expect-error type rro
     if (!formData.status) newErrors.status = "Status is required";
-
+//@ts-expect-error type rro
     setErrors(newErrors);
+    
     return Object.keys(newErrors).length === 0;
   };
 
