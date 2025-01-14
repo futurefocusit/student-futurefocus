@@ -258,7 +258,6 @@ const Dashboard = () => {
     plugins: {
       tooltip: {
         callbacks: {
-          //@ts-expect-error error
           footer: (tooltipItems) => {
             const label = tooltipItems[0].label;
             const shiftData = summary.shiftStudents.find(
