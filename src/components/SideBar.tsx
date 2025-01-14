@@ -30,7 +30,7 @@ const SideBar = () => {
   const { logout } = useAuth();
 
   const menuItems = [
-    { label: "DASHBOARD", icon: FaTachometerAlt, href: "/", admin: true },
+    { label: "DASHBOARD", icon: FaTachometerAlt, href: "/dashboard", admin: true },
     { label: "STUDENTS", icon: FaUser, href: "/students", admin: true },
     {
       label: "STUDENT ATTENDANCE",
