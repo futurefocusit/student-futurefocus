@@ -18,12 +18,11 @@ const LoginForm = () => {
     });
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     try {
       await login(formData);
     } catch (error) {
-      console.log(error);
+     throw error
     }
   };
 

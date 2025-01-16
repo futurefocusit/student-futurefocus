@@ -1,5 +1,8 @@
 'use client'
+import API_BASE_URL from '@/config/baseURL'
+import axios from 'axios'
 import { useState, ChangeEvent, FormEvent } from 'react'
+import { toast } from 'react-toastify'
 // import { useRouter } from 'next/router'
 
 interface FormData {
@@ -54,18 +57,20 @@ const RegisterPage = () => {
     }
 
     try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        body: form,
-      })
-
-      if (response.ok) {
-        // router.push('/success') // Redirect on success
-      } else {
-        throw new Error('Something went wrong')
+      const response = await axios.post(`${API_BASE_URL}/institution`, form)
+         toast.success(response.data.message)
+    } catch (err:any) {
+      if(err.response){
+        setError(err.response.data.message)
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+      else if(err.request){
+        setError('failed to connect to server')
+      }
+      else{
+        setError(err.message)
+
+      }
+      
     } finally {
       setLoading(false)
     }
@@ -123,6 +128,7 @@ const RegisterPage = () => {
                 type="file"
                 id="logo"
                 name="logo"
+                accept='.png'
                 onChange={handleFileChange}
                 required
                 className="w-full p-3 border border-gray-300 rounded-lg shadow-sm"

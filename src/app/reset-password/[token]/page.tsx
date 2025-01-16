@@ -53,7 +53,7 @@ const ResetPasswordPage = () => {
         { password:password }
       );
       toast.success(response.data.message);
-      window.location.href = "/admin/login";
+      window.location.href = "/login";
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         toast.error(error.response.data.message);

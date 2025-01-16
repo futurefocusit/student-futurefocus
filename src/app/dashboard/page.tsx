@@ -127,7 +127,11 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchSummary = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/others/dashboard`);
+        const response = await axios.get(`${API_BASE_URL}/others/dashboard`,{
+          headers:{
+            "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
+          }
+        });
         setSummary(response.data);
         await fetchLoggedUser();
       } catch (error) {

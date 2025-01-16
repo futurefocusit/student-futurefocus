@@ -45,7 +45,7 @@ const ResetPasswordPage = () => {
       );
       toast.success(response.data.message);
       localStorage.setItem("ffa-admin", response.data.token);
-      window.location.href = "/";
+      window.location.href = "/dashboard";
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         toast.error(error.response.data.message);
