@@ -108,7 +108,11 @@ const PaymentsPage: React.FC = () => {
   const fetchCashflows = async () => {
     try {
       await fetchLoggedUser();
-      const response = await axios.get(`${API_BASE_URL}/cashflow`);
+      const response = await axios.get(`${API_BASE_URL}/cashflow`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
       if (!response) {
         throw new Error("Network response was not ok");
       }
@@ -169,7 +173,11 @@ const PaymentsPage: React.FC = () => {
   const handleSubmit = async () => {
     try {
       formData.user = loggedUser?.name;
-      const response = await axios.post(`${API_BASE_URL}/cashflow`, formData);
+      const response = await axios.post(`${API_BASE_URL}/cashflow`, formData,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
       fetchCashflows();
       toast.success(response.data.message);
     } catch (error) {
@@ -180,7 +188,11 @@ const PaymentsPage: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
       setIsLoading(true)
-      const response = await axios.delete(`${API_BASE_URL}/cashflow/${id}`);
+      const response = await axios.delete(`${API_BASE_URL}/cashflow/${id}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
       toast.success(response.data.message);
       await fetchCashflows();
     } catch (error) {

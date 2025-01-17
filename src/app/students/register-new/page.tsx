@@ -59,7 +59,11 @@ const Registration: React.FC = () => {
    useEffect(() => {
      const fetchCourses = async () => {
        try {
-         const response = await axios.get(`${API_BASE_URL}/course`);
+         const response = await axios.get(`${API_BASE_URL}/course`,{
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+          },
+         });
          await fetchLoggedUser();
          setCourses(response.data);
 
@@ -79,7 +83,11 @@ const Registration: React.FC = () => {
      };
      const getIntakes = async () => {
        try {
-         const response = await axios.get(`${API_BASE_URL}/others/intake`);
+         const response = await axios.get(`${API_BASE_URL}/others/intake`,{
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+          },
+         });
          setIntakes(response.data.intakes);
          if (response.data.length > 0) {
            setFormData((prevData) => ({
@@ -145,6 +153,9 @@ const data:IInvoice = {
          {
            headers: {
              "Content-Type": "application/json",
+          
+              Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+            
            },
          }
        );

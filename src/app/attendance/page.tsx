@@ -27,7 +27,11 @@ const AttendancePage: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${API_BASE_URL}/students/attendance`);
+          const response = await axios.get(`${API_BASE_URL}/students/attendance`,{
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+            },
+          });
         const data: AttendanceRecord[] = response.data;
         groupAttendanceData(data);
       } catch (error) {

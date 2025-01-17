@@ -73,7 +73,11 @@ const AttendancePage: React.FC = () => {
   const handleComment=async(id:string)=>{
     try {
       await axios.put(`${API_BASE_URL}/member/comment/${id}`,
-       { comment}
+       { comment},{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+       }
       )
       toast.success('response added')
     } catch (error) {

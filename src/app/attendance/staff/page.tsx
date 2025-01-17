@@ -33,7 +33,7 @@ const AttendancePage: React.FC = () => {
         `${API_BASE_URL}/member/attendance`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("ffa-team-member")}`,
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
           },
         }
       );
@@ -59,7 +59,11 @@ const getLocationFromIP = async () => {
 };
   const handleResponse = async (id: string,phone:string) => {
     try {
-      await axios.put(`${API_BASE_URL}/member/response/${id}`, { response,phone });
+      await axios.put(`${API_BASE_URL}/member/response/${id}`, { response,phone },{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
       toast.success("comment added");
     } catch (error) {
       toast.error("failed to add comment");
@@ -78,7 +82,7 @@ const getLocationFromIP = async () => {
         location,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("ffa-team-member")}`,
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
           },
         }
       );

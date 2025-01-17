@@ -402,7 +402,11 @@ const StudentManagement: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
       setIsLoading(true);
-      await axios.delete(`${API_BASE_URL}/students/${id}`);
+      await axios.delete(`${API_BASE_URL}/students/${id}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
       const updatedStudents = students.filter(
         (student) => student._id !== id
       );
@@ -457,7 +461,11 @@ const StudentManagement: React.FC = () => {
   const handleAttend = async (id: string) => {
     try {
       setIsLoading(true);
-      await axios.put(`${API_BASE_URL}/students/attend/${id}`);
+      await axios.put(`${API_BASE_URL}/students/attend/${id}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
       toast.success("attend succesfully");
       setError(null);
       await fetchStudents();
@@ -500,6 +508,10 @@ const StudentManagement: React.FC = () => {
       setIsLoading(true);
       await axios.put(`${API_BASE_URL}/students/comment/${student}`, {
         comment: commentText.comment,
+      },{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
       });
       setError(null);
       setSucces("comment saved");

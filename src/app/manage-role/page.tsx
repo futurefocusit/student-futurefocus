@@ -53,7 +53,11 @@ const ManageRolesPermissions: React.FC = () => {
 
   const fetchFeatures = async () => {
    try {
-     const res = await axios.get<IFeature[]>(`${API_BASE_URL}/role/feature`);
+     const res = await axios.get<IFeature[]>(`${API_BASE_URL}/role/feature`,{
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+      },
+     });
      setFeatures(res.data);
      await fetchLoggedUser();
      setUserData(loggedUser);
@@ -68,18 +72,30 @@ const ManageRolesPermissions: React.FC = () => {
 
   const fetchPermissions = async () => {
     const res = await axios.get<IPermission[]>(
-      `${API_BASE_URL}/role/permission`
+      `${API_BASE_URL}/role/permission`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      }
     );
     setPermissions(res.data);
   };
 
   const fetchRoles = async () => {
-    const res = await axios.get<IRole[]>(`${API_BASE_URL}/role`);
+    const res = await axios.get<IRole[]>(`${API_BASE_URL}/role`,{
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+      },
+    });
     setRoles(res.data);
   };
 
   const fetchUsers = async () => {
-    const res = await axios.get<TeamMember[]>(`${API_BASE_URL}/member/admins`);
+    const res = await axios.get<TeamMember[]>(`${API_BASE_URL}/member/admins`,{
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+      },
+    });
     setUsers(res.data);
   };
 
@@ -96,7 +112,11 @@ const ManageRolesPermissions: React.FC = () => {
   // };
 
   const handleAddRole = async () => {
-    await axios.post(`${API_BASE_URL}/role`, newRole);
+    await axios.post(`${API_BASE_URL}/role`, newRole,{
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+      },
+    });
     fetchRoles();
     setNewRole({ role: "", permission: [] });
   };
@@ -113,7 +133,9 @@ const ManageRolesPermissions: React.FC = () => {
 
   const handleDeleteRole = async (id: string) => {
     try {
-      await axios.delete(`${API_BASE_URL}/role`, { data: { id } });
+      await axios.delete(`${API_BASE_URL}/role`, { data: { id },headers: {
+        Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+      }},);
       toast.success("role deleted successfully");
       fetchRoles();
     } catch (error) {
@@ -125,6 +147,10 @@ const ManageRolesPermissions: React.FC = () => {
     try {
       await axios.put(`${API_BASE_URL}/role/${selectedRole}`, {
         permissions: selectedPermissions,
+      },{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
       });
       toast.success(`permissions assigned ${selectedRole}`);
       fetchRoles();
@@ -137,6 +163,10 @@ const ManageRolesPermissions: React.FC = () => {
     try {
       await axios.put(`${API_BASE_URL}/others/role/${selectedUser}`, {
         role: selectedRole,
+      },{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
       });
       toast.success(`role assigned user`);
       fetchUsers();
