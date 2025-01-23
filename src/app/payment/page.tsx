@@ -194,8 +194,7 @@ const StudentManagement: React.FC = () => {
       await fetchPayment();
     } catch (error) {
       toast.error("failed to delete data");
-      //@ts-expect-error error
-      throw new Error(error);
+      throw error
     }finally{
       SetConfirmModel(false)
       setIsLoading(true);

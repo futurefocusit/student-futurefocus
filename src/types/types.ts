@@ -24,6 +24,7 @@ export interface TeamMember {
   isAdmin: boolean;
   role: Role;
   image:string
+  position:string
 }
 export interface TeamMemberLogin {
 

@@ -118,8 +118,7 @@ const PaymentsPage: React.FC = () => {
       }
       const data = await response.data;
       setCashflows(data);
-    } catch (error) {
-      //@ts-expect-error ignore error
+    } catch (error:any) {
       setError(error.message);
     } finally {
       setIsFetching(false);
@@ -197,8 +196,7 @@ const PaymentsPage: React.FC = () => {
       await fetchCashflows();
     } catch (error) {
       toast.error("failed to delete data");
-      //@ts-expect-error error
-      throw new Error(error);
+      throw  error;
     }finally{
       SetConfirmModel(false);
       setIsLoading(false)

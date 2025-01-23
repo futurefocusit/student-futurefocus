@@ -29,7 +29,7 @@ interface Student {
   phone: string;
   intake: string;
   selectedCourse: string
-  message: string;
+    message: string;
   selectedShift: { _id: string; name: string; start: string; end: string };
   updatedAt: string;
   createdAt: string;
@@ -178,6 +178,10 @@ const StudentManagement: React.FC = () => {
           {
             message,
             recipients: selectedValues,
+          },{
+            headers:{
+              "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+            }
           }
         );
         setSucces(response.data.message);
@@ -234,6 +238,10 @@ const StudentManagement: React.FC = () => {
         status: newStatus,
         user,
         paymentMethod,
+      },{
+        headers:{
+          "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+        }
       });
       setError(null);
       setSucces("status changed");
@@ -259,7 +267,11 @@ const StudentManagement: React.FC = () => {
       formData.user = loggedUser?.name;
       const response = await axios.post(
         `${API_BASE_URL}/payment/pay/${id}`,
-        formData
+        formData,{
+          headers:{
+            "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+          }
+        }
       );
       setSucces(response.data.message);
       setError(null);
@@ -278,7 +290,11 @@ const StudentManagement: React.FC = () => {
     try {
       const response = await axios.put(
         `${API_BASE_URL}/payment/discount/${id}`,
-        formData
+        formData,{
+          headers:{
+            "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+          }
+        }
       );
       setSucces(response.data.message);
       setError(null);
@@ -295,7 +311,11 @@ const StudentManagement: React.FC = () => {
       setIsLoading(true);
       const response = await axios.put(
         `${API_BASE_URL}/payment/extra/${id}`,
-        formData
+        formData,{
+          headers:{
+            "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+          }
+        }
       );
       setSucces(response.data.message);
       setError(null);
@@ -313,7 +333,11 @@ const StudentManagement: React.FC = () => {
   };
   const fetchStudents = async () => {
     try {
-      const response = await axios.get<Student[]>(`${API_BASE_URL}/students`);
+      const response = await axios.get<Student[]>(`${API_BASE_URL}/students`,{
+        headers:{
+          "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+        }
+      });
       await fetchLoggedUser();
       const sortedStudents = response.data.sort(
         (a, b) =>
@@ -331,7 +355,11 @@ const StudentManagement: React.FC = () => {
   };
   const fetchCourses = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/course`);
+      const response = await axios.get(`${API_BASE_URL}/course`,{
+        headers:{
+          "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+        }
+      });
       setCourses(response.data);
     } catch (error) {
       console.error("Error fetching courses:", error);
@@ -355,6 +383,10 @@ const StudentManagement: React.FC = () => {
           selectedShift: selectedStudent.selectedShift,
           intake: selectedStudent.intake,
           name: selectedStudent.name,
+        },{
+          headers:{
+            "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+          }
         }
       );
       setSucces("updated student successfully");
@@ -373,7 +405,11 @@ const StudentManagement: React.FC = () => {
 
   const fetchPayment = async () => {
     try {
-      const response = await axios.get<Payment[]>(`${API_BASE_URL}/payment`);
+      const response = await axios.get<Payment[]>(`${API_BASE_URL}/payment`,{
+        headers:{
+          "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+        }
+      });
       setPayment(response.data);
     } catch (error) {
       console.error("Error fetching payment data:", error);
@@ -1128,7 +1164,7 @@ const StudentManagement: React.FC = () => {
                         onChange={(e) =>
                           setSelectedStudent({
                             ...selectedStudent,
-                            selectedCourse: e.target.value,
+                            selectedCourse : e.target.value ,
 
                             selectedShift:
                               courses.find((c) => c._id === e.target.value)

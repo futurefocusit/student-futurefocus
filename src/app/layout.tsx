@@ -7,7 +7,7 @@ import { CartProvider } from "@/context/cartContext";
 
 export const metadata: Metadata = {
   title: "Students",
-  description: "Student management system",
+  description: "Xcool management system",
 };
 
 export default function RootLayout({

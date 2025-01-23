@@ -210,7 +210,6 @@ const SideBar = () => {
                     isExpanded ? "" : "hidden"
                   }`}
                 >
-                  {/* @ts-expect-error error */}
                   {loggedUser?.role?.role||loggedUser?.position }
                 </p>
               </span>

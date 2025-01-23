@@ -116,12 +116,9 @@ const AttendancePage: React.FC = () => {
       );
       toast.success("Attendance marked successfully!");
       await fetchAttendance();
-    } catch (error) {
-      //@ts-expect-error error
+    } catch (error:any) {
       if (error.response) {
-        //@ts-expect-error error
         toast.error(error.response.message);
-        //@ts-expect-error error
       } else if (error.request) {
         toast.error("failed to attend. try again");
       } else {

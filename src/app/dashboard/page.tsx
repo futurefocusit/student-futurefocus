@@ -121,7 +121,7 @@ const Dashboard = () => {
     monthlyCashflows: [],
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<any>(null);
   const { fetchLoggedUser, loggedUser } = useAuth();
 
   useEffect(() => {
@@ -134,9 +134,8 @@ const Dashboard = () => {
         });
         setSummary(response.data);
         await fetchLoggedUser();
-      } catch (error) {
-        //@ts-expect-error ignore error
-        setError(error);
+      } catch (error:any) {
+        setError(error.message);
       } finally {
         setLoading(false);
       }
@@ -157,7 +156,6 @@ const Dashboard = () => {
     return (
       <div className="flex flex-col items-center p-4">
         <SideBar />
-        {/* @ts-expect-error ignore error */}
         Error loading summary: {error.message}
       </div>
     );
@@ -262,8 +260,7 @@ const Dashboard = () => {
     plugins: {
       tooltip: {
         callbacks: {
-          //@ts-expect-error error
-          footer: (tooltipItems) => {
+          footer: (tooltipItems: { label: any; }[]) => {
             const label = tooltipItems[0].label;
             const shiftData = summary.shiftStudents.find(
               (ss) => ss._id.shiftName === label

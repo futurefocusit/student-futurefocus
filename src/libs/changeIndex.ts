@@ -1,5 +1,4 @@
-//@ts-expect-error ignore type
-export const changeIndex=(array, currentIndex, newIndex) =>{
+export const changeIndex=(array:any, currentIndex:number, newIndex:number) =>{
   if (!Array.isArray(array)) {
     throw new TypeError("Expected an array");
   }
@@ -15,9 +14,7 @@ export const changeIndex=(array, currentIndex, newIndex) =>{
     return;
   }
 
-  // Remove the item from the current index
   const item = array.splice(currentIndex, 1)[0];
 
-  // Insert the item at the new index
   array.splice(newIndex, 0, item);
 }
