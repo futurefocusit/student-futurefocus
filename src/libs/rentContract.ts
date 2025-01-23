@@ -6,7 +6,6 @@ const underlineText = (doc: jsPDF, text:string, x:number, y:number) => {
   doc.text(text, x, y);
   doc.line(x, y + 2, x + textWidth, y + 2); // Draw a line beneath the text
 };
-//@ts-expect-error error
 export const printRentalContract = (renter, materials:CartItem[]) => {
   const doc = new jsPDF();
 const rentalTerms = [

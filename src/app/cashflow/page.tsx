@@ -118,7 +118,7 @@ const PaymentsPage: React.FC = () => {
       }
       const data = await response.data;
       setCashflows(data);
-    } catch (error:any) {
+    } catch (error) {
       setError(error.message);
     } finally {
       setIsFetching(false);
@@ -298,8 +298,10 @@ const PaymentsPage: React.FC = () => {
         </div>):""
 }
         <div className="flex justify-around p-4 flex-wrap gap-4">
+          {/* @ts-expect-error error */}
           <DatePicker
             selected={selectedDate}
+          // {/* @ts-expect-error error */ }
             onChange={(date) => setSelectedDate(date)}
             showMonthYearPicker
             dateFormat="MMMM yyyy"
