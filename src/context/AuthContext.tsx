@@ -46,6 +46,9 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
         },
       });
       setLoggedUser(response.data);
+      if(loggedUser.isSuperAdmin){
+        window.location.href='/dash'
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response) {
@@ -106,7 +109,6 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
         const errorMessage = error.response.data.message || "An error occurred";
         toast.error(errorMessage);
 
-        // Handle 401 Unauthorized errors
         if (error.response.status === 401) {
           logout();
         }

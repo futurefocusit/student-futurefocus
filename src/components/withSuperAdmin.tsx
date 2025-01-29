@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { FaSpinner } from "react-icons/fa";
 import { toast } from "react-toastify";
 
-const withAdminAuth = <P extends object>(WrappedComponent: React.FC<P>) => {
+const withSuperAdminAuth = <P extends object>(WrappedComponent: React.FC<P>) => {
   const AuthHOC: React.FC<P> = (props) => {
     const [loading, setLoading] = useState(true);
     const { fetchLoggedUser, loggedUser } = useAuth();
@@ -13,9 +13,9 @@ const withAdminAuth = <P extends object>(WrappedComponent: React.FC<P>) => {
         setLoading(true);
         try {
           await fetchLoggedUser();
-
+          
         } catch (error) {
-
+          
           toast.error("You have been logged out.");
           window.location.href = "/login";
           return;
@@ -28,9 +28,9 @@ const withAdminAuth = <P extends object>(WrappedComponent: React.FC<P>) => {
     }, [fetchLoggedUser]);
 
     useEffect(() => {
-      if (!loading && loggedUser && !loggedUser.isAdmin) {
+      if (!loading && loggedUser && !loggedUser.isSuperAdmin) {
         toast.error("Unauthorized access. Redirecting...");
-        window.location.href = "/staff/task";
+        window.location.href = "/dashboard";
       }
 
 
@@ -50,4 +50,4 @@ const withAdminAuth = <P extends object>(WrappedComponent: React.FC<P>) => {
   return AuthHOC;
 };
 
-export default withAdminAuth;
+export default withSuperAdminAuth;

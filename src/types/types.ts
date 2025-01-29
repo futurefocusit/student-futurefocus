@@ -22,9 +22,11 @@ export interface TeamMember {
   name: string;
   password: string;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
   role: Role;
   image:string
   position:string
+  
 }
 export interface TeamMemberLogin {
 
