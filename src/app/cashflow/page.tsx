@@ -301,7 +301,7 @@ const PaymentsPage: React.FC = () => {
           {/* @ts-expect-error error */}
           <DatePicker
             selected={selectedDate}
-          // {/* @ts-expect-error error */ }
+          /* @ts-expect-error error */ 
             onChange={(date) => setSelectedDate(date)}
             showMonthYearPicker
             dateFormat="MMMM yyyy"

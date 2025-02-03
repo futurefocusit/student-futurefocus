@@ -45,10 +45,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setLoggedUser(response.data);
-      if(loggedUser.isSuperAdmin){
-        window.location.href='/dash'
-      }
+      setLoggedUser(response.data);   
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response) {
@@ -63,7 +60,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
         toast.error("An unexpected error occurred");
       }
     
-      localStorage.removeItem("ffa-admin");
+      // localStorage.removeItem("ffa-admin");
       setLoggedUser(null);
     }
   }, []);

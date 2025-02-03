@@ -1,5 +1,6 @@
 "use client";
 import API_BASE_URL from "@/config/baseURL";
+import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -8,7 +9,7 @@ const ResetPasswordPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '']); // 4 separate boxes for OTP
   const [id, setId] = useState<string | null>(null);
-
+ const {fetchLoggedUser} = useAuth()
   const handleOTPChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return; // Allow only numbers
     const newOtp = [...otp];
@@ -45,7 +46,9 @@ const ResetPasswordPage = () => {
       );
       toast.success(response.data.message);
       localStorage.setItem("ffa-admin", response.data.token);
+      await fetchLoggedUser()
       window.location.href = "/dashboard";
+      
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         toast.error(error.response.data.message);

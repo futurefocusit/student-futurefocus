@@ -13,6 +13,7 @@ const withAdminAuth = <P extends object>(WrappedComponent: React.FC<P>) => {
         setLoading(true);
         try {
           await fetchLoggedUser();
+         
 
         } catch (error) {
 
@@ -28,10 +29,12 @@ const withAdminAuth = <P extends object>(WrappedComponent: React.FC<P>) => {
     }, [fetchLoggedUser]);
 
     useEffect(() => {
-      if (!loading && loggedUser && !loggedUser.isAdmin) {
+      if (!loading && loggedUser && !loggedUser.isAdmin && !loggedUser.isSuperAdmin) {
         toast.error("Unauthorized access. Redirecting...");
         window.location.href = "/staff/task";
       }
+      else if(!loading && loggedUser&& loggedUser.isSuperAdmin)
+        window.location.href = "/dash";
 
 
     }, [loading, loggedUser]);
