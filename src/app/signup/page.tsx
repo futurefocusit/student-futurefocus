@@ -59,7 +59,7 @@ const RegisterPage = () => {
     try {
       const response = await axios.post(`${API_BASE_URL}/institution`, form)
          toast.success(response.data.message)
-    } catch (err:any) {
+    } catch (err) {
       if(err.response){
         setError(err.response.data.message)
       }

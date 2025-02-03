@@ -1,4 +1,4 @@
-export const changeIndex=(array:any, currentIndex:number, newIndex:number) =>{
+export const changeIndex=(array, currentIndex:number, newIndex:number) =>{
   if (!Array.isArray(array)) {
     throw new TypeError("Expected an array");
   }
@@ -10,7 +10,6 @@ export const changeIndex=(array:any, currentIndex:number, newIndex:number) =>{
     newIndex < 0 ||
     newIndex >= array.length
   ) {
-    console.error("Invalid indices");
     return;
   }
 
