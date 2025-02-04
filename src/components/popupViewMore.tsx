@@ -1,8 +1,9 @@
 // PopupViewMore.tsx
+import { IMaterialRent } from "@/app/inventory/page";
 import React from "react";
 
 interface PopupViewMoreProps {
-  rentedMaterial
+  rentedMaterial:{rentDate:string,amount:number,materialId:{materialName:string},returnDate:string,returned:boolean}
   onClose: () => void;
 }
 

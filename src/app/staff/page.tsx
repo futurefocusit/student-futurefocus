@@ -73,7 +73,11 @@ const AttendancePage: React.FC = () => {
   const handleComment=async(id:string)=>{
     try {
       await axios.put(`${API_BASE_URL}/member/comment/${id}`,
-       { comment}
+       { comment},{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+       }
       )
       toast.success('response added')
     } catch (error) {
@@ -112,12 +116,9 @@ const AttendancePage: React.FC = () => {
       );
       toast.success("Attendance marked successfully!");
       await fetchAttendance();
-    } catch (error) {
-      //@ts-expect-error error
+    } catch (error:any) {
       if (error.response) {
-        //@ts-expect-error error
         toast.error(error.response.message);
-        //@ts-expect-error error
       } else if (error.request) {
         toast.error("failed to attend. try again");
       } else {
@@ -136,11 +137,8 @@ const AttendancePage: React.FC = () => {
       toast.success("thank you for coming");
       await fetchAttendance();
     } catch (error) {
-      //@ts-expect-error error
       if (error.response) {
-        //@ts-expect-error error
         toast.error(error.response.message);
-        //@ts-expect-error error
       } else if (error.request) {
         toast.error("failed to leave. try again");
       } else {

@@ -66,7 +66,11 @@ const MaterialManagement: React.FC = () => {
 
   const fetchCategory = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/inventory/category`);
+      const response = await axios.get(`${API_BASE_URL}/inventory/category`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
       setCategory(response.data);
     } catch (error) {
       setMessage({ type: "error", text: "Failed to load category" });
@@ -75,7 +79,11 @@ const MaterialManagement: React.FC = () => {
 
   const fetchRented = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/inventory/rent`);
+      const response = await axios.get(`${API_BASE_URL}/inventory/rent`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
       setRentedMaterials(response.data);
     } catch (error) {
       setMessage({ type: "error", text: "Failed to load rented materials" });
@@ -86,6 +94,10 @@ const MaterialManagement: React.FC = () => {
     try {
       await axios.put(`${API_BASE_URL}/inventory/${id}`, {
         receiver: loggedUser?._id,
+      },{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
       });
       toast.success("Item returned");
       await fetchRented();
@@ -124,7 +136,11 @@ const MaterialManagement: React.FC = () => {
         category: material.category._id, // Replace with updated category ID
       };
       
-      await axios.patch(`${API_BASE_URL}/inventory/${material._id}`, updatedMaterial);
+      await axios.patch(`${API_BASE_URL}/inventory/${material._id}`, updatedMaterial,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
       toast.success("Material updated successfully!");
       fetchMaterials(); // Refetch materials to reflect changes
     } catch (error) {
@@ -134,7 +150,11 @@ const MaterialManagement: React.FC = () => {
 
   const handleDelete = async (material:IMaterial) => {
     try {
-      await axios.delete(`${API_BASE_URL}/inventory/${material._id}`);
+      await axios.delete(`${API_BASE_URL}/inventory/${material._id}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
       toast.success("Material deleted successfully!");
       fetchMaterials(); // Refetch materials to reflect changes
     } catch (error) {

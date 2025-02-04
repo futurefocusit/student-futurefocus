@@ -10,7 +10,6 @@ import {
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import API_BASE_URL from "@/config/baseURL";
-import Loader from "@/components/loader";
 import { TeamMember, TeamMemberLogin } from "@/types/types";
 interface AuthContextData {
   signed: boolean;
@@ -47,8 +46,23 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
         },
       });
       setLoggedUser(response.data);
+      if(loggedUser.isSuperAdmin){
+        window.location.href='/dash'
+      }
     } catch (error) {
-      handleAxiosError(error);
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          const errorMessage = error.response.data.message || "An error occurred";
+          toast.error(errorMessage);         
+        } else if (error.request) {
+          toast.error("Failed to connect to server");
+        } else {
+          toast.error("Error sending request. Please try again.");
+        }
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    
       localStorage.removeItem("ffa-admin");
       setLoggedUser(null);
     }
@@ -90,13 +104,11 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const handleAxiosError = (error: unknown) => {
-    console.error("API Error:", error);
     if (axios.isAxiosError(error)) {
       if (error.response) {
         const errorMessage = error.response.data.message || "An error occurred";
         toast.error(errorMessage);
 
-        // Handle 401 Unauthorized errors
         if (error.response.status === 401) {
           logout();
         }
@@ -121,9 +133,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     fetchLoggedUser
   };
 
-  if (isLoading) {
-    return <Loader />;
-  }
+  
 
   return (
     <AuthContext.Provider value={contextValue}>

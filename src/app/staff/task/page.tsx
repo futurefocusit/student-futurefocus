@@ -50,7 +50,11 @@ const MemberTasks: React.FC = () => {
     try {
       await fetchLoggedUser();
       const res = await axios.get<Task[]>(
-        `${API_BASE_URL}/task/${loggedUser?._id}`
+        `${API_BASE_URL}/task/${loggedUser?._id}`,{
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+          },
+        }
       );
       setTasks(res.data);
     } catch (error) {

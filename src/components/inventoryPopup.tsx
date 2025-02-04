@@ -5,7 +5,7 @@ import API_BASE_URL from "@/config/baseURL";
 interface PopupFormProps {
   onClose: () => void;
   onSuccess: (message: string) => void;
-  categories:[]
+  categories:{_id:string, name:string}[]
 }
 
 export const PopupForm: React.FC<PopupFormProps> = ({ onClose, onSuccess,categories }) => {
@@ -88,9 +88,7 @@ export const PopupForm: React.FC<PopupFormProps> = ({ onClose, onSuccess,categor
           className="border p-2 mb-4 w-full"
         >
           {categories.map((category, index) => (
-            //@ts-expect-error error
             <option key={index} value={category._id}>
-              {/*@ts-expect-error error */}
               {category.name}
             </option>
           ))}

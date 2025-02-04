@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import Loader from "@/components/loader";
 import API_BASE_URL from "@/config/baseURL";
 import { toast } from "react-toastify";
@@ -33,7 +33,7 @@ const AttendancePage: React.FC = () => {
         `${API_BASE_URL}/member/attendance`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("ffa-team-member")}`,
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
           },
         }
       );
@@ -59,7 +59,11 @@ const getLocationFromIP = async () => {
 };
   const handleResponse = async (id: string,phone:string) => {
     try {
-      await axios.put(`${API_BASE_URL}/member/response/${id}`, { response,phone });
+      await axios.put(`${API_BASE_URL}/member/response/${id}`, { response,phone },{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
       toast.success("comment added");
     } catch (error) {
       toast.error("failed to add comment");
@@ -78,18 +82,15 @@ const getLocationFromIP = async () => {
         location,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("ffa-team-member")}`,
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
           },
         }
       );
       toast.success("Attendance marked successfully!");
       await fetchAttendance();
-    } catch (error) {
-      //@ts-expect-error error
+    } catch (error:any) {
       if (error.response) {
-        //@ts-expect-error error
         toast.error(error.response.message);
-        //@ts-expect-error error
       } else if (error.request) {
         toast.error("failed to attend. try again");
       } else {

@@ -48,7 +48,11 @@ const PaymentsPage: React.FC = () => {
   const { fetchLoggedUser, loggedUser } = useAuth();
   const fetchPayments = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/payment/transaction`);
+      const response = await axios.get(`${API_BASE_URL}/payment/transaction`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
         await fetchLoggedUser();
 
       if (!response) {
@@ -57,7 +61,6 @@ const PaymentsPage: React.FC = () => {
       const data = await response.data;
       setPayments(data);
     } catch (error) {
-      //@ts-expect-error error
       setError(error.message);
     } finally {
       setIsFetching(false);
@@ -70,14 +73,17 @@ const PaymentsPage: React.FC = () => {
     try {
       setIsLoading(true)
       const response = await axios.delete(
-        `${API_BASE_URL}/payment/transaction/${id}`
+        `${API_BASE_URL}/payment/transaction/${id}`,{
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+          },
+        }
       );
       toast.success(response.data.message);
       await fetchPayments();
     } catch (error) {
       toast.error("failed to delete data");
-      //@ts-expect-error error
-      throw new Error(error);
+      throw error
     }
     finally{
        SetConfirmModel(false);

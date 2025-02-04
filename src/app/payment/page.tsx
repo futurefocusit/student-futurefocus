@@ -67,6 +67,10 @@ const StudentManagement: React.FC = () => {
     try {
       await axios.put(`${API_BASE_URL}/payment/comment/${studentId}`, {
         comment: commentText.comment,
+      },{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
       });
     } catch (error) {
       console.error("Error saving comment:", error);
@@ -98,7 +102,11 @@ const StudentManagement: React.FC = () => {
   const fetchStudents = async () => {
     try {
       setIsFetching(true);
-      const response = await axios.get<Student[]>(`${API_BASE_URL}/students`);
+      const response = await axios.get<Student[]>(`${API_BASE_URL}/students`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
       await fetchLoggedUser();
       const sortedStudents = response.data.sort(
         (a, b) =>
@@ -117,7 +125,11 @@ const StudentManagement: React.FC = () => {
 
   const fetchPayment = async () => {
     try {
-      const response = await axios.get<Payment[]>(`${API_BASE_URL}/payment`);
+      const response = await axios.get<Payment[]>(`${API_BASE_URL}/payment`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
       setPayment(response.data);
     } catch (error) {
       console.error("Error fetching payment data:", error);
@@ -152,7 +164,11 @@ const StudentManagement: React.FC = () => {
       formData.user = loggedUser?.name;
       const response = await axios.post(
         `${API_BASE_URL}/payment/pay/${id}`,
-        formData
+        formData,{
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+          },
+        }
       );
       toast.success(response.data.message);
       const ourlogo = await convertImageUrlToBase64(imageUrl as string);
@@ -169,13 +185,16 @@ const StudentManagement: React.FC = () => {
     try {
       setIsLoading(true);
 
-      const response = await axios.delete(`${API_BASE_URL}/payment/${id}`);
+      const response = await axios.delete(`${API_BASE_URL}/payment/${id}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
       toast.success(response.data.message);
       await fetchPayment();
     } catch (error) {
       toast.error("failed to delete data");
-      //@ts-expect-error error
-      throw new Error(error);
+      throw error
     }finally{
       SetConfirmModel(false)
       setIsLoading(true);
@@ -191,7 +210,11 @@ const StudentManagement: React.FC = () => {
       setIsLoading(true);
       const response = await axios.put(
         `${API_BASE_URL}/payment/discount/${id}`,
-        formData
+        formData,{
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+          },
+        }
       );
       toast.success(response.data.message);
       fetchPayment();
@@ -209,7 +232,11 @@ const StudentManagement: React.FC = () => {
 
       const response = await axios.put(
         `${API_BASE_URL}/payment/extra/${id}`,
-        formData
+        formData,{
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+          },
+        }
       );
       toast.success(response.data.message);
       fetchPayment();

@@ -188,6 +188,9 @@ const Past: React.FC = () => {
         formData,
         {
           headers: {
+         
+              Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+            
             "Content-Type": "application/json",
           },
         }

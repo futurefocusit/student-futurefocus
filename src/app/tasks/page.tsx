@@ -34,7 +34,7 @@ import { useAuth } from "@/context/AuthContext";
 import withAdminAuth from "@/components/withAdminAuth";
 import SideBar from "@/components/SideBar";
 import ConfirmDeleteModal from "@/components/confirmPopupmodel";
-import { useFormState } from "react-dom";
+
 
 // Types
 interface Comment {
@@ -106,7 +106,11 @@ const MemberTasks: React.FC = () => {
 
   const fetchTasks = async () => {
     try {
-      const res = await axios.get<Task[]>(`${API_BASE_URL}/task`);
+      const res = await axios.get<Task[]>(`${API_BASE_URL}/task`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
       setTasks(res.data);
     } catch (error) {
       console.error("Error fetching tasks:", error);
@@ -115,7 +119,11 @@ const MemberTasks: React.FC = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get<User[]>(`${API_BASE_URL}/member`);
+      const res = await axios.get<User[]>(`${API_BASE_URL}/member`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
       setUsers(res.data);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -135,6 +143,10 @@ const MemberTasks: React.FC = () => {
         manager: loggedUser?._id,
         endTime,
         startTime,
+      },{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
       });
       setIsFormOpen(false);
       resetForm();
@@ -157,6 +169,10 @@ const MemberTasks: React.FC = () => {
     try {
       await axios.put(`${API_BASE_URL}/task/${taskId}`, {
         status: "completed",
+      },{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        }
       });
       fetchTasks();
     } catch (error) {
@@ -167,7 +183,11 @@ const MemberTasks: React.FC = () => {
   const handleDeleteTask = async (taskId: string) => {
     try {
       setIsLoading(true);
-      await axios.delete(`${API_BASE_URL}/task/${taskId}`);
+      await axios.delete(`${API_BASE_URL}/task/${taskId}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        }
+      });
       fetchTasks();
     } catch (error) {
       console.error("Error deleting task:", error);
@@ -185,6 +205,10 @@ const MemberTasks: React.FC = () => {
       await axios.post(`${API_BASE_URL}/task/comment/${taskId}`, {
         text: comment,
         user: loggedUser?._id,
+      },{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
       });
       setComment("");
       fetchTasks();
@@ -205,6 +229,10 @@ const MemberTasks: React.FC = () => {
         await axios.post(`${API_BASE_URL}/task/comment/reply/${commentId}`, {
           text: reply.text,
           user: loggedUser?._id,
+        },{
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+          },
         });
         setReply(null);
         fetchTasks();

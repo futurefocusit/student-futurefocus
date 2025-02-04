@@ -28,12 +28,10 @@ export const sendMessage= async(data:smsInterface) =>{
       toast.error('failed to send sms')
     }
   } catch (error) {
-    // @ts-expect-error error
-    console.error("Error:", error.message);
       toast.error("internal server error");
+      throw error
 
   }
 }
 
-// Call the function to make the payment
 
