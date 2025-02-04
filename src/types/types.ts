@@ -17,6 +17,7 @@ export interface Role {
 }
 
 export interface TeamMember {
+
   _id: string;
   email: string;
   name: string;
@@ -26,6 +27,8 @@ export interface TeamMember {
   role: Role;
   image:string
   position:string
+  attend: boolean;
+  active: boolean;
   
 }
 export interface TeamMemberLogin {

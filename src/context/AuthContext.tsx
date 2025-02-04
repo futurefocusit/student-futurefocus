@@ -17,6 +17,10 @@ interface AuthContextData {
   loggedUser: TeamMember | null;
   login: (user: TeamMemberLogin) => Promise<void>;
   fetchLoggedUser: () => Promise<void>;
+  fetchTeam: () => Promise<TeamMember[]>;
+  addTeamMember: (newMember: Omit<TeamMember, "_id">) => Promise<void>;
+  updateTeamMember: (id: string, updatedMember: TeamMember) => Promise<void>;
+  deleteTeamMember: (id: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -88,6 +92,65 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(false);
     }
   }, []);
+  const fetchTeam = async (): Promise<TeamMember[]> => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`${API_BASE_URL}/member`, {
+        withCredentials: true,
+      });
+      return response.data;
+    } catch (error) {
+      handleAxiosError(error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const addTeamMember = async (newMember: Omit<TeamMember, "_id">) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/member/new`,
+        newMember,
+        { withCredentials: true }
+      );
+      toast.success("Member added successfully");
+      return response.data;
+    } catch (error) {
+      handleAxiosError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateTeamMember = async (id: string, updatedMember: TeamMember) => {
+    setIsLoading(true);
+    try {
+      await axios.put(`${API_BASE_URL}/member/update/${id}`, updatedMember, {
+        withCredentials: true,
+      });
+      toast.success("Member updated successfully");
+    } catch (error) {
+      handleAxiosError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteTeamMember = async (id: string) => {
+    setIsLoading(true);
+    try {
+      await axios.delete(`${API_BASE_URL}/member/delete/${id}`, {
+        withCredentials: true,
+      });
+      toast.success("Member deleted successfully");
+    } catch (error) {
+      handleAxiosError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const logout = useCallback(async () => {
     try {
@@ -127,7 +190,11 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     loggedUser,
     login,
     logout,
-    fetchLoggedUser
+    fetchLoggedUser,
+    fetchTeam,
+        addTeamMember,
+        updateTeamMember,
+        deleteTeamMember,
   };
 
   
