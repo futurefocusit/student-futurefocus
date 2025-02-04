@@ -1,7 +1,11 @@
 import { CartItem } from "@/context/cartContext";
 import { jsPDF } from "jspdf";
+<<<<<<< HEAD
+const underlineText = (doc, text, x, y) => {
+=======
 
 const underlineText = (doc: jsPDF, text:string, x:number, y:number) => {
+>>>>>>> general
   const textWidth = doc.getTextWidth(text);
   doc.text(text, x, y);
   doc.line(x, y + 2, x + textWidth, y + 2); // Draw a line beneath the text
