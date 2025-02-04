@@ -18,17 +18,26 @@ export const getCourses = async () => {
 };
 
 export const addCourse = async (course: Course) => {
-  return await axios.post<Course>(`${API_BASE_URL}/course/new`, course);
+  return await axios.post<Course>(`${API_BASE_URL}/course/new`, course,{headers:{
+    Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`,
+
+  }});
  
 };
 
 export const updateCourse = async (id: string, course: Course) => {
   return await axios.put<Course>(
     `${API_BASE_URL}/course/update/${id}`,
-    course
+    course,{headers:{
+      Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`,
+  
+    }}
   );
 };
 
 export const deleteCourse = async (id: string) => {
-  return await axios.delete(`${API_BASE_URL}/course/delete/${id}`);
+  return await axios.delete(`${API_BASE_URL}/course/delete/${id}`,{headers:{
+    Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`,
+
+  }});
 };
