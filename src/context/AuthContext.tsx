@@ -96,7 +96,10 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       const response = await axios.get(`${API_BASE_URL}/member`, {
-        withCredentials: true,
+        withCredentials: true,headers:{
+          Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`,
+
+        }
       });
       return response.data;
     } catch (error) {
@@ -113,7 +116,11 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await axios.post(
         `${API_BASE_URL}/member/new`,
         newMember,
-        { withCredentials: true }
+        
+        { withCredentials: true ,headers:{
+          Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`,
+          
+        }}
       );
       toast.success("Member added successfully");
       return response.data;
@@ -128,7 +135,10 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       await axios.put(`${API_BASE_URL}/member/update/${id}`, updatedMember, {
-        withCredentials: true,
+        withCredentials: true,headers:{
+          Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`,
+          
+        }
       });
       toast.success("Member updated successfully");
     } catch (error) {
@@ -142,7 +152,10 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       await axios.delete(`${API_BASE_URL}/member/delete/${id}`, {
-        withCredentials: true,
+        withCredentials: true,headers:{
+          Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`,
+
+        }
       });
       toast.success("Member deleted successfully");
     } catch (error) {
