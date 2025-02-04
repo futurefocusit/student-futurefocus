@@ -180,7 +180,7 @@ const StudentManagement: React.FC = () => {
             recipients: selectedValues,
           },{
             headers:{
-              "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+              "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
             }
           }
         );
@@ -240,7 +240,7 @@ const StudentManagement: React.FC = () => {
         paymentMethod,
       },{
         headers:{
-          "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+          "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
         }
       });
       setError(null);
@@ -269,7 +269,7 @@ const StudentManagement: React.FC = () => {
         `${API_BASE_URL}/payment/pay/${id}`,
         formData,{
           headers:{
-            "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+            "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
           }
         }
       );
@@ -292,7 +292,7 @@ const StudentManagement: React.FC = () => {
         `${API_BASE_URL}/payment/discount/${id}`,
         formData,{
           headers:{
-            "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+            "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
           }
         }
       );
@@ -313,7 +313,7 @@ const StudentManagement: React.FC = () => {
         `${API_BASE_URL}/payment/extra/${id}`,
         formData,{
           headers:{
-            "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+            "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
           }
         }
       );
@@ -335,7 +335,7 @@ const StudentManagement: React.FC = () => {
     try {
       const response = await axios.get<Student[]>(`${API_BASE_URL}/students`,{
         headers:{
-          "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+          "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
         }
       });
       await fetchLoggedUser();
@@ -357,7 +357,7 @@ const StudentManagement: React.FC = () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/course`,{
         headers:{
-          "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+          "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
         }
       });
       setCourses(response.data);
@@ -385,7 +385,7 @@ const StudentManagement: React.FC = () => {
           name: selectedStudent.name,
         },{
           headers:{
-            "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+            "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
           }
         }
       );
@@ -407,7 +407,7 @@ const StudentManagement: React.FC = () => {
     try {
       const response = await axios.get<Payment[]>(`${API_BASE_URL}/payment`,{
         headers:{
-          "Authorization":`Bearer ${localStorage.getItem('ff-admin')}`
+          "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
         }
       });
       setPayment(response.data);

@@ -116,7 +116,7 @@ const AttendancePage: React.FC = () => {
       );
       toast.success("Attendance marked successfully!");
       await fetchAttendance();
-    } catch (error:any) {
+    } catch (error) {
       if (error.response) {
         toast.error(error.response.message);
       } else if (error.request) {

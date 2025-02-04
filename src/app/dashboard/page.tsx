@@ -121,7 +121,7 @@ const Dashboard = () => {
     monthlyCashflows: [],
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState(null);
   const { fetchLoggedUser, loggedUser } = useAuth();
 
   useEffect(() => {
@@ -134,7 +134,7 @@ const Dashboard = () => {
         });
         setSummary(response.data);
         await fetchLoggedUser();
-      } catch (error:any) {
+      } catch (error) {
         setError(error.message);
       } finally {
         setLoading(false);
@@ -260,7 +260,7 @@ const Dashboard = () => {
     plugins: {
       tooltip: {
         callbacks: {
-          footer: (tooltipItems: { label: any; }[]) => {
+          footer: (tooltipItems: { label; }[]) => {
             const label = tooltipItems[0].label;
             const shiftData = summary.shiftStudents.find(
               (ss) => ss._id.shiftName === label

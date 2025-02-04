@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import Loader from "@/components/loader";
 import API_BASE_URL from "@/config/baseURL";
 import { toast } from "react-toastify";
@@ -88,7 +88,7 @@ const getLocationFromIP = async () => {
       );
       toast.success("Attendance marked successfully!");
       await fetchAttendance();
-    } catch (error:any) {
+    } catch (error) {
       if (error.response) {
         toast.error(error.response.message);
       } else if (error.request) {

@@ -17,9 +17,12 @@ import {
   FaClipboardList,
   FaToolbox,
   FaCode,
+  FaBookOpen,
+  FaCalendar,
+  FaTeamspeak,
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
-import { FaLockOpen, FaMessage, FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
+import { FaHouseCrack, FaLockOpen, FaMessage, FaPeopleGroup,  FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
 import { MdEventAvailable } from "react-icons/md";
 
 const SideBar = () => {
@@ -36,6 +39,36 @@ const SideBar = () => {
       label: "STUDENT ATTENDANCE",
       icon: FaCalendarCheck,
       href: "/attendance",
+      admin: true,
+    },
+    {
+      label: "ADMINS",
+      icon: FaPeopleGroup,
+      href: "/admins",
+      admin: true,
+    },
+    {
+      label: "Team",
+      icon: FaTeamspeak,
+      href: "/members",
+      admin: true,
+    },
+    {
+      label: "COURSES",
+      icon: FaBookOpen,
+      href: "/course",
+      admin: true,
+    },
+    {
+      label: "INTAKE",
+      icon: FaCalendar,
+      href: "/intake",
+      admin: true,
+    },
+    {
+      label: "SHIFT",
+      icon: FaHouseCrack,
+      href: "/shift",
       admin: true,
     },
     {

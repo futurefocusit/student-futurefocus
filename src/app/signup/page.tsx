@@ -59,7 +59,7 @@ const RegisterPage = () => {
     try {
       const response = await axios.post(`${API_BASE_URL}/institution`, form)
          toast.success(response.data.message)
-    } catch (err:any) {
+    } catch (err) {
       if(err.response){
         setError(err.response.data.message)
       }
@@ -77,14 +77,23 @@ const RegisterPage = () => {
   }
 
   return (
-      <div className="flex  mx-auto w-full shadow-lg h-full rounded-lg overflow-hidden">
-        <div className="w-full px-36 lg:w-1/2 bg-white p-8">
-          <h1 className="text-3xl font-semibold text-center text-blue-600 mb-6">Register</h1>
+      <div className="flex  mx-auto w-full shadow-lg h-full round overflow-hidden">
+        <div className="hidden  lg:w-3/5 bg-blue-600 text-white p-8 lg:flex flex-col justify-center">
+          <h2 className="text-xl font-bold mb-4">Join Us Today</h2>
+          <p className="text-sm mb-6">Become part of a growing community that values learning and innovation. Register now and start your journey with us!</p>
+          <img
+            src="/hero.jpg" 
+            alt="Register Illustration"
+            className="w-full h-96 object-cover rounded-lg shadow-md"
+          />
+        </div>
+        <div className="w-full px-20 lg:w-2/5 bg-white py-8">
+          <h1 className="text-2xl font-semibold text-center text-blue-600 mb-6">Register Your Institution</h1>
           <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-6">
             {error && <p className="text-red-500 text-center">{error}</p>}
 
             <div>
-              <label htmlFor="name" className="block text-lg font-medium">Name</label>
+              <label htmlFor="name" className="block text-md font-medium">Institution Name</label>
               <input
                 type="text"
                 id="name"
@@ -92,12 +101,12 @@ const RegisterPage = () => {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm"
+                className="w-full p-1 border border-gray-300 rounded-lg shadow-sm"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-lg font-medium">Email</label>
+              <label htmlFor="email" className="block text-md font-medium">Admin Email</label>
               <input
                 type="email"
                 id="email"
@@ -105,12 +114,12 @@ const RegisterPage = () => {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm"
+                className="w-full p-1 border border-gray-300 rounded-lg shadow-sm"
               />
             </div>
 
             <div>
-              <label htmlFor="phone" className="block text-lg font-medium">Phone</label>
+              <label htmlFor="phone" className="block text-md font-medium">Admin  Phone</label>
               <input
                 type="text"
                 id="phone"
@@ -118,12 +127,12 @@ const RegisterPage = () => {
                 value={formData.phone}
                 onChange={handleChange}
                 required
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm"
+                className="w-full p-1 border border-gray-300 rounded-lg shadow-sm"
               />
             </div>
 
             <div>
-              <label htmlFor="logo" className="block text-lg font-medium">Logo</label>
+              <label htmlFor="logo" className="block text-md font-medium">Company Logo</label>
               <input
                 type="file"
                 id="logo"
@@ -131,7 +140,7 @@ const RegisterPage = () => {
                 accept='.png'
                 onChange={handleFileChange}
                 required
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm"
+                className="w-full p-1 border border-gray-300 rounded-lg shadow-sm"
               />
             </div>
 
@@ -139,24 +148,17 @@ const RegisterPage = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition duration-300"
+                className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition duration-300"
               >
                 {loading ? 'Submitting...' : 'Register'}
               </button>
+              <p>Already registered? <a href="/login" className='text-blue-600 hover:text-blue-800'>login</a></p>
             </div>
           </form>
         </div>
 
      
-        <div className="hidden  lg:w-1/2 bg-blue-600 text-white p-8 lg:flex flex-col justify-center">
-          <h2 className="text-4xl font-bold mb-4">Join Us Today</h2>
-          <p className="text-lg mb-6">Become part of a growing community that values learning and innovation. Register now and start your journey with us!</p>
-          <img
-            src="/images/register-image.png" // Add an appropriate image here
-            alt="Register Illustration"
-            className="w-full h-64 object-cover rounded-lg shadow-md"
-          />
-        </div>
+        
       </div>
   )
 }

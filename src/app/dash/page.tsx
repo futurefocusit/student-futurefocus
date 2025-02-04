@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import withSuperAdminAuth from "@/components/withSuperAdmin"
+import API_BASE_URL from "@/config/baseURL"
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: API_BASE_URL
 })
 
 // API functions
