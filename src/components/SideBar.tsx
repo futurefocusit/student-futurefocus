@@ -22,7 +22,7 @@ import {
   FaTeamspeak,
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
-import { FaHouseCrack, FaLockOpen, FaMessage, FaPeopleGroup,  FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
+import { FaHouseCrack, FaLockOpen, FaMessage,  FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
 import { MdEventAvailable } from "react-icons/md";
 
 const SideBar = () => {
@@ -41,12 +41,7 @@ const SideBar = () => {
       href: "/attendance",
       admin: true,
     },
-    {
-      label: "ADMINS",
-      icon: FaPeopleGroup,
-      href: "/admins",
-      admin: true,
-    },
+   
     {
       label: "Team",
       icon: FaTeamspeak,

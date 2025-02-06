@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import Layout from "../layout";
 import { hasPermission } from "@/libs/hasPermission";
 import withAdminAuth from "@/components/withAdminAuth";
+import SideBar from "@/components/SideBar";
 
 
 const Intake = () => {
@@ -42,7 +43,10 @@ const {loggedUser,fetchLoggedUser}=useAuth()
   const getIntakes = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`${API_BASE_URL}/others/intake`);
+      const response = await axios.get(`${API_BASE_URL}/others/intake`,{
+        headers:{
+          "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
+        }});
       setIntakes(response.data.intakes);
       await fetchLoggedUser()
     } catch (error) {
@@ -57,6 +61,10 @@ const {loggedUser,fetchLoggedUser}=useAuth()
       setIsSubmitting(true);
       const response = await axios.post(`${API_BASE_URL}/others/intake`, {
         intake: intake,
+      },{
+        headers:{
+          "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
+        }
       });
       toast.success(response.data.message);
       await getIntakes();
@@ -73,7 +81,7 @@ const {loggedUser,fetchLoggedUser}=useAuth()
 
   return (
     <div>
-      <Layout>
+      <SideBar/>
         <div className="">
           <h1 className="text-3xl font-bold mb-4 text-center">Intakes</h1>
           <div className="flex gap-3 justify-center">
@@ -114,7 +122,6 @@ const {loggedUser,fetchLoggedUser}=useAuth()
                 ))}
           </div>
         </div>
-      </Layout>
     </div>
   );
 };

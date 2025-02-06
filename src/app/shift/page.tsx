@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import Layout from "../layout";
 import { hasPermission } from "@/libs/hasPermission";
 import withAdminAuth from "@/components/withAdminAuth";
+import SideBar from "@/components/SideBar";
 
 const Shift = () => {
   const [shift, setShift] = useState({
@@ -36,11 +37,16 @@ const {loggedUser,fetchLoggedUser}=useAuth()
     }));
   };
 
-  // Handle deleting a shift
   const handleDelete = async (id: string) => {
     try {
       setDeletingId(id);
-      const response = await axios.delete(`${API_BASE_URL}/others/shift/${id}`);
+      const response = await axios.delete(`${API_BASE_URL}/others/shift/${id}`,
+        {
+          headers:{
+            "Authorization": `${localStorage.getItem('ffa-admin')}`
+          }
+        }
+      );
       await getIntakes();
       toast.success(response.data.message);
     } catch (error) {
@@ -50,11 +56,14 @@ const {loggedUser,fetchLoggedUser}=useAuth()
     }
   };
 
-  // Fetch all shifts
   const getIntakes = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`${API_BASE_URL}/others/shift`);
+      const response = await axios.get(`${API_BASE_URL}/others/shift`,{
+        headers:{
+          "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
+        }
+      });
       setShifts(response.data.shifts);
       await fetchLoggedUser();
     } catch (error) {
@@ -64,7 +73,6 @@ const {loggedUser,fetchLoggedUser}=useAuth()
     }
   };
 
-  // Handle form submission (either create or update)
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
@@ -78,9 +86,13 @@ const {loggedUser,fetchLoggedUser}=useAuth()
         end: shift.end,
         name: shift.name,
         days: shift.days,
+      },{
+        headers:{
+          "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
+        }
       });
       toast.success(response.data.message);
-      setEditingShift(null); // Reset after submitting
+      setEditingShift(null); 
       await getIntakes();
     } catch (error) {
       toast.error("Failed to add or update shift");
@@ -89,7 +101,6 @@ const {loggedUser,fetchLoggedUser}=useAuth()
     }
   };
 
-  // Handle editing a shift
   const handleEdit = (shift: {
     _id: string;
     start: string;
@@ -106,14 +117,13 @@ const {loggedUser,fetchLoggedUser}=useAuth()
     });
   };
 
-  // Run on component mount
   useEffect(() => {
     getIntakes();
   }, []);
 
   return (
     <div>
-      <Layout>
+     <SideBar/>
         <div className="">
           <h1 className="text-3xl font-bold mb-4 text-center">Shift</h1>
           <div className="flex gap-3 items-center justify-center">
@@ -246,7 +256,6 @@ const {loggedUser,fetchLoggedUser}=useAuth()
                 )}
           </div>
         </div>
-      </Layout>
     </div>
   );
 };
