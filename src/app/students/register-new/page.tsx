@@ -71,8 +71,8 @@ const Registration: React.FC = () => {
          if (response.data.length > 0) {
            setFormData((prevData) => ({
              ...prevData,
-            //  selectedCourse: response.data[0].title,
-            //  selectedShift: response.data[0].shifts[0],
+             selectedCourse: response.data[0].title,
+             selectedShift: response.data[0].shifts[0],
            }));
          }
          setLoading(false);
