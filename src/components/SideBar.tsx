@@ -180,8 +180,9 @@ const SideBar = () => {
                 <FaChevronRight size={20} />
               )}
             </button>
-            <Image src={loggedUser.institution.logo} alt={`${loggedUser.institution.logo}'s logo`} className="rounded-full  bg-gray-600 w-10 h-10 "/>
           </div>
+            <img
+             src={loggedUser.institution.logo} alt={`${loggedUser.institution.logo}'s logo`} className="rounded-full  bg-gray-600 w-10 h-10 "/>
           <div className="">
             {menuItems
               .filter(
@@ -226,7 +227,7 @@ const SideBar = () => {
               </p>
             </button>
             <div className="flex flex-row ">
-              <Image src={loggedUser.image} alt={`${loggedUser.name}'s profile`} className="rounded-full  bg-gray-600 w-10 h-10 " />
+              <img src={loggedUser.image} alt={`${loggedUser.name}'s profile`} className="rounded-full  bg-gray-600 w-10 h-10 " />
               <span className="flex flex-col  items-center">
                 <p
                   className={`mx-4 text-sm text-white ${
