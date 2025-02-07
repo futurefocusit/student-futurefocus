@@ -288,6 +288,8 @@ const data:IInvoice = {
              onChange={handleChange}
              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
            >
+                <option disabled> Select Shift (Required)</option>
+
              {courses.map((course) => (
                <option key={course.title} value={course._id}>
                  {course.title}
@@ -305,7 +307,7 @@ const data:IInvoice = {
              onChange={handleChange}
              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
            >
-                <option disabled> Select Course (Required)</option>
+                <option disabled> Select Shift (Required)</option>
            
                          {courses
                .find((course) => course._id === formData.selectedCourse)
