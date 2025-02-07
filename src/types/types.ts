@@ -29,6 +29,7 @@ export interface TeamMember {
   position:string
   attend: boolean;
   active: boolean;
+  institution:{logo:string,name:string}
   
 }
 export interface TeamMemberLogin {

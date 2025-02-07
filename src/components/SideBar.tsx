@@ -22,8 +22,9 @@ import {
   FaTeamspeak,
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
-import { FaHouseCrack, FaLockOpen, FaMessage,  FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
+import { FaHouseCrack, FaLockOpen, FaMessage, FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
 import { MdEventAvailable } from "react-icons/md";
+import Image from "next/image";
 
 const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -179,6 +180,7 @@ const SideBar = () => {
                 <FaChevronRight size={20} />
               )}
             </button>
+            <Image src={loggedUser.institution.logo} alt={`${loggedUser.institution.logo}'s logo`} className="rounded-full  bg-gray-600 w-10 h-10 "/>
           </div>
           <div className="">
             {menuItems
@@ -224,7 +226,7 @@ const SideBar = () => {
               </p>
             </button>
             <div className="flex flex-row ">
-              <img src={loggedUser?.image} className="rounded-full  bg-gray-600 w-10 h-10 " />
+              <Image src={loggedUser.image} alt={`${loggedUser.name}'s profile`} className="rounded-full  bg-gray-600 w-10 h-10 " />
               <span className="flex flex-col  items-center">
                 <p
                   className={`mx-4 text-sm text-white ${

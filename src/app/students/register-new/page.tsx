@@ -10,7 +10,6 @@ import Loader from "@/components/loader";
 import { generateRegisterStatementPdf } from "@/libs/generateInvoice";
 import { convertImageUrlToBase64 } from "@/libs/convertImage";
 import { useAuth } from "@/context/AuthContext";
-const imageUrl = "/futurefocuslogo.png";
 
 interface Course {
   _id:string
@@ -132,7 +131,7 @@ const Registration: React.FC = () => {
 
 // }
    const handleSubmit = async () => {
-    const ourlogo = await convertImageUrlToBase64(imageUrl as string);
+    const ourlogo = await convertImageUrlToBase64(loggedUser.institution.logo as string);
 const data:IInvoice = {
   paymentMethod: formData.payment,
   student: formData.name,
