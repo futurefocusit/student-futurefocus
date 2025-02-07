@@ -56,7 +56,10 @@ const {loggedUser,fetchLoggedUser} = useAuth()
 
     const getShifts = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/others/shift`);
+        const response = await axios.get(`${API_BASE_URL}/others/shift`,{
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+          }});
         setShifts(response.data.shifts);
       } catch (error) {
         console.log(error);
@@ -78,7 +81,10 @@ const {loggedUser,fetchLoggedUser} = useAuth()
 
   const handleToggleActive = async (id: string) => {
     try {
-      await axios.put(`${API_BASE_URL}/course/activate/${id}`,);
+      await axios.put(`${API_BASE_URL}/course/activate/${id}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        }});
       setTogglesActive((prev) => ({
         ...prev,
         [id]: !prev[id],
@@ -372,7 +378,6 @@ const {loggedUser,fetchLoggedUser} = useAuth()
           </form>
         </Modal>
 
-        {/* Update Course Modal */}
         {editingCourse && (
           <Modal
             isOpen={isUpdateModalOpen}

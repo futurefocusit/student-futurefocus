@@ -30,7 +30,10 @@ const {loggedUser,fetchLoggedUser}=useAuth()
   const handleDelete = async (id: string) => {
     try {
       setDeletingId(id);
-      const response = await axios.delete(`${API_BASE_URL}/others/intake/${id}`);
+      const response = await axios.delete(`${API_BASE_URL}/others/intake/${id}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        }});
       await getIntakes();
       toast.success(response.data.message);
     } catch (error) {
