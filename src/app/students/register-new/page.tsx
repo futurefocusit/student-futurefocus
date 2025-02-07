@@ -35,6 +35,7 @@ const Registration: React.FC = () => {
   
    const [courses, setCourses] = useState<Course[]>([]);
    const [loading, setLoading] = useState<boolean>(true);
+   const [submiting, setSubmiting] = useState<boolean>(false);
    const [error, setError] = useState<string | null>(null);
   const { fetchLoggedUser, loggedUser } = useAuth();
    const [formData, setFormData] = useState<registrationData>({
@@ -146,6 +147,7 @@ const data:IInvoice = {
      setSubmissionResult(null);
 
      try {
+      setSubmiting(true)
       formData.user=loggedUser?.name
        const response = await axios.post(
          `${API_BASE_URL}/students/register`,
@@ -187,6 +189,9 @@ const data:IInvoice = {
        } else {
          setSubmissionResult("An unexpected error occurred. Please try again.");
        }
+     }
+     finally{
+      setSubmiting(false)
      }
    };
 
@@ -368,7 +373,7 @@ const data:IInvoice = {
              onClick={()=>handleSubmit()}
                className="inline-flex justify-center px-4 py-2 border border-transparent text-sm font-extrabold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
              >
-              SUBMIT
+              {submiting?"SUBMITING..":"SUBMIT"}
              </button>
            ) : (
              ""
