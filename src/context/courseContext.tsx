@@ -14,7 +14,10 @@ export interface Course {
 
 
 export const getCourses = async () => {
-  return await axios.get<Course[]>(`${API_BASE_URL}/course/`);
+  return await axios.get<Course[]>(`${API_BASE_URL}/course/`,{
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+    }});
 };
 
 export const addCourse = async (course: Course) => {
