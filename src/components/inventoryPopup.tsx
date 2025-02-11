@@ -95,6 +95,7 @@ export const PopupForm: React.FC<PopupFormProps> = ({ onClose, onSuccess,categor
           onChange={handleChange}
           className="border p-2 mb-4 w-full"
         >
+       <option value="" disabled>select category</option>
           {categories.map((category, index) => (
             <option key={index} value={category._id}>
               {category.name}
