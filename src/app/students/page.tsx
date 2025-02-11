@@ -25,7 +25,6 @@ interface Student {
   _id: string;
   name: string;
   email: string;
-  referer: "default" | "cyd";
   phone: string;
   intake: string;
   selectedCourse: string
@@ -99,7 +98,6 @@ const StudentManagement: React.FC = () => {
   const [item, setItem] = useState<string | null>(null);
   const [items, setItems] = useState({ itemId: "", name: "", status: "" });
   const { fetchLoggedUser, loggedUser } = useAuth();
-  const [refererFilter, setRefererFilter] = useState<string>("default");
 
   const [studentToRegister, setStudentToRegister] = useState<{
     id: string;
@@ -117,15 +115,13 @@ const StudentManagement: React.FC = () => {
   };
   const filterStudents = (
     status: string,
-    referer: string,
     studentsData: Student[] = students
   ) => {
     setActiveFilter(status);
-    setRefererFilter(referer);
     setSearchTerm("");
     const filteredStudents = studentsData.filter(
       (student) =>
-        student.status === status && (referer === "all" || student.referer === referer)
+        student.status === status
     );
     groupStudentsByIntake(filteredStudents);
   };
@@ -343,7 +339,7 @@ const StudentManagement: React.FC = () => {
         (a, b) =>
           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       );
-      filterStudents(activeFilter, refererFilter,sortedStudents);
+      filterStudents(activeFilter,sortedStudents);
       setStudents(sortedStudents);
       setStudentCounts(getStudentCountByStatus(sortedStudents));
     } catch (error) {
@@ -447,7 +443,7 @@ const StudentManagement: React.FC = () => {
         (student) => student._id !== id
       );
       setStudents(updatedStudents);
-      filterStudents(activeFilter, refererFilter, updatedStudents);
+      filterStudents(activeFilter, updatedStudents);
       setSelectedStudent(null);
       setError(null);
       setSucces("deleted student successfully");
@@ -531,7 +527,6 @@ const StudentManagement: React.FC = () => {
     const filteredStudents = students.filter(
       (student) =>
         student.status === activeFilter &&
-        (refererFilter === "all" || student.referer === refererFilter) &&
         (student.name.toLowerCase().includes(searchValue) ||
           student.email.toLowerCase().includes(searchValue) ||
           student.phone.toLowerCase().includes(searchValue))
