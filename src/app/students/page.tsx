@@ -927,7 +927,7 @@ const StudentManagement: React.FC = () => {
                 <button
                   key={status}
                   onClick={() => {
-                    filterStudents(status, refererFilter);
+                    filterStudents(status);
                     setStatus(status);
                   }}
                   className={`px-3 py-1 flex gap-1  text-xs sm:text-sm font-extrabold text-white   border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${activeFilter === status ? "bg-green-20" : ""
@@ -974,24 +974,7 @@ const StudentManagement: React.FC = () => {
                 </button>
               ))}
             </div>
-            <div className="flex items-center space-x-2 mt-4">
-              <label
-                htmlFor="refererFilter"
-                className="font-medium text-gray-700"
-              >
-                Filter by Referer:
-              </label>
-              <select
-                id="refererFilter"
-                value={refererFilter}
-                onChange={(e) => filterStudents(activeFilter, e.target.value)}
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-              >
-                <option value="all">All</option>
-                <option value="default">Default</option>
-                <option value="cyd">CYD</option>
-              </select>
-            </div>
+           
             <div className="relative w-full sm:w-64">
               <input
                 type="text"
