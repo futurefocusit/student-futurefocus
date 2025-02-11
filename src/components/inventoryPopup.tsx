@@ -18,7 +18,11 @@ export const PopupForm: React.FC<PopupFormProps> = ({ onClose, onSuccess,categor
   });
  const fetchMaterials = async () => {
    try {
-     const response = await axios.get(`${API_BASE_URL}/inventory`);
+     await axios.get(`${API_BASE_URL}/inventory`,{
+      headers:{
+        "Authorization":`Beare ${localStorage.getItem('ffa-admin')}`
+      }
+    });
    } catch (error) {
     console.log(error)
    }
@@ -31,7 +35,11 @@ export const PopupForm: React.FC<PopupFormProps> = ({ onClose, onSuccess,categor
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_BASE_URL}/inventory`, formData);
+      await axios.post(`${API_BASE_URL}/inventory`, formData,{
+        headers:{
+          "Authorization":`Beare ${localStorage.getItem('ffa-admin')}`
+        }
+      });
       onSuccess("Material added successfully!");
       await fetchMaterials()
     } catch (error) {
@@ -121,7 +129,11 @@ export const PopupFormCategory: React.FC<PopupFormProps> = ({ onClose, onSuccess
   });
   const fetchCategory = async () => {
     try {
-     await axios.get(`${API_BASE_URL}/inventory/category`);
+     await axios.get(`${API_BASE_URL}/inventory/category`,{
+      headers:{
+        "Authorization":`Beare ${localStorage.getItem('ffa-admin')}`
+      }
+    });
 
     } catch (error) {
    console.log(error)
@@ -135,7 +147,11 @@ export const PopupFormCategory: React.FC<PopupFormProps> = ({ onClose, onSuccess
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_BASE_URL}/inventory/category`, formData);
+      await axios.post(`${API_BASE_URL}/inventory/category`, formData,{
+        headers:{
+          "Authorization":`Beare ${localStorage.getItem('ffa-admin')}`
+        }
+      });
       onSuccess("Category added successfully!");
       await fetchCategory()
     } catch (error) {

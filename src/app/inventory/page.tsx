@@ -50,7 +50,6 @@ const MaterialManagement: React.FC = () => {
   const [showCart, setShowCart] = useState(false);
   const [message, setMessage] = useState<{ type: string; text: string } | null>(null);
   const [activeTab, setActiveTab] = useState<"materials" | "rented" | "category">("materials");
-  const [selectedCategory, setSelectedCategory] = useState<string>(""); 
 
 
   const fetchMaterials = async () => {
@@ -118,9 +117,7 @@ const MaterialManagement: React.FC = () => {
     fetchCategory();
   }, []);
 
-  const handleRentSuccess = (message: string) => {
-    setMessage({ type: "success", text: message });
-  };
+
 
   const handleAddToCart = (material:CartItem) => {
     const amount = 1; // Default amount
