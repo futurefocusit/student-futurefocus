@@ -29,6 +29,10 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose, loggedUser }) => {
           render: loggedUser._id,
           rendeeName,
           returnDate,
+        },{
+          headers:{
+            "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
+          }
         });
       
      printRentalContract({rendeeName,render:loggedUser.name},cartItems)
