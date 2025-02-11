@@ -28,7 +28,7 @@ const Shift = () => {
     days: string;
   }>(null);
 const {loggedUser,fetchLoggedUser}=useAuth()
-  // Handle form input changes
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setShift((prev) => ({
@@ -43,7 +43,7 @@ const {loggedUser,fetchLoggedUser}=useAuth()
       const response = await axios.delete(`${API_BASE_URL}/others/shift/${id}`,
         {
           headers:{
-            "Authorization": `${localStorage.getItem('ffa-admin')}`
+            "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
           }
         }
       );

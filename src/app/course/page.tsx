@@ -9,8 +9,8 @@ import API_BASE_URL from "@/config/baseURL";
 import { addCourse, Course, deleteCourse, getCourses, updateCourse } from "@/context/courseContext";
 import { useAuth } from "@/context/AuthContext";
 import { hasPermission } from "@/libs/hasPermission";
-import Layout from "../layout";
 import Modal from "@/components/Modal";
+import SideBar from "@/components/SideBar";
 
 const CoursesComponent: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -199,8 +199,8 @@ const {loggedUser,fetchLoggedUser} = useAuth()
     : false;
 
   return (
-    <Layout>
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <SideBar />
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-semibold text-gray-900">Courses</h1>
           <button
@@ -461,7 +461,7 @@ const {loggedUser,fetchLoggedUser} = useAuth()
           </Modal>
         )}
       </div>
-    </Layout>
+   
   );
 };
 

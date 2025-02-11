@@ -50,11 +50,17 @@ const MaterialManagement: React.FC = () => {
   const [showCart, setShowCart] = useState(false);
   const [message, setMessage] = useState<{ type: string; text: string } | null>(null);
   const [activeTab, setActiveTab] = useState<"materials" | "rented" | "category">("materials");
+  const [selectedCategory, setSelectedCategory] = useState<string>(""); 
+
 
   const fetchMaterials = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_BASE_URL}/inventory`);
+      const response = await axios.get(`${API_BASE_URL}/inventory`,{
+        headers:{
+          "Authorization":`Beare ${localStorage.getItem('ffa-admin')}`
+        }
+      });
       setMaterials(response.data);
       await fetchLoggedUser();
     } catch (error) {

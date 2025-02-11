@@ -25,7 +25,7 @@ const ManageRolesPermissions: React.FC = () => {
   });
   const [newRole, setNewRole] = useState({ role: "", permission: [] });
   const [selectedRole, setSelectedRole] = useState<string>("");
-  const [selectedUser, setSelectedUser] = useState<string>("");
+  const [selectedUser, setSelectedUser] = useState<string>(null);
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
   const [rolePermissions, setRolePermissions] = useState<string[]>([]);
   const [userData, setUserData] = useState<TeamMember|null>()
@@ -144,6 +144,8 @@ const ManageRolesPermissions: React.FC = () => {
   };
 
   const handleAssignPermissionsToRole = async () => {
+    console.log(selectedRole)
+    if(!selectedRole)return
     try {
       await axios.put(`${API_BASE_URL}/role/${selectedRole}`, {
         permissions: selectedPermissions,
