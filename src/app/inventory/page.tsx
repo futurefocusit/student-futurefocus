@@ -4,7 +4,7 @@ import axios from "axios";
 import Message from "@/components/message";
 import {
   PopupForm,
-  PopupFormCategory,
+  PopupFormCategory, PopupUpdateForm
 } from "@/components/inventoryPopup";
 import API_BASE_URL from "@/config/baseURL";
 import { useAuth } from "@/context/AuthContext";
@@ -46,11 +46,12 @@ const MaterialManagement: React.FC = () => {
   const [rentedMaterials, setRentedMaterials] = useState<IMaterialRent[]>([]);
   const [showPopupNM, setShowPopupNM] = useState(false);
   const [showPopupNC, setShowPopupNC] = useState(false);
+  const [showPopupUM, setShowPopupUM] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [showCart, setShowCart] = useState(false);
   const [message, setMessage] = useState<{ type: string; text: string } | null>(null);
   const [activeTab, setActiveTab] = useState<"materials" | "rented" | "category">("materials");
-
+  const [updateMaterial,setUpdateMaterial]=useState<IMaterial>(null)
 
   const fetchMaterials = async () => {
     try {
@@ -129,27 +130,7 @@ const MaterialManagement: React.FC = () => {
     toast.success("Added to cart");
   };
 
-  const handleUpdate = async (material:IMaterial) => {
-    try {
-      // Simulating the updated material's data. You may want to open a form for this.
-      const updatedMaterial = {
-        materialName: material.materialName, // Replace with updated values
-        amount: material.amount, // Replace with updated values
-        rent: material.rent, // Replace with updated values
-        category: material.category._id, // Replace with updated category ID
-      };
-      
-      await axios.patch(`${API_BASE_URL}/inventory/${material._id}`, updatedMaterial,{
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
-        },
-      });
-      toast.success("Material updated successfully!");
-      fetchMaterials(); // Refetch materials to reflect changes
-    } catch (error) {
-      toast.error("Failed to update material.");
-    }
-  };
+  
 
   const handleDelete = async (material:IMaterial) => {
     try {
@@ -159,7 +140,7 @@ const MaterialManagement: React.FC = () => {
         },
       });
       toast.success("Material deleted successfully!");
-      fetchMaterials(); // Refetch materials to reflect changes
+      fetchMaterials(); 
     } catch (error) {
       toast.error("Failed to delete material.");
     }
@@ -172,6 +153,11 @@ const MaterialManagement: React.FC = () => {
         <Loader />
       </div>
     );
+  }
+
+const  handleUpdate=(material: IMaterial)=> {
+   setShowPopupUM(true)
+   setUpdateMaterial(material)
   }
 
   return (
@@ -258,13 +244,13 @@ const MaterialManagement: React.FC = () => {
                         Add to Cart
                       </button>
                       <button
-                        onClick={() => handleDelete(material)} // Corrected delete function
+                        onClick={() => handleDelete(material)} 
                         className="bg-red-500 text-white px-2 py-1 rounded"
                       >
                         Delete
                       </button>
                       <button
-                        onClick={() => handleUpdate(material)} // Corrected update function
+                        onClick={() => handleUpdate(material)} 
                         className="bg-blue-500 text-white px-2 py-1 rounded"
                       >
                         Update
@@ -344,18 +330,29 @@ const MaterialManagement: React.FC = () => {
           <PopupForm
             categories={category as never}
             onClose={() => setShowPopupNM(false)}
-            onSuccess={() => {
-              fetchMaterials();
+            onSuccess={async() => {
+             await fetchMaterials();
               setShowPopupNM(false);
             }}
+          />
+        )}
+        {showPopupUM && (
+          <PopupUpdateForm
+          onClose={() => setShowPopupNM(false)}
+          onSuccess={async() => {
+           await fetchMaterials();
+            setShowPopupUM(false);
+          }}
+          Material={updateMaterial}
+          categories={category as never}
           />
         )}
         {showPopupNC && (
           <PopupFormCategory
             categories={[]}
             onClose={() => setShowPopupNC(false)}
-            onSuccess={() => {
-              fetchCategory();
+            onSuccess={async() => {
+             await fetchCategory();
               setShowPopupNC(false);
             }}
           />
