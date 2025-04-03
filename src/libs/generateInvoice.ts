@@ -182,6 +182,5 @@ export const generateRegisterStatementPdf = (
     doc.internal.pageSize.height - 20
   );
 
-  // Save the document
   doc.save(`${data.student}_registration_statement.pdf`);
 };
