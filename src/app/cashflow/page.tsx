@@ -483,7 +483,24 @@ const PaymentsPage: React.FC = () => {
         <div className="p-4">
           {hasPermission(loggedUser as TeamMember, "cashflow", "view") ? (
             <div className="overflow-x-auto">
-              {Object.entries(groupedCashflows).map(([date, { total, transactions }]) => (
+              {Object.entries(groupedCashflows).sort(([dateB], [dateA]) => {
+    const dA = new Date(dateA);
+    const dB = new Date(dateB);
+    
+    // Compare years first
+    if (dA.getFullYear() !== dB.getFullYear()) {
+        return dA.getFullYear() - dB.getFullYear();
+    }
+    
+    // If years are the same, compare months
+    if (dA.getMonth() !== dB.getMonth()) {
+        return dA.getMonth() - dB.getMonth();
+    }
+    
+    // If both year and month are the same, compare days
+    return dA.getDate() - dB.getDate();
+})
+.map(([date, { total, transactions }]) => (
                 <div key={date} className="mb-4">
                   <h3 className="text-lg font-bold text-gray-800">{date.toUpperCase()}</h3>
                   <div className="text-sm text-gray-600 flex flex-wrap gap-4">
