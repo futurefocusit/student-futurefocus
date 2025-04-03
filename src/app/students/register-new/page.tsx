@@ -131,7 +131,7 @@ const Registration: React.FC = () => {
 
 // }
    const handleSubmit = async () => {
-    const ourlogo = await convertImageUrlToBase64('/logo' as string);
+    const ourlogo = await convertImageUrlToBase64(loggedUser.institution.logo as string);
 const data:IInvoice = {
   paymentMethod: formData.payment,
   student: formData.name,
