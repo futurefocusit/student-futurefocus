@@ -102,6 +102,7 @@ const PaymentsPage: React.FC = () => {
       await fetchLoggedUser()
       const response = await axios.get(`${API_BASE_URL}/cashflow`, {
         headers: {
+          "Content-Type":'applicatio/json',
           Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
         },
       })
