@@ -100,12 +100,7 @@ const SideBar = () => {
       href: "/message",
       admin: true,
     },
-    {
-      label: "MANAGE ROLE",
-      icon: FaLockOpen,
-      href: "/manage-role",
-      admin: true,
-    },
+
     {
       label: "TECHUP PROGRAM",
       icon: FaCode,
