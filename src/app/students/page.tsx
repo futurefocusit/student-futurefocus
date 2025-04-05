@@ -91,8 +91,10 @@ const StudentManagement: React.FC = () => {
   const [student, setStudent] = useState<string | null>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [isPaying, setIsPaying] = useState<boolean>(false);
+  const [isRecovering, setIsRecovering] = useState<boolean>(false);
   const [updateMode, setUpdateMode] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isRecoverModalOpen, setIsRecoverModalOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
   const [item, setItem] = useState<string | null>(null);
@@ -107,6 +109,10 @@ const StudentManagement: React.FC = () => {
     amount: 0,
     user: loggedUser?.name,
     method: "",
+  });
+  const [RecoverFormData, setRecoverFormData] = useState({
+    amountDue: 0,
+    amountPaid: 0,
   });
   const closePopup = () => {
     setOpenMessage(false);
@@ -198,6 +204,13 @@ const StudentManagement: React.FC = () => {
       [name]: name === "amount" ? Number(value) : value,
     }));
   };
+  const handleRecoverFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setRecoverFormData((prevData) => ({
+      ...prevData,
+      [name]:  Number(value) ,
+    }));
+  };
   const handleViewP = (student: Student, type: string) => {
     setSelectedStudent(student);
     setType(type);
@@ -273,6 +286,28 @@ const StudentManagement: React.FC = () => {
       setError(null);
       const ourlogo = await convertImageUrlToBase64(imageUrl as string);
       generateStatementPdf(response.data.data, ourlogo as string);
+      fetchPayment();
+    } catch (error) {
+      console.log(error);
+      setSucces(null);
+      setError("Error happened! check payment and try again");
+    } finally {
+      setIsPaying(false);
+    }
+  };
+  const handleRecover = async (id: string) => {
+    try {
+      setIsRecovering(true);
+      const response = await axios.post(
+        `${API_BASE_URL}/payment/recover/${id}`,
+        RecoverFormData,{
+          headers:{
+            "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
+          }
+        }
+      );
+      setSucces(response.data.message);
+      setError(null);
       fetchPayment();
     } catch (error) {
       console.log(error);
@@ -1095,23 +1130,36 @@ const StudentManagement: React.FC = () => {
                         {hasPermission(loggedUser as TeamMember, "payment", "pay") ? (
                           <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden md:table-cell">
                             <div className="text-sm text-gray-900">
-                              {payment &&
-                                payment.filter(
-                                  (payment) => payment.studentId === student._id
-                                ).length === 0 ? (
-                                <div>No payment info</div>
-                              ) : (
-                                payment &&
-                                payment
-                                  .filter(
-                                    (payment) => payment.studentId === student._id
-                                  )
-                                  .map((filteredPayment) => (
-                                    <div key={filteredPayment._id}>
-                                      {filteredPayment.status.toUpperCase()}
-                                    </div>
-                                  ))
-                              )}
+                            {payment &&
+                           payment.find((payment) => payment.studentId === student._id) ?
+                            (
+                       payment &&
+                       payment
+                         .filter(
+                           (payment) => payment.studentId === student._id
+                         )
+                         .map((filteredPayment) => (
+                           <div key={filteredPayment._id}>
+                             
+                             
+                             <p className="flex mt-1">
+                               <span className=" text-blue-600 font-extrabold ">
+                                 {
+                                   filteredPayment.status
+                                 }
+                                
+                               </span>
+                             </p>
+                          
+                           </div>
+                         ))
+                     ): (
+                      <div>
+                        <p>No payment information found</p>
+                        {student.status==='registered'||student.status==='started'||student.status==='completed'?
+                        <button onClick={()=>{setIsRecoverModalOpen(true);setSelectedStudent(student)}} className="bg-green-600 p-2 text-white font-bold rounded-md">Recover</button>:''}
+                        </div>
+                    ) }
                             </div>
                           </td>
                         ) : (
@@ -1427,6 +1475,61 @@ const StudentManagement: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+      {isRecoverModalOpen && (
+        <div className="fixed inset-0 flex  items-center justify-center bg-gray-800 bg-opacity-75">
+        <div className="bg-white rounded-lg overflow-hidden h-64 shadow-xl transform transition-all sm:w-full sm:max-w-lg">
+          <div className="bg-gray-50  overflow-scroll">
+            <h3 className="text-lg text-center bg-blue-600 text-white font-extrabold">
+             RECOVER PAYMENT
+            </h3>
+            <div className="mt-4 flex  flex-col gap-5">
+              <span className="flex gap-10 items-center justify-between mx-10 mb-3">
+                <label className="font-extrabold" htmlFor="amount">
+                  AMOUNT DUE:
+                </label>
+                <input
+                  name="amountDue"
+                  type="number"
+                  onChange={handleRecoverFormData}
+                  placeholder="Amount in Frw"
+                  className="border-2 p-2 rounded-md border-blue-700"
+                />
+              </span>
+          
+            </div>
+            <div className="mt-4 flex  flex-col gap-5">
+              <span className="flex gap-10 items-center justify-between mx-10 mb-3">
+                <label className="font-extrabold" htmlFor="amount">
+                  AMOUNT PAID:
+                </label>
+                <input
+                  name="amountPaid"
+                  type="number"
+                  onChange={handleRecoverFormData}
+                  placeholder="Amount in Frw"
+                  className="border-2 p-2 rounded-md border-blue-700"
+                />
+              </span>
+          
+            </div>
+          </div>
+          <div className="bg-gray-50 p-4 flex justify-between  mx-5">
+            <button
+              onClick={()=>handleRecover(selectedStudent._id)}
+              className="px-4 py-2 text-sm text-black font-extrabold hover:text-white bg-green-300 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
+            >
+           {isRecovering?'Recovering':"Recover"}
+            </button>
+            <button
+              onClick={() => setIsRecoverModalOpen(false)}
+              className="px-4 py-2 text-sm text-black font-extrabold hover:text-white bg-red-300 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
       )}
       {selectedStudent && type && openPay && (
         <div className="fixed inset-0 flex  items-center justify-center bg-gray-800 bg-opacity-75">
