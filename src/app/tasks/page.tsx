@@ -24,17 +24,12 @@ import {
   Message,
   Check,
   Delete,
-  // FormatBold,
-  // FormatItalic,
-  // FormatListBulleted,
-  // FormatListNumbered,
 } from "@mui/icons-material";
 import API_BASE_URL from "@/config/baseURL";
 import { useAuth } from "@/context/AuthContext";
 import withAdminAuth from "@/components/withAdminAuth";
 import SideBar from "@/components/SideBar";
 import ConfirmDeleteModal from "@/components/confirmPopupmodel";
-
 
 // Types
 interface Comment {
@@ -60,12 +55,11 @@ interface User {
   name: string;
 }
 
-
 const MemberTasks: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
-    const [confirmModelOpen, SetConfirmModel] = useState(false);
-    const [action, setAction] = useState("");
-   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+  const [confirmModelOpen, SetConfirmModel] = useState(false);
+  const [action, setAction] = useState("");
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [task, setTask] = useState<string>("");
@@ -75,11 +69,12 @@ const MemberTasks: React.FC = () => {
   const { fetchLoggedUser, loggedUser } = useAuth();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [comment, setComment] = useState<string>("");
-  const [loading,setIsLoading]=useState(false)
+  const [loading, setIsLoading] = useState(false);
   const [reply, setReply] = useState<{
     commentId: string;
     text: string;
   } | null>(null);
+  const [selectedTaskForUpdate, setSelectedTaskForUpdate] = useState<Task | null>(null);
 
   useEffect(() => {
     const fetchloggedUser = async () => {
@@ -129,14 +124,16 @@ const MemberTasks: React.FC = () => {
       console.error("Error fetching users:", error);
     }
   };
- const handleDeleteClick = (itemId: string) => {
-   setItemToDelete(itemId); // Set the item that will be deleted
-   SetConfirmModel(true); // Open the modal
- };
+
+  const handleDeleteClick = (itemId: string) => {
+    setItemToDelete(itemId); // Set the item that will be deleted
+    SetConfirmModel(true); // Open the modal
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       await axios.post(`${API_BASE_URL}/task`, {
         task,
         user,
@@ -153,8 +150,35 @@ const MemberTasks: React.FC = () => {
       fetchTasks();
     } catch (error) {
       console.error("Error assigning task:", error);
-    }finally{
-      setIsLoading(false)
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTaskForUpdate) return;
+
+    try {
+      setIsLoading(true);
+      await axios.patch(`${API_BASE_URL}/task/${selectedTaskForUpdate._id}`, {
+        task,
+        user,
+        startTime,
+        endTime,
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
+      setIsFormOpen(false);
+      resetForm();
+      setSelectedTaskForUpdate(null); // Reset selected task after update
+      fetchTasks();
+    } catch (error) {
+      console.error("Error updating task:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -163,6 +187,7 @@ const MemberTasks: React.FC = () => {
     setUser("");
     setEndTime("");
     setStartTime("");
+    setSelectedTaskForUpdate(null); // Reset task being edited
   };
 
   const handleMarkAsDone = async (taskId: string) => {
@@ -191,17 +216,15 @@ const MemberTasks: React.FC = () => {
       fetchTasks();
     } catch (error) {
       console.error("Error deleting task:", error);
-    }finally{
+    } finally {
       setIsLoading(false);
-      SetConfirmModel(false)
-
+      SetConfirmModel(false);
     }
   };
 
   const handleAddComment = async (taskId: string) => {
     try {
       setIsLoading(true);
-
       await axios.post(`${API_BASE_URL}/task/comment/${taskId}`, {
         text: comment,
         user: loggedUser?._id,
@@ -212,36 +235,34 @@ const MemberTasks: React.FC = () => {
       });
       setComment("");
       fetchTasks();
-      
     } catch (error) {
       console.error("Error adding comment:", error);
-    }finally{
-      setIsFormOpen(false)
+    } finally {
+      setIsFormOpen(false);
       setIsLoading(false);
-
     }
   };
 
   const handleAddReply = async (commentId: string) => {
     if (!reply) return;
-      setIsLoading(true);
-      try {
-        await axios.post(`${API_BASE_URL}/task/comment/reply/${commentId}`, {
-          text: reply.text,
-          user: loggedUser?._id,
-        },{
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
-          },
-        });
-        setReply(null);
-        fetchTasks();
-      } catch (error) {
-        console.error("Error adding reply:", error);
-      } finally {
-        setIsFormOpen(false);
-        setIsLoading(false);
-      }
+    setIsLoading(true);
+    try {
+      await axios.post(`${API_BASE_URL}/task/comment/reply/${commentId}`, {
+        text: reply.text,
+        user: loggedUser?._id,
+      },{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
+      setReply(null);
+      fetchTasks();
+    } catch (error) {
+      console.error("Error adding reply:", error);
+    } finally {
+      setIsFormOpen(false);
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -268,13 +289,14 @@ const MemberTasks: React.FC = () => {
           onClose={() => {
             setIsFormOpen(false);
             resetForm();
+            setSelectedTaskForUpdate(null); // Reset task when closing
           }}
           maxWidth="md"
           fullWidth
         >
-          <DialogTitle>Assign New Task</DialogTitle>
+          <DialogTitle>{selectedTaskForUpdate ? "Update Task" : "Assign New Task"}</DialogTitle>
           <DialogContent>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={selectedTaskForUpdate ? handleUpdateTask : handleSubmit}>
               <Box sx={{ mb: 2 }}>
                 <Typography variant="subtitle1" sx={{ mb: 1 }}>
                   Task Description
@@ -282,7 +304,7 @@ const MemberTasks: React.FC = () => {
                 <TextField
                   fullWidth
                   multiline
-                  placeholder="enter task separated by comma(',')"
+                  placeholder="Enter task separated by comma(',')"
                   value={task}
                   onChange={(e) => setTask(e.target.value)}
                 />
@@ -327,11 +349,18 @@ const MemberTasks: React.FC = () => {
               />
 
               <DialogActions>
-                <Button onClick={() => setIsFormOpen(false)} color="primary">
+                <Button
+                  onClick={() => {
+                    setIsFormOpen(false);
+                    resetForm();
+                    setSelectedTaskForUpdate(null); // Reset task when closing
+                  }}
+                  color="primary"
+                >
                   Cancel
                 </Button>
                 <Button type="submit" color="primary">
-                  Assign Task
+                  {selectedTaskForUpdate ? "Update Task" : "Assign Task"}
                 </Button>
               </DialogActions>
             </form>
@@ -346,7 +375,7 @@ const MemberTasks: React.FC = () => {
           }}
         >
           {tasks.length === 0 ? (
-            <p>no task availbale</p>
+            <p>No tasks available</p>
           ) : (
             tasks.map((t) => (
               <Card key={t._id}>
@@ -386,10 +415,25 @@ const MemberTasks: React.FC = () => {
                   <Button
                     variant="outlined"
                     color="error"
-                    onClick={() =>{ handleDeleteClick(t._id);setAction('delete taks')}}
+                    onClick={() => { handleDeleteClick(t._id); setAction("delete task"); }}
                     style={{ marginLeft: "8px" }}
                   >
                     <Delete style={{ marginRight: "8px" }} />
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => {
+                      setSelectedTaskForUpdate(t);
+                      setTask(t.task);
+                      setUser(t.user._id);
+                      setStartTime(t.startTime);
+                      setEndTime(t.endTime);
+                      setIsFormOpen(true);
+                    }}
+                    style={{ marginLeft: "8px" }}
+                  >
+                    Edit
                   </Button>
                 </CardContent>
               </Card>
@@ -412,88 +456,65 @@ const MemberTasks: React.FC = () => {
             <DialogContent>
               <div style={{ marginBottom: "16px" }}>
                 {selectedTask.comments?.map((comment) => (
-                  <div key={comment._id} style={{ marginBottom: "16px" }}>
-                    <div
-                      style={{
-                        background: "#f5f5f5",
-                        padding: "8px",
-                        borderRadius: "4px",
-                      }}
-                    >
-                      <Typography variant="body1">
-                        {comment?.user?.name}: {comment?.text}
-                      </Typography>
-                      <Button
-                        variant="outlined"
-                        onClick={() =>
-                          setReply({ commentId: comment._id, text: "" })
-                        }
-                      >
-                        Reply
-                      </Button>
-                      {comment.replies?.map((replyComment) => (
-                        <div
-                          key={replyComment._id}
-                          style={{ marginLeft: "20px", marginTop: "8px" }}
-                        >
-                          <Typography
-                            variant="body2"
-                            style={{
-                              background: "#e0e0e0",
-                              padding: "4px",
-                              borderRadius: "4px",
-                            }}
-                          >
-                            {replyComment?.user?.name}: {replyComment?.text}
-                          </Typography>
-                        </div>
-                      ))}
-                    </div>
+                  <div key={comment._id}>
+                    <p>
+                      <b>{comment.user?.name}:</b> {comment.text}
+                    </p>
+                    {comment.replies?.map((reply) => (
+                      <p key={reply._id} style={{ paddingLeft: "20px" }}>
+                        <b>{reply.user?.name}:</b> {reply.text}
+                      </p>
+                    ))}
                   </div>
                 ))}
               </div>
+
+              <TextField
+                fullWidth
+                label="Add a Comment"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                style={{ marginBottom: "16px" }}
+              />
+
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleAddComment(selectedTask._id)}
+              >
+                Add Comment
+              </Button>
+
               {reply && (
                 <div>
                   <TextField
-                    placeholder="Add a reply..."
                     fullWidth
+                    label="Reply"
                     value={reply.text}
                     onChange={(e) =>
                       setReply({ ...reply, text: e.target.value })
                     }
+                    style={{ marginBottom: "16px" }}
                   />
-                  <IconButton
-                    onClick={() => handleAddReply(reply.commentId)}
+                  <Button
+                    variant="contained"
                     color="primary"
+                    onClick={() => handleAddReply(reply.commentId)}
                   >
-                    <Send />
-                  </IconButton>
+                    Add Reply
+                  </Button>
                 </div>
               )}
-              <TextField
-                placeholder="Add a comment..."
-                fullWidth
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-              />
-              <IconButton
-                onClick={() => handleAddComment(selectedTask._id)}
-                color="primary"
-              >
-                <Send />
-              </IconButton>
             </DialogContent>
           </Dialog>
         )}
-        {confirmModelOpen && (
-          <ConfirmDeleteModal
-            onConfirm={() => handleDeleteTask(itemToDelete as string)}
-            onClose={() => SetConfirmModel(false)}
-            action={action}
-            loading={loading}
-          />
-        )}
       </div>
+
+   {
+    confirmModelOpen&& <ConfirmDeleteModal
+    onClose={() => SetConfirmModel(false)}
+    onConfirm={() => handleDeleteTask(itemToDelete!)} action={'delete'} loading={false}/>
+   }
     </>
   );
 };
