@@ -6,7 +6,10 @@ import withSuperAdminAuth from "@/components/withSuperAdmin"
 import API_BASE_URL from "@/config/baseURL"
 
 const api = axios.create({
-  baseURL: API_BASE_URL
+  baseURL: API_BASE_URL,
+  headers: {
+    "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
+  }
 })
 
 // API functions
@@ -22,8 +25,7 @@ const updateFeature = (id: string, featureId: string, active: boolean, dueDate: 
 const removeFeature = (id: string, featureId: string) => api.delete(`/institution/${id}/features/${featureId}`)
 const getAllFeatures = () => api.get("/role/feature")
 
-// Main component
-const AdminInstitutionsPage=()=> {
+const AdminInstitutionsPage = () => {
   const [institutions, setInstitutions] = useState([])
   const [selectedInstitution, setSelectedInstitution] = useState(null)
   const [amount, setAmount] = useState("")
@@ -34,11 +36,32 @@ const AdminInstitutionsPage=()=> {
   const [searchTerm, setSearchTerm] = useState("")
   const [accessDetails, setAccessDetails] = useState(null)
   const [allFeatures, setAllFeatures] = useState([])
+  const [stats, setStats] = useState({
+    totalInstitutions: 0,
+    verifiedInstitutions: 0,
+    activeFeatures: 0,
+    totalRevenue: 0
+  })
 
   useEffect(() => {
     fetchInstitutions()
     fetchAllFeatures()
+    calculateStats()
   }, [])
+
+  const calculateStats = () => {
+    const totalInstitutions = institutions.length
+    const verifiedInstitutions = institutions.filter(inst => inst.verified).length
+    const activeFeatures = institutions.reduce((acc, inst) => acc + (inst.activeFeatures || 0), 0)
+    const totalRevenue = institutions.reduce((acc, inst) => acc + (inst.revenue || 0), 0)
+
+    setStats({
+      totalInstitutions,
+      verifiedInstitutions,
+      activeFeatures,
+      totalRevenue
+    })
+  }
 
   async function fetchInstitutions() {
     try {
@@ -121,14 +144,14 @@ const AdminInstitutionsPage=()=> {
 
   const handleFeatureSelection = (featureId) => {
     setSelectedFeatures((prev) =>
-      prev.includes(featureId) ? prev.filter((id) => id !== featureId) : [...prev, featureId],
+      prev.includes(featureId) ? prev.filter((id) => id !== featureId) : [...prev, featureId]
     )
   }
 
   const filteredInstitutions = institutions.filter(
     (institution) =>
       institution.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      institution.email.toLowerCase().includes(searchTerm.toLowerCase()),
+      institution.email.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   if (isLoading) {
@@ -136,241 +159,240 @@ const AdminInstitutionsPage=()=> {
   }
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "20px" }}>
-      <h1 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "20px" }}>Manage Institutions</h1>
-      <input
-        type="text"
-        placeholder="Search institutions..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        style={{ width: "100%", padding: "10px", marginBottom: "20px", borderRadius: "4px", border: "1px solid #ddd" }}
-      />
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={{ textAlign: "left", padding: "10px", borderBottom: "1px solid #ddd" }}>Name</th>
-            <th style={{ textAlign: "left", padding: "10px", borderBottom: "1px solid #ddd" }}>Email</th>
-            <th style={{ textAlign: "left", padding: "10px", borderBottom: "1px solid #ddd" }}>Phone</th>
-            <th style={{ textAlign: "left", padding: "10px", borderBottom: "1px solid #ddd" }}>Verified</th>
-            <th style={{ textAlign: "left", padding: "10px", borderBottom: "1px solid #ddd" }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredInstitutions.map((institution) => (
-            <tr key={institution._id}>
-              <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>{institution.name}</td>
-              <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>{institution.email}</td>
-              <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>{institution.phone}</td>
-              <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>{institution.verified ? "Yes" : "No"}</td>
-              <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-                {!institution.verified && (
-                  <button
-                    onClick={() => handleVerify(institution._id)}
-                    style={{
-                      marginRight: "10px",
-                      padding: "5px 10px",
-                      backgroundColor: "#4CAF50",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Verify
-                  </button>
-                )}
-                <button
-                  onClick={() => {
-                    setSelectedInstitution(institution)
-                    fetchAccessDetails(institution._id)
-                    setShowModal(true)
-                  }}
-                  style={{
-                    padding: "5px 10px",
-                    backgroundColor: "#008CBA",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Manage Access
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {showModal && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "20px",
-              borderRadius: "8px",
-              width: "600px",
-              maxHeight: "80vh",
-              overflowY: "auto",
-            }}
-          >
-            <h2 style={{ marginBottom: "20px" }}>Manage Access for {selectedInstitution?.name}</h2>
-            <div style={{ marginBottom: "10px" }}>
-              <label htmlFor="amount" style={{ display: "block", marginBottom: "5px" }}>
-                Amount:
-              </label>
-              <input
-                id="amount"
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                style={{ width: "100%", padding: "5px" }}
-              />
-            </div>
-            <div style={{ marginBottom: "10px" }}>
-              <label htmlFor="months" style={{ display: "block", marginBottom: "5px" }}>
-                Months:
-              </label>
-              <input
-                id="months"
-                type="number"
-                value={months}
-                onChange={(e) => setMonths(e.target.value)}
-                style={{ width: "100%", padding: "5px" }}
-              />
-            </div>
-            <div style={{ marginBottom: "20px" }}>
-              <label style={{ display: "block", marginBottom: "5px" }}>Features:</label>
-              <div style={{ maxHeight: "200px", overflowY: "auto", border: "1px solid #ddd", padding: "10px" }}>
-                {allFeatures.map((feature) => (
-                  <div key={feature._id} style={{ marginBottom: "5px" }}>
-                    <label style={{ display: "flex", alignItems: "center" }}>
-                      <input
-                        type="checkbox"
-                        checked={selectedFeatures.includes(feature._id)}
-                        onChange={() => handleFeatureSelection(feature._id)}
-                        style={{ marginRight: "10px" }}
-                      />
-                      {feature.feature}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "20px" }}>
-              <button
-                onClick={handleActivateAll}
-                style={{
-                  marginRight: "10px",
-                  padding: "5px 10px",
-                  backgroundColor: "#4CAF50",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                }}
-              >
-                Activate All Features
-              </button>
-              <button
-                onClick={handleActivateSome}
-                style={{
-                  padding: "5px 10px",
-                  backgroundColor: "#008CBA",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                }}
-              >
-                Activate Selected Features
-              </button>
-            </div>
-            {accessDetails && (
-              <div>
-                <h3 style={{ marginBottom: "10px" }}>Current Features:</h3>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <thead>
-                    <tr>
-                      <th style={{ textAlign: "left", padding: "5px", borderBottom: "1px solid #ddd" }}>Feature</th>
-                      <th style={{ textAlign: "left", padding: "5px", borderBottom: "1px solid #ddd" }}>Active</th>
-                      <th style={{ textAlign: "left", padding: "5px", borderBottom: "1px solid #ddd" }}>Due Date</th>
-                      <th style={{ textAlign: "left", padding: "5px", borderBottom: "1px solid #ddd" }}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {accessDetails.features.map((feature) => (
-                      <tr key={feature.feature}>
-                        <td style={{ padding: "5px", borderBottom: "1px solid #ddd" }}>
-                          {allFeatures.find((f) => f._id === feature.feature)?.feature || "Unknown"}
-                        </td>
-                        <td style={{ padding: "5px", borderBottom: "1px solid #ddd" }}>
-                          <input
-                            type="checkbox"
-                            checked={feature.active}
-                            onChange={(e) => handleUpdateFeature(feature.feature, e.target.checked, feature.dueDate)}
-                          />
-                        </td>
-                        <td style={{ padding: "5px", borderBottom: "1px solid #ddd" }}>
-                          <input
-                            type="date"
-                            value={new Date(feature.dueDate).toISOString().split("T")[0]}
-                            onChange={(e) =>
-                              handleUpdateFeature(feature.feature, feature.active, new Date(e.target.value))
-                            }
-                          />
-                        </td>
-                        <td style={{ padding: "5px", borderBottom: "1px solid #ddd" }}>
-                          <button
-                            onClick={() => handleRemoveFeature(feature.feature)}
-                            style={{
-                              padding: "3px 6px",
-                              backgroundColor: "#f44336",
-                              color: "white",
-                              border: "none",
-                              borderRadius: "4px",
-                              cursor: "pointer",
-                            }}
-                          >
-                            Remove
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-            <button
-              onClick={() => setShowModal(false)}
-              style={{
-                position: "absolute",
-                top: "10px",
-                right: "10px",
-                background: "none",
-                border: "none",
-                fontSize: "18px",
-                cursor: "pointer",
-              }}
-            >
-              &times;
-            </button>
+    <div className="min-h-screen bg-gray-100 p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Institution Management</h1>
+          <div className="flex gap-4">
+            <input
+              type="text"
+              placeholder="Search institutions..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
         </div>
-      )}
+
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="text-lg font-semibold text-gray-600">Total Institutions</h3>
+            <p className="text-3xl font-bold text-blue-600">{stats.totalInstitutions}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="text-lg font-semibold text-gray-600">Verified Institutions</h3>
+            <p className="text-3xl font-bold text-green-600">{stats.verifiedInstitutions}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="text-lg font-semibold text-gray-600">Active Features</h3>
+            <p className="text-3xl font-bold text-purple-600">{stats.activeFeatures}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="text-lg font-semibold text-gray-600">Total Revenue</h3>
+            <p className="text-3xl font-bold text-orange-600">${stats.totalRevenue.toLocaleString()}</p>
+          </div>
+        </div>
+
+        {/* Institutions Table */}
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredInstitutions.map((institution) => (
+                <tr key={institution._id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="text-sm font-medium text-gray-900">{institution.name}</div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{institution.email}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{institution.phone}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${institution.verified
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                      {institution.verified ? 'Verified' : 'Pending'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex gap-2">
+                      {!institution.verified && (
+                        <button
+                          onClick={() => handleVerify(institution._id)}
+                          className="text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200 px-3 py-1 rounded-md"
+                        >
+                          Verify
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          setSelectedInstitution(institution)
+                          fetchAccessDetails(institution._id)
+                          setShowModal(true)
+                        }}
+                        className="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 px-3 py-1 rounded-md"
+                      >
+                        Manage Access
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Modal */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800">
+                    Manage Access for {selectedInstitution?.name}
+                  </h2>
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Amount
+                    </label>
+                    <input
+                      type="number"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Months
+                    </label>
+                    <input
+                      type="number"
+                      value={months}
+                      onChange={(e) => setMonths(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Features
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-60 overflow-y-auto p-4 border rounded-md">
+                    {allFeatures.map((feature) => (
+                      <div key={feature._id} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedFeatures.includes(feature._id)}
+                          onChange={() => handleFeatureSelection(feature._id)}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <label className="ml-2 text-sm text-gray-700">
+                          {feature.feature}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-4">
+                  <button
+                    onClick={handleActivateAll}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    Activate All Features
+                  </button>
+                  <button
+                    onClick={handleActivateSome}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    Activate Selected Features
+                  </button>
+                </div>
+
+                {accessDetails && (
+                  <div className="mt-8">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Current Features</h3>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Feature</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Due Date</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {accessDetails.features.map((feature) => (
+                            <tr key={feature.feature}>
+                              <td className="px-4 py-2">
+                                {allFeatures.find((f) => f._id === feature.feature)?.feature || "Unknown"}
+                              </td>
+                              <td className="px-4 py-2">
+                                <input
+                                  type="checkbox"
+                                  checked={feature.active}
+                                  onChange={(e) => handleUpdateFeature(feature.feature, e.target.checked, feature.dueDate)}
+                                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                />
+                              </td>
+                              <td className="px-4 py-2">
+                                <input
+                                  type="date"
+                                  value={new Date(feature.dueDate).toISOString().split("T")[0]}
+                                  onChange={(e) => handleUpdateFeature(feature.feature, feature.active, new Date(e.target.value))}
+                                  className="px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                              </td>
+                              <td className="px-4 py-2">
+                                <button
+                                  onClick={() => handleRemoveFeature(feature.feature)}
+                                  className="text-red-600 hover:text-red-900"
+                                >
+                                  Remove
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
+
 export default withSuperAdminAuth(AdminInstitutionsPage)

@@ -124,12 +124,7 @@ const Registration: React.FC = () => {
        }
      }
    };
-// const handleSendMessage = async(id:string,message:string)=>{
-//   const response = await axios.post(`${API_BASE_URL}/student/message/${id}`,{
-//     message
-//   })
 
-// }
    const handleSubmit = async () => {
     const ourlogo = await convertImageUrlToBase64(loggedUser.institution.logo as string);
 const data:IInvoice = {
