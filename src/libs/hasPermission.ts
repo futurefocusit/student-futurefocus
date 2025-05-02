@@ -21,7 +21,7 @@ export const hasPermission = (
 
   return user.role.permission.some(
     (p) =>
-      p.feature._id === featureId && p.permission === requiredPermission
+      p.feature.feature === featureId && p.permission === requiredPermission
   );
 };
 
