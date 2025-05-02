@@ -1,7 +1,7 @@
 // import type { Metadata } from "next";
 import "./globals.css";
 import React from "react";
-import AuthContextAPI from "@/context/AuthContext";
+import AuthContextAPI  from "@/context/AuthContext";
 import { CartProvider } from "@/context/cartContext";
 
 

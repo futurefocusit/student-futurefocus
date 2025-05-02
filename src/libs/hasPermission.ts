@@ -1,16 +1,27 @@
 import { TeamMember } from "@/types/types";
 
-
+interface User {
+  role: {
+    permission: Array<{
+      feature: {
+        _id: string;
+        feature: string;
+      };
+      permission: string;
+    }>;
+  };
+}
 
 export const hasPermission = (
-  user: TeamMember,
-  featureName: string,
-  permissionType: string
-) => {
-  return user.role?.permission.some(
-    (permission) =>
-      permission.feature.feature === featureName &&
-      permission.permission === permissionType
+  user: User,
+  featureId: string,
+  requiredPermission: string
+): boolean => {
+  if (!user?.role?.permission) return false;
+
+  return user.role.permission.some(
+    (p) =>
+      p.feature._id === featureId && p.permission === requiredPermission
   );
 };
 

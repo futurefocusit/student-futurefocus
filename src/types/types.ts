@@ -25,12 +25,12 @@ export interface TeamMember {
   isAdmin: boolean;
   isSuperAdmin: boolean;
   role: Role;
-  image:string
-  position:string
+  image: string
+  position: string
   attend: boolean;
   active: boolean;
-  institution:{logo:string,name:string}
-  
+  institution: { logo: string, name: string }
+
 }
 export interface TeamMemberLogin {
 
@@ -41,13 +41,13 @@ export interface TeamMemberLogin {
   // role: Role;
 }
 export interface IInvoice {
-  paymentMethod:string
+  paymentMethod: string
   student: string;
   amount: number;
   reason: string;
   date: Date;
-  remaining:number
-  status:string
+  remaining: number
+  status: string
 }
 export interface Student {
   _id: string;
@@ -72,13 +72,13 @@ export interface AttendanceRecord {
 }
 export interface memberAttendanceRecord {
   _id: string;
-  memberId: { name: string; position: string,phone:string };
+  memberId: { name: string; position: string, phone: string };
   email: string;
-  comment:string
+  comment: string
   status: string;
   updatedAt: string;
   timeOut: string;
-  response:string
+  response: string
 }
 export interface GroupedAttendance {
   [date: string]: {
@@ -110,4 +110,73 @@ export interface IFeature {
   _id: string;
   feature: string;
   web: string;
+}
+
+export interface Institution {
+  _id: string;
+  name: string;
+  isSuperInst: boolean;
+  email: string;
+  phone: number;
+  logo: string;
+  verified: boolean;
+  access?: {
+    _id: string;
+    institution: string;
+    subscriptionEnd: string;
+    features: Array<{
+      feature: string;
+      active: boolean;
+      lastUpdated: string;
+      expiresAt: string;
+      _id: string;
+    }>;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  };
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+export interface User {
+  _id: string;
+  institution: Institution;
+  name: string;
+  active: boolean;
+  attend: boolean;
+  image: string;
+  position: string;
+  email: string;
+  phone: string;
+  password: string;
+  otp: string | null;
+  role: {
+    _id: string;
+    institution: string;
+    role: string;
+    permission: Array<{
+      _id: string;
+      feature: {
+        _id: string;
+        feature: string;
+        web: string;
+        createdAt: string;
+        updatedAt: string;
+        __v: number;
+      };
+      permission: string;
+      createdAt: string;
+      updatedAt: string;
+      __v: number;
+    }>;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  };
+  isAdmin: boolean;
+  isSuperAdmin: boolean;
+  __v: number;
 }

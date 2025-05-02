@@ -3,24 +3,46 @@ import API_BASE_URL from "@/config/baseURL";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import Message from "@/components/message";
 
 const ResetPasswordPage = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isValidPassword, setIsValidPassword] = useState(true);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [token, setToken] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  // Password validation states
+  const [hasMinLength, setHasMinLength] = useState(false);
+  const [hasUpperCase, setHasUpperCase] = useState(false);
+  const [hasLowerCase, setHasLowerCase] = useState(false);
+  const [hasNumber, setHasNumber] = useState(false);
+  const [hasSpecialChar, setHasSpecialChar] = useState(false);
+  const [passwordsMatch, setPasswordsMatch] = useState(false);
+
+  const validatePassword = (value: string) => {
+    setHasMinLength(value.length >= 8);
+    setHasUpperCase(/[A-Z]/.test(value));
+    setHasLowerCase(/[a-z]/.test(value));
+    setHasNumber(/\d/.test(value));
+    setHasSpecialChar(/[@$!%*?&]/.test(value));
+  };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPassword = e.target.value;
     setPassword(newPassword);
-    setIsValidPassword(newPassword.length >= 8);
+    validatePassword(newPassword);
+    setPasswordsMatch(newPassword === confirmPassword);
   };
 
-  const handleConfirmPasswordChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setConfirmPassword(e.target.value);
+  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newConfirmPassword = e.target.value;
+    setConfirmPassword(newConfirmPassword);
+    setPasswordsMatch(password === newConfirmPassword);
   };
 
   useEffect(() => {
@@ -32,76 +54,138 @@ const ResetPasswordPage = () => {
 
   const handleChangePassword = async () => {
     if (password === "" || confirmPassword === "") {
-      toast.error("Password fields cannot be empty");
+      setError("Password fields cannot be empty");
       return;
     }
 
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+    if (!hasMinLength || !hasUpperCase || !hasLowerCase || !hasNumber || !hasSpecialChar) {
+      setError("Password does not meet all requirements");
       return;
     }
 
-    if (!isValidPassword) {
-      toast.error("Password must be at least 8 characters long");
+    if (!passwordsMatch) {
+      setError("Passwords do not match");
       return;
     }
 
     try {
       setIsLoading(true);
+      setError("");
+      setSuccess("");
       const response = await axios.put(
         `${API_BASE_URL}/member/reset-password/${token}`,
-        { password:password }
+        { password }
       );
-      toast.success(response.data.message);
-      window.location.href = "/login";
+      setSuccess(response.data.message);
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 2000);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        toast.error(error.response.data.message);
+        setError(error.response.data.message);
       } else {
-        toast.error("Failed! Try again");
+        setError("Failed! Try again");
       }
-
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <main className="flex h-screen flex-wrap content-center">
-      <a href="/" className="p-2 bg-blue-700 fixed top-3 left-4 text-white">
-        Back Home
-      </a>
-      <h2 className="text-center w-full text-blue-500">Reset Password</h2>
-      <div className="mx-auto shadow-lg bg-slate-200 px-10 lg:w-1/3 py-20 rounded-md flex flex-col gap-6 items-center">
-        <p className={`text-red-600 ${isValidPassword ? "hidden" : "block"}`}>
-          Enter a password of at least 8 characters
-        </p>
-        <input
-          type="password"
-          name="password"
-          id="password"
-          placeholder="Enter New Password"
-          className={`p-3 w-full border-2 ${
-            isValidPassword ? "border-white" : "border-red-600"
-          }`}
-          onChange={handlePasswordChange}
-        />
-        <input
-          type="password"
-          name="confirmPassword"
-          id="confirmPassword"
-          placeholder="Confirm New Password"
-          className="p-3 w-full border-2 border-white"
-          onChange={handleConfirmPasswordChange}
-        />
-        <button
-          className="bg-blue-600 px-5 py-2 hover:bg-blue-700 text-white"
-          onClick={handleChangePassword}
-        >
-          {isLoading ? "Changing Password..." : "Change Password"}
-        </button>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">Reset Password</h2>
+          <p className="text-gray-600 mt-2">Enter your new password below</p>
+        </div>
+
+        {error && <Message type="error" text={error} />}
+        {success && <Message type="success" text={success} />}
+
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              New Password
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                value={password}
+                onChange={handlePasswordChange}
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 pr-10"
+                placeholder="Enter new password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+              >
+                {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+              Confirm Password
+            </label>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={handleConfirmPasswordChange}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${passwordsMatch && confirmPassword ? "focus:ring-green-600" : "focus:ring-red-600"
+                  } pr-10`}
+                placeholder="Confirm new password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+              >
+                {showConfirmPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-gray-700">Password Requirements:</p>
+            <ul className="space-y-1 text-sm">
+              <li className={`flex items-center ${hasMinLength ? "text-green-600" : "text-gray-500"}`}>
+                <span className="mr-2">•</span>
+                At least 8 characters
+              </li>
+              <li className={`flex items-center ${hasUpperCase ? "text-green-600" : "text-gray-500"}`}>
+                <span className="mr-2">•</span>
+                One uppercase letter
+              </li>
+              <li className={`flex items-center ${hasLowerCase ? "text-green-600" : "text-gray-500"}`}>
+                <span className="mr-2">•</span>
+                One lowercase letter
+              </li>
+              <li className={`flex items-center ${hasNumber ? "text-green-600" : "text-gray-500"}`}>
+                <span className="mr-2">•</span>
+                One number
+              </li>
+              <li className={`flex items-center ${hasSpecialChar ? "text-green-600" : "text-gray-500"}`}>
+                <span className="mr-2">•</span>
+                One special character (@$!%*?&)
+              </li>
+            </ul>
+          </div>
+
+          <button
+            onClick={handleChangePassword}
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isLoading || !passwordsMatch || !hasMinLength || !hasUpperCase || !hasLowerCase || !hasNumber || !hasSpecialChar}
+          >
+            {isLoading ? "Changing Password..." : "Change Password"}
+          </button>
+        </div>
       </div>
-    </main>
+    </div>
   );
 };
 

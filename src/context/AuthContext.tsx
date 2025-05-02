@@ -13,7 +13,7 @@ import API_BASE_URL from "@/config/baseURL";
 import { TeamMember, TeamMemberLogin } from "@/types/types";
 interface AuthContextData {
   signed: boolean;
-  isLoading: boolean;
+  loading: boolean;
   loggedUser: TeamMember | null;
   login: (user: TeamMemberLogin) => Promise<void>;
   fetchLoggedUser: () => Promise<void>;
@@ -34,13 +34,13 @@ export const AuthContext = createContext<AuthContextData>(
 
 const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
   const [loggedUser, setLoggedUser] = useState<TeamMember | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setIsLoading] = useState(false);
 
 
   const fetchLoggedUser = useCallback(async () => {
     const token = localStorage.getItem("ffa-admin");
     if (!token) {
-   window.location.href='/login'
+      window.location.href = '/login'
     };
 
     try {
@@ -49,12 +49,12 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setLoggedUser(response.data);   
+      setLoggedUser(response.data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response) {
           const errorMessage = error.response.data.message || "An error occurred";
-          toast.error(errorMessage);         
+          toast.error(errorMessage);
         } else if (error.request) {
           toast.error("Failed to connect to server");
         } else {
@@ -63,7 +63,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       } else {
         toast.error("An unexpected error occurred");
       }
-    
+
       // localStorage.removeItem("ffa-admin");
       setLoggedUser(null);
     }
@@ -80,7 +80,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       );
       setLoggedUser(response.data);
       toast.success("Login successful!");
-      if(!response.data.token){
+      if (!response.data.token) {
         window.location.href = `/two-factor-auth/${response.data.id}`;
         return
       }
@@ -88,7 +88,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       window.location.href = "/staff";
     } catch (error) {
       handleAxiosError(error);
-    }  finally {
+    } finally {
       setIsLoading(false);
     }
   }, []);
@@ -96,7 +96,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       const response = await axios.get(`${API_BASE_URL}/member`, {
-        withCredentials: true,headers:{
+        withCredentials: true, headers: {
           Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`,
 
         }
@@ -116,11 +116,13 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await axios.post(
         `${API_BASE_URL}/member/new`,
         newMember,
-        
-        { withCredentials: true ,headers:{
-          Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`,
-          
-        }}
+
+        {
+          withCredentials: true, headers: {
+            Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`,
+
+          }
+        }
       );
       toast.success("Member added successfully");
       return response.data;
@@ -135,9 +137,9 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       await axios.put(`${API_BASE_URL}/member/update/${id}`, updatedMember, {
-        withCredentials: true,headers:{
+        withCredentials: true, headers: {
           Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`,
-          
+
         }
       });
       toast.success("Member updated successfully");
@@ -152,7 +154,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       await axios.delete(`${API_BASE_URL}/member/delete/${id}`, {
-        withCredentials: true,headers:{
+        withCredentials: true, headers: {
           Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`,
 
         }
@@ -199,18 +201,18 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
 
   const contextValue = {
     signed: Boolean(loggedUser),
-    isLoading,
+    loading,
     loggedUser,
     login,
     logout,
     fetchLoggedUser,
     fetchTeam,
-        addTeamMember,
-        updateTeamMember,
-        deleteTeamMember,
+    addTeamMember,
+    updateTeamMember,
+    deleteTeamMember,
   };
 
-  
+
 
   return (
     <AuthContext.Provider value={contextValue}>
@@ -219,7 +221,6 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -229,3 +230,4 @@ export const useAuth = () => {
 };
 
 export default AuthContextAPI;
+
