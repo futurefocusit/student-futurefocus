@@ -234,7 +234,7 @@ const  handleUpdate=(material: IMaterial)=> {
                   <tr key={material._id} className="hover:bg-gray-100">
                     <td className="border border-gray-300 p-2">{material.materialName}</td>
                     <td className="border border-gray-300 p-2">{material.amount}</td>
-                    <td className="border border-gray-300 p-2">{material.category.name}</td>
+                    <td className="border border-gray-300 p-2">{material.category?.name}</td>
                     <td className="border border-gray-300 p-2">{material.rent}</td>
                     <td className="border border-gray-300 p-2 flex gap-3">
                       <button
