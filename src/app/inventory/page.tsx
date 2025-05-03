@@ -284,7 +284,7 @@ const  handleUpdate=(material: IMaterial)=> {
                   <tr key={rented._id} className="hover:bg-gray-100">
                     <td className="border border-gray-300 p-2">{rented.materialId.materialName}</td>
                     <td className="border border-gray-300 p-2">{rented.amount}</td>
-                    <td className="border border-gray-300 p-2">{rented.render.name}</td>
+                    <td className="border border-gray-300 p-2">{rented.render?.name}</td>
                     <td className="border border-gray-300 p-2">{rented.rendeeName}</td>
                     <td className="border border-gray-300 p-2">{new Date(rented.createdAt).toDateString()}</td>
                     <td className="border border-gray-300 p-2">{new Date(rented?.returnDate)?.toDateString()}</td>
@@ -318,7 +318,7 @@ const  handleUpdate=(material: IMaterial)=> {
               <tbody>
                 {category.map((category:{name:string,_id:string}) => (
                   <tr key={category._id} className="hover:bg-gray-100">
-                    <td className="border border-gray-300 p-2">{category.name}</td>
+                    <td className="border border-gray-300 p-2">{category?.name}</td>
                   </tr>
                 ))}
               </tbody>
