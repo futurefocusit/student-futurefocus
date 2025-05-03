@@ -124,8 +124,8 @@ export const PopupForm: React.FC<PopupFormProps> = ({ onClose, onSuccess,categor
         >
        <option value="" disabled>select category</option>
           {categories.map((category, index) => (
-            <option key={index} value={category._id}>
-              {category.name}
+            <option key={index} value={category?._id}>
+              {category?.name}
             </option>
           ))}
         </select>
@@ -229,14 +229,14 @@ export const PopupUpdateForm: React.FC<PopupUpdateFormProps> = ({ onClose, onSuc
         />
         <select
           name="category"
-          value={formData.category._id}
+          value={formData.category?._id}
           onChange={handleChange}
           className="border p-2 mb-4 w-full"
         >
        <option value="" disabled>select category</option>
           {categories.map((category, index) => (
-            <option key={index} value={category._id}>
-              {category.name}
+            <option key={index} value={category?._id}>
+              {category?.name}
             </option>
           ))}
         </select>
