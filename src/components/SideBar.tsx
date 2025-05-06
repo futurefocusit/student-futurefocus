@@ -181,7 +181,7 @@ const SideBar = () => {
             </button>
           </div>
           <img
-            src={loggedUser?.institution.logo} alt={`${loggedUser?.institution.logo}'s logo`} className="rounded-full  bg-gray-600 w-10 h-10 " />
+            src={loggedUser?.institution?.logo} alt={`${loggedUser?.institution?.logo}'s logo`} className="rounded-full  bg-gray-600 w-10 h-10 " />
           <div className="">
             {menuItems
               .filter(
