@@ -24,7 +24,6 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { FaHouseCrack, FaLockOpen, FaMessage, FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
 import { MdEventAvailable } from "react-icons/md";
-import Image from "next/image";
 
 const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -225,7 +224,7 @@ const SideBar = () => {
               </p>
             </button>
             <div className="flex flex-row ">
-              <img src={loggedUser.image} alt={`${loggedUser.name}'s profile`} className="rounded-full  bg-gray-600 w-10 h-10 " />
+              <img src={loggedUser?.image} alt={`${loggedUser?.name}'s profile`} className="rounded-full  bg-gray-600 w-10 h-10 " />
               <span className="flex flex-col  items-center">
                 <p
                   className={`mx-4 text-sm text-white ${isExpanded ? "" : "hidden"
