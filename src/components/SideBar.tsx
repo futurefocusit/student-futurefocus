@@ -30,8 +30,8 @@ const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const { fetchLoggedUser, loggedUser } = useAuth();
-  const { logout } = useAuth();
+  const { fetchLoggedUser, logout, loggedUser, loading } = useAuth();
+
 
   const menuItems = [
     { label: "DASHBOARD", icon: FaTachometerAlt, href: "/dashboard", admin: true },
@@ -42,7 +42,7 @@ const SideBar = () => {
       href: "/attendance",
       admin: true,
     },
-   
+
     {
       label: "Team",
       icon: FaTeamspeak,
@@ -130,6 +130,13 @@ const SideBar = () => {
     };
     fetchUserData();
   }, []);
+
+  useEffect(() => {
+    if (!loading && !loggedUser) {
+      logout();
+    }
+  }, [loading, loggedUser, logout]);
+
   const handleLogout = async () => {
     await logout();
   };
@@ -147,21 +154,18 @@ const SideBar = () => {
       </button>
 
       <div
-        className={`flex flex-col fixed top-0 left-0 ${
-          isOpen ? " bg-gray-800" : ""
-        } lg:bg-gray-800 z-30 justify-between  h-full`}
+        className={`flex flex-col fixed top-0 left-0 ${isOpen ? " bg-gray-800" : ""
+          } lg:bg-gray-800 z-30 justify-between  h-full`}
       >
         <nav
           ref={sidebarRef}
-          className={` flex flex-col h-screen justify-between py-8 overflow-y-auto transition-all duration-300 ease-in-out ${
-            isOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0 ${isExpanded ? "w-72" : "w-20"}`}
+          className={` flex flex-col h-screen justify-between py-8 overflow-y-auto transition-all duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"
+            } md:translate-x-0 ${isExpanded ? "w-72" : "w-20"}`}
         >
           <div className="flex items-center justify-between mb-6 px-4">
             <h2
-              className={`text-2xl font-semibold text-white ${
-                isExpanded ? "" : "hidden"
-              }`}
+              className={`text-2xl font-semibold text-white ${isExpanded ? "" : "hidden"
+                }`}
             >
               MENU
             </h2>
@@ -176,8 +180,8 @@ const SideBar = () => {
               )}
             </button>
           </div>
-            <img
-             src={loggedUser.institution.logo} alt={`${loggedUser.institution.logo}'s logo`} className="rounded-full  bg-gray-600 w-10 h-10 "/>
+          <img
+            src={loggedUser?.institution.logo} alt={`${loggedUser?.institution.logo}'s logo`} className="rounded-full  bg-gray-600 w-10 h-10 " />
           <div className="">
             {menuItems
               .filter(
@@ -187,9 +191,8 @@ const SideBar = () => {
                 <Link
                   key={index}
                   href={item.href}
-                  className={`flex items-center px-4 py-2 mt-2 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white ${
-                    isExpanded ? "" : "justify-center"
-                  }`}
+                  className={`flex items-center px-4 py-2 mt-2 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white ${isExpanded ? "" : "justify-center"
+                    }`}
                   onClick={() => setIsOpen(false)}
                 >
                   <item.icon className="w-5 h-5" />
@@ -205,7 +208,7 @@ const SideBar = () => {
           <div className="px-4">
             <a
               href="https://www.futurefocus.co.rw/admin"
-              className={`flex items-center px-4 py-2 mb-10 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white ${loggedUser&&loggedUser.isAdmin?'':'hidden'} `}
+              className={`flex items-center px-4 py-2 mb-10 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white ${loggedUser && loggedUser.isAdmin ? '' : 'hidden'} `}
             >
               <FaWebAwesome className="w-5 h-5" />
               <p className={`mx-4 font-medium ${isExpanded ? "" : "hidden"}`}>
@@ -225,18 +228,16 @@ const SideBar = () => {
               <img src={loggedUser.image} alt={`${loggedUser.name}'s profile`} className="rounded-full  bg-gray-600 w-10 h-10 " />
               <span className="flex flex-col  items-center">
                 <p
-                  className={`mx-4 text-sm text-white ${
-                    isExpanded ? "" : "hidden"
-                  }`}
+                  className={`mx-4 text-sm text-white ${isExpanded ? "" : "hidden"
+                    }`}
                 >
                   {loggedUser?.name}
                 </p>
                 <p
-                  className={`mx-4 font-medium text-gray-400 ${
-                    isExpanded ? "" : "hidden"
-                  }`}
+                  className={`mx-4 font-medium text-gray-400 ${isExpanded ? "" : "hidden"
+                    }`}
                 >
-                  {loggedUser?.role?.role||loggedUser?.position }
+                  {loggedUser?.role?.role || loggedUser?.position}
                 </p>
               </span>
             </div>

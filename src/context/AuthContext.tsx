@@ -44,6 +44,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     try {
+      setIsLoading(true)
       const response = await axios.get(`${API_BASE_URL}/member/logged-user`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -66,6 +67,8 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
 
       // localStorage.removeItem("ffa-admin");
       setLoggedUser(null);
+    } finally {
+      setIsLoading(false)
     }
   }, []);
 
