@@ -10,9 +10,11 @@ import { TeamMember } from "@/types/types";
 import Layout from "../layout";
 import { hasPermission } from "@/libs/hasPermission";
 import SideBar from "@/components/SideBar";
+import { CloudUpload, Person, Email, Phone, Work, AccessTime, CalendarToday } from "@mui/icons-material";
+import { TextField, Select, MenuItem, FormControl, InputLabel, Grid, Chip, OutlinedInput } from "@mui/material";
 
 const MembersPage: React.FC = () => {
-  const { fetchTeam, addTeamMember, updateTeamMember, deleteTeamMember,loggedUser,fetchLoggedUser } =
+  const { fetchTeam, addTeamMember, updateTeamMember, deleteTeamMember, loggedUser, fetchLoggedUser } =
     useAuth();
 
   const [members, setMembers] = useState<TeamMember[]>([]);
@@ -29,16 +31,31 @@ const MembersPage: React.FC = () => {
     _id: "",
     name: "",
     image: "",
-    role: "",
     position: "",
-    entry:"",
-    exit:"",
+    entry: "",
+    exit: "",
     email: "",
-    days:"",
-    phone:'',
-    instagram: "",
-    isAdmin:false
+    days: "",
+    phone: "",
+    isAdmin: false,
+    isSuperAdmin: false,
+    attend: false,
+    active: true,
+    institution: { logo: "", name: "" }
   });
+
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false);
+
+  const weekDays = [
+    { value: "Monday", label: "Monday" },
+    { value: "Tuesday", label: "Tuesday" },
+    { value: "Wednesday", label: "Wednesday" },
+    { value: "Thursday", label: "Thursday" },
+    { value: "Friday", label: "Friday" },
+    { value: "Saturday", label: "Saturday" },
+    { value: "Sunday", label: "Sunday" },
+  ];
 
   useEffect(() => {
     const loadTeamMembers = async () => {
@@ -52,9 +69,9 @@ const MembersPage: React.FC = () => {
         const initialTogglesAttendance: { [key: string]: boolean } = {};
         const initialTogglesActive: { [key: string]: boolean } = {};
         teamMembers.forEach((member) => {
-          initialTogglesAdmin[member._id] = member.isAdmin; 
-          initialTogglesAttendance[member._id] = member.attend; 
-          initialTogglesActive[member._id] = member.active; 
+          initialTogglesAdmin[member._id] = member.isAdmin;
+          initialTogglesAttendance[member._id] = member.attend;
+          initialTogglesActive[member._id] = member.active;
         });
         setTogglesAdmin(initialTogglesAdmin);
         setTogglesAttendance(initialTogglesAttendance);
@@ -72,11 +89,11 @@ const MembersPage: React.FC = () => {
     e.preventDefault();
     try {
       if (editingMember) {
-        //@ts-expect-error errro
+        //@ts-expect-error error
         await updateTeamMember(editingMember._id, formData);
         toast.success("Member updated successfully");
       } else {
-        //@ts-expect-error errro
+        //@ts-expect-error error
         await addTeamMember(formData);
         toast.success("Member added successfully");
       }
@@ -116,43 +133,43 @@ const MembersPage: React.FC = () => {
     }
   };
 
-  const handleToggleAttend = async(id: string) => {
+  const handleToggleAttend = async (id: string) => {
     try {
       await axios.put(`${API_BASE_URL}/member/toogle-attendance/${id}`);
       setTogglesAttendance((prev) => ({
         ...prev,
         [id]: !prev[id],
       }));
-     toast.success("switched succsfully"); 
+      toast.success("switched succsfully");
 
     } catch (error) {
-     toast.error('failed to switch') 
+      toast.error('failed to switch')
     }
   };
-  const handleToggleActive = async(id: string) => {
+  const handleToggleActive = async (id: string) => {
     try {
       await axios.put(`${API_BASE_URL}/member/toogle-active/${id}`);
       setTogglesActive((prev) => ({
         ...prev,
         [id]: !prev[id],
       }));
-     toast.success("switched succsfully"); 
+      toast.success("switched succsfully");
 
     } catch (error) {
-     toast.error('failed to switch') 
+      toast.error('failed to switch')
     }
   };
-  const handleToggleAdmin = async(id: string) => {
+  const handleToggleAdmin = async (id: string) => {
     try {
       await axios.put(`${API_BASE_URL}/member/toogle-admin/${id}`);
       setTogglesAdmin((prev) => ({
         ...prev,
         [id]: !prev[id],
       }));
-     toast.success("switched succsfully"); 
+      toast.success("switched succsfully");
 
     } catch (error) {
-     toast.error('failed to switch') 
+      toast.error('failed to switch')
     }
   };
 
@@ -164,28 +181,84 @@ const MembersPage: React.FC = () => {
       _id: "",
       name: "",
       image: "",
-      role: "",
-      phone:"",
       position: "",
-      entry:"",
+      entry: "",
+      exit: "",
       email: "",
-      instagram: "",
-      isAdmin:false,
-      exit:"",
-      days:""
+      days: "",
+      phone: "",
+      isAdmin: false,
+      isSuperAdmin: false,
+      attend: false,
+      active: true,
+      institution: { logo: "", name: "" }
     });
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check if file is WebP format
+    if (file.type !== "image/webp") {
+      toast.error("Please upload only WebP format images");
+      return;
+    }
+
+    // Check file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image size should be less than 2MB");
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const response = await axios.post(
+        `${API_BASE_URL}/upload/image`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+          },
+        }
+      );
+
+      setFormData((prev) => ({
+        ...prev,
+        image: response.data.url,
+      }));
+      setImagePreview(response.data.url);
+      toast.success("Image uploaded successfully");
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      toast.error("Failed to upload image");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDaysChange = (event: any) => {
+    const selectedDays = event.target.value;
+    setFormData(prev => ({
+      ...prev,
+      days: selectedDays.join(", ")
+    }));
+  };
+
   return (
-    <><SideBar/><div className="p-2 md:pl-24 md:p-4">
+    <><SideBar /><div className="p-2 md:pl-24 md:p-4">
       <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
         <h1 className="text-xl md:text-2xl font-semibold">Team Members</h1>
         <button
           disabled={!hasPermission(loggedUser, "team", "create")}
           onClick={() => setIsAddModalOpen(true)}
           className={`w-full sm:w-auto px-4 py-2 ${!hasPermission(loggedUser, "team", "create")
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600"} text-white rounded-md`}
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-blue-600"} text-white rounded-md`}
         >
           Add Member
         </button>
@@ -277,8 +350,8 @@ const MembersPage: React.FC = () => {
                     disabled={!hasPermission(loggedUser, "team", "update")}
                     onClick={() => handleEdit(member)}
                     className={`flex-1 md:flex-none px-4 py-2 text-sm md:text-base ${!hasPermission(loggedUser, "team", "update")
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-green-600"} text-white rounded-md`}
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-green-600"} text-white rounded-md`}
                   >
                     Edit
                   </button>
@@ -286,8 +359,8 @@ const MembersPage: React.FC = () => {
                     disabled={!hasPermission(loggedUser, "team", "delete")}
                     onClick={() => handleDelete(member._id)}
                     className={`flex-1 md:flex-none px-4 py-2 text-sm md:text-base ${!hasPermission(loggedUser, "team", "delete")
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-red-600"} text-white rounded-md`}
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-red-600"} text-white rounded-md`}
                   >
                     Delete
                   </button>
@@ -299,94 +372,184 @@ const MembersPage: React.FC = () => {
       )}
 
       <Modal isOpen={isAddModalOpen || isUpdateModalOpen} onClose={closeModal}>
-        <h2 className="text-lg md:text-xl font-bold mb-4">
-          {editingMember ? "Edit Member" : "Add New Member"}
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Name"
-            className="w-full p-2 border rounded-md text-sm md:text-base"
-            required />
-          <input
-            type="text"
-            name="image"
-            value={formData.image}
-            onChange={handleChange}
-            placeholder="Image URL"
-            className="w-full p-2 border rounded-md text-sm md:text-base"
-            required />
-          <input
-            type="text"
-            name="position"
-            value={formData.position}
-            onChange={handleChange}
-            placeholder="Position"
-            className="w-full p-2 border rounded-md text-sm md:text-base"
-            required />
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Email"
-            className="w-full p-2 border rounded-md text-sm md:text-base"
-            required />
-          <input
-            type="text"
-            name="instagram"
-            value={formData.instagram}
-            onChange={handleChange}
-            placeholder="Instagram URL"
-            className="w-full p-2 border rounded-md text-sm md:text-base"
-            required />
-          <input
-            type="text"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder="Phone number"
-            className="w-full p-2 border rounded-md text-sm md:text-base"
-            required />
-          <input
-            type="time"
-            name="entry"
-            value={formData.entry}
-            onChange={handleChange}
-            placeholder="Entry time"
-            className="w-full p-2 border rounded-md text-sm md:text-base"
-            required />
-          <input
-            type="time"
-            name="exit"
-            value={formData.exit}
-            onChange={handleChange}
-            placeholder="Exit time"
-            className="w-full p-2 border rounded-md text-sm md:text-base"
-            required />
-          <input
-            type="text"
-            name="days"
-            value={formData.days}
-            onChange={handleChange}
-            placeholder="working days"
-            className="w-full p-2 border rounded-md text-sm md:text-base"
-            required />
-          <button
-            type="submit"
-            className="w-full py-2 bg-blue-600 text-white rounded-md text-sm md:text-base"
-          >
-            {editingMember ? "Update Member" : "Add Member"}
-          </button>
-        </form>
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-lg md:text-xl font-bold mb-6 text-center">
+            {editingMember ? "Edit Member" : "Add New Member"}
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Grid container spacing={3}>
+              {/* Profile Image Upload */}
+              <Grid item xs={12}>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Profile Image (WebP format only)
+                  </label>
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept=".webp"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        id="image-upload"
+                        disabled={isUploading}
+                      />
+                      <label
+                        htmlFor="image-upload"
+                        className={`flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer ${isUploading ? "opacity-50 cursor-not-allowed" : ""
+                          }`}
+                      >
+                        <CloudUpload className="mr-2" />
+                        {isUploading ? "Uploading..." : "Upload Image"}
+                      </label>
+                    </div>
+                    {(imagePreview || formData.image) && (
+                      <div className="relative w-20 h-20">
+                        <img
+                          src={imagePreview || formData.image}
+                          alt="Preview"
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Maximum file size: 2MB. Only WebP format is supported.
+                  </p>
+                </div>
+              </Grid>
+
+              {/* Basic Information */}
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Full Name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  InputProps={{
+                    startAdornment: <Person className="text-gray-400 mr-2" />,
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  InputProps={{
+                    startAdornment: <Email className="text-gray-400 mr-2" />,
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Phone Number"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  required
+                  InputProps={{
+                    startAdornment: <Phone className="text-gray-400 mr-2" />,
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Position"
+                  name="position"
+                  value={formData.position}
+                  onChange={handleChange}
+                  required
+                  InputProps={{
+                    startAdornment: <Work className="text-gray-400 mr-2" />,
+                  }}
+                />
+              </Grid>
+
+              {/* Working Hours */}
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Entry Time"
+                  name="entry"
+                  type="time"
+                  value={formData.entry}
+                  onChange={handleChange}
+                  required
+                  InputProps={{
+                    startAdornment: <AccessTime className="text-gray-400 mr-2" />,
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Exit Time"
+                  name="exit"
+                  type="time"
+                  value={formData.exit}
+                  onChange={handleChange}
+                  required
+                  InputProps={{
+                    startAdornment: <AccessTime className="text-gray-400 mr-2" />,
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth required>
+                  <InputLabel>Working Days</InputLabel>
+                  <Select
+                    multiple
+                    value={formData.days ? formData.days.split(", ") : []}
+                    onChange={handleDaysChange}
+                    input={<OutlinedInput label="Working Days" />}
+                    renderValue={(selected) => (
+                      <div className="flex flex-wrap gap-1">
+                        {selected.map((value) => (
+                          <Chip key={value} label={value} />
+                        ))}
+                      </div>
+                    )}
+                    startAdornment={<CalendarToday className="text-gray-400 mr-2" />}
+                  >
+                    {weekDays.map((day) => (
+                      <MenuItem key={day.value} value={day.value}>
+                        {day.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Submit Button */}
+              <Grid item xs={12}>
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-blue-600 text-white rounded-md text-sm md:text-base hover:bg-blue-700 transition-colors"
+                >
+                  {editingMember ? "Update Member" : "Add Member"}
+                </button>
+              </Grid>
+            </Grid>
+          </form>
+        </div>
       </Modal>
     </div></>
   );
 };
-  
 
 const Modal: React.FC<{
   isOpen: boolean;
@@ -396,11 +559,11 @@ const Modal: React.FC<{
   if (!isOpen) return null;
   return (
     <div
-      className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
+      className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
       onClick={onClose}
     >
       <div
-        className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
+        className="relative top-20 mx-auto p-6 border w-full max-w-4xl shadow-lg rounded-md bg-white"
         onClick={(e) => e.stopPropagation()}
       >
         {children}

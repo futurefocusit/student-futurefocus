@@ -93,19 +93,19 @@ const SideBar = () => {
       href: "/manage-role",
       admin: true,
     },
-    {
-      label: "MESSAGE",
-      icon: FaMessage,
-      href: "/message",
-      admin: true,
-    },
+    // {
+    //   label: "MESSAGE",
+    //   icon: FaMessage,
+    //   href: "/message",
+    //   admin: true,
+    // },
 
-    {
-      label: "TECHUP PROGRAM",
-      icon: FaCode,
-      href: "/techups",
-      admin: true,
-    },
+    // {
+    //   label: "TECHUP PROGRAM",
+    //   icon: FaCode,
+    //   href: "/techups",
+    //   admin: true,
+    // },
   ];
 
   useEffect(() => {
@@ -158,12 +158,12 @@ const SideBar = () => {
       >
         <nav
           ref={sidebarRef}
-          className={` flex flex-col h-screen justify-between py-8 overflow-y-auto transition-all duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"
-            } md:translate-x-0 ${isExpanded ? "w-72" : "w-20"}`}
+          className={` flex flex-col h-screen justify-between  py-8 overflow-y-auto transition-all duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"
+            } md:translate-x-0 w-42 md:${isExpanded ? "w-72" : "w-20"}`}
         >
           <div className="flex items-center justify-between mb-6 px-4">
             <h2
-              className={`text-2xl font-semibold text-white ${isExpanded ? "" : "hidden"
+              className={`text-2xl font-semibold text-white mt-5 md:${isExpanded ? "" : "hidden"
                 }`}
             >
               MENU
@@ -179,9 +179,11 @@ const SideBar = () => {
               )}
             </button>
           </div>
-          <img
-            src={loggedUser?.institution?.logo} alt={`${loggedUser?.institution?.logo}'s logo`} className="rounded-full  bg-gray-600 w-10 h-10 " />
-          <div className="">
+          <Link className="flex items-center justify-left ml-4 text-[20px] gap-2 " href="/dashboard">
+            <img src={loggedUser?.institution?.logo} alt={`${loggedUser?.institution?.logo}'s logo`} className="rounded-full  bg-gray-600 w-10 h-10 " />
+            {isExpanded && <h2 className="text-white text-sm font-semibold">{loggedUser?.institution?.name}</h2>}
+          </Link>
+          <div className="flex flex-col items-start">
             {menuItems
               .filter(
                 (item) => !item.admin || (item.admin && loggedUser?.isAdmin)
@@ -196,7 +198,7 @@ const SideBar = () => {
                 >
                   <item.icon className="w-5 h-5" />
                   <span
-                    className={`mx-4 font-medium ${isExpanded ? "" : "hidden"}`}
+                    className={`mx-4 font-medium   md:${isExpanded ? "" : "hidden"}`}
                   >
                     {item.label}
                   </span>
@@ -210,7 +212,7 @@ const SideBar = () => {
               className={`flex items-center px-4 py-2 mb-10 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white ${loggedUser && loggedUser.isAdmin ? '' : 'hidden'} `}
             >
               <FaWebAwesome className="w-5 h-5" />
-              <p className={`mx-4 font-medium ${isExpanded ? "" : "hidden"}`}>
+              <p className={`mx-4 font-medium md:${isExpanded ? "" : "hidden"}`}>
                 Go to web
               </p>
             </a>
@@ -219,7 +221,7 @@ const SideBar = () => {
               onClick={handleLogout}
             >
               <FaRightFromBracket className="w-5 h-5" />
-              <p className={`mx-4 font-medium ${isExpanded ? "" : "hidden"}`}>
+              <p className={`mx-4 font-medium md:${isExpanded ? "" : "hidden"}`}>
                 Logout
               </p>
             </button>
@@ -227,7 +229,7 @@ const SideBar = () => {
               <img src={loggedUser?.image} alt={`${loggedUser?.name}'s profile`} className="rounded-full  bg-gray-600 w-10 h-10 " />
               <span className="flex flex-col  items-center">
                 <p
-                  className={`mx-4 text-sm text-white ${isExpanded ? "" : "hidden"
+                  className={`mx-4 text-sm text-white md:${isExpanded ? "" : "hidden"
                     }`}
                 >
                   {loggedUser?.name}

@@ -12,18 +12,24 @@ import {
   CardHeader,
   Typography,
   IconButton,
+  Chip,
+  Avatar,
+  Tooltip,
+  Badge,
 } from "@mui/material";
-import { Send, Message, Check } from "@mui/icons-material";
+import { Send, Message, Check, AccessTime, Schedule, Close } from "@mui/icons-material";
 import API_BASE_URL from "@/config/baseURL";
 import withMemberAuth from "@/components/withMemberAuth";
 import { useAuth } from "@/context/AuthContext";
 import SideBar from "@/components/SideBar";
+import { toast } from "react-toastify";
+import Loader from "@/components/loader";
 
 interface Comment {
   _id: string;
   text: string;
   createdAt: string;
-  user: { name: string; _id: string };
+  user: { name: string; _id: string, image: string };
   replies?: Comment[];
 }
 
@@ -46,11 +52,16 @@ const MemberTasks: React.FC = () => {
     commentId: string;
     text: string;
   } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [filter, setFilter] = useState<"all" | "pending" | "started" | "completed">("all");
+
   const fetchTasks = async () => {
     try {
+      setLoading(true);
       await fetchLoggedUser();
       const res = await axios.get<Task[]>(
-        `${API_BASE_URL}/task/${loggedUser?._id}`,{
+        `${API_BASE_URL}/task/${loggedUser?._id}`,
+        {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
           },
@@ -59,245 +70,350 @@ const MemberTasks: React.FC = () => {
       setTasks(res.data);
     } catch (error) {
       console.error("Error fetching tasks:", error);
+      toast.error("Failed to fetch tasks");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchTasks();
   }, []);
-const sanitizeHTML = (html: string): string => {
-  const temp = document.createElement("div");
-  temp.innerHTML = html;
 
-  const removeAttributes = (element: Element) => {
-    Array.from(element.attributes).forEach((attr) => {
-      if (!["class", "style"].includes(attr.name.toLowerCase())) {
-        element.removeAttribute(attr.name);
-      }
-    });
-  };
-
-  const allowedTags = new Set([
-    "P",
-    "DIV",
-    "SPAN",
-    "BR",
-    "B",
-    "I",
-    "U",
-    "UL",
-    "OL",
-    "LI",
-    "STRONG",
-    "EM",
-  ]);
-
-  const clean = (node: Node) => {
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      const element = node as Element;
-
-      if (!allowedTags.has(element.tagName)) {
-        const text = document.createTextNode(element.textContent || "");
-        element.parentNode?.replaceChild(text, element);
-        return;
-      }
-
-      removeAttributes(element);
-      Array.from(element.children).forEach((child) => clean(child));
+  const statusColor = (status: string) => {
+    switch (status) {
+      case "started":
+        return "#4a90e2"; // Light blue
+      case "completed":
+        return "#f5a623"; // Light orange
+      default:
+        return "#7ed321"; // Light green for pending
     }
   };
 
-  Array.from(temp.children).forEach((child) => clean(child));
-  return temp.innerHTML;
-};
   const handleAddComment = async (taskId: string) => {
+    if (!comment.trim()) {
+      toast.warning("Please enter a comment");
+      return;
+    }
     try {
-      await axios.post(`${API_BASE_URL}/task/comment/${taskId}`, {
-        text: comment,
-        user: loggedUser?._id,
-      });
+      setLoading(true);
+      await axios.post(
+        `${API_BASE_URL}/task/comment/${taskId}`,
+        {
+          text: comment,
+          user: loggedUser?._id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+          },
+        }
+      );
       setComment("");
-      await fetchTasks(); 
+      await fetchTasks();
+      toast.success("Comment added successfully");
     } catch (error) {
       console.error("Error adding comment:", error);
+      toast.error("Failed to add comment");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleAddReply = async (commentId: string) => {
+    if (!reply?.text.trim()) {
+      toast.warning("Please enter a reply");
+      return;
+    }
     try {
-      await axios.post(`${API_BASE_URL}/task/comment/reply/${commentId}`, {
-        text: reply?.text,
-        user: loggedUser?._id,
-      });
+      setLoading(true);
+      await axios.post(
+        `${API_BASE_URL}/task/comment/reply/${commentId}`,
+        {
+          text: reply.text,
+          user: loggedUser?._id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+          },
+        }
+      );
       setReply(null);
-      await fetchTasks(); // Refresh tasks after adding a reply
+      await fetchTasks();
+      toast.success("Reply added successfully");
     } catch (error) {
       console.error("Error adding reply:", error);
+      toast.error("Failed to add reply");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleMarkAsStarted = async (taskId: string) => {
     try {
-      await axios.put(`${API_BASE_URL}/task/${taskId}`, { status: "started" });
-      await fetchTasks(); // Refresh tasks after updating status
+      setLoading(true);
+      await axios.put(
+        `${API_BASE_URL}/task/${taskId}`,
+        { status: "started" },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+          },
+        }
+      );
+      await fetchTasks();
+      toast.success("Task marked as started");
     } catch (error) {
       console.error("Error marking task as started:", error);
+      toast.error("Failed to update task status");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const statusColor = (status: string) => {
-    switch (status) {
-      case "started":
-        return "#153cec";
-      case "completed":
-        return "#36c622";
-      default:
-        return "#272033";
-    }
-  };
+  const filteredTasks = tasks.filter((task) => {
+    if (filter === "all") return true;
+    return task.status === filter;
+  });
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader />
+      </div>
+    );
+  }
 
   return (
     <>
       <SideBar />
-      <div style={{ maxWidth: "800px", margin: "0 auto", padding: "16px" }}>
-        <Typography variant="h4" gutterBottom>
-        MY TASKS
-        </Typography>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-            gap: "16px",
-          }}
-        >
-          {tasks.map((t) => (
-            <Card key={t._id}>
-              <CardHeader
-                title={
-                  <div className="text-white">
-                    {t.task.split(",").map((task, index) => (
-                      <p className="font-bold" key={index}>
-                        {index + 1}
-                        {". "}
-                        {task}
-                      </p>
-                    ))}
-                  </div>
-                }
-                subheader={
-                  <p  className="font-extrabold text-gray-300">
-                    Assigned by: {t.manager?.name} | Status: {t.status}
-                  </p>
-                }
-                style={{ backgroundColor: statusColor(t.status) }}
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <Typography variant="h4" className="font-bold text-gray-800">
+            My Tasks
+          </Typography>
+          <div className="flex gap-2">
+            {["all", "pending", "started", "completed"].map((status) => (
+              <Chip
+                key={status}
+                label={status.charAt(0).toUpperCase() + status.slice(1)}
+                onClick={() => setFilter(status as any)}
+                color={filter === status ? "primary" : "default"}
+                className={`cursor-pointer ${filter === status
+                  ? "bg-[#4a90e2] text-white"
+                  : "bg-gray-100 hover:bg-gray-200"
+                  }`}
               />
-              <CardContent>
-                <Typography variant="body2">
-                  Start: {new Date(t.startTime).toLocaleString()} <br />
-                  End: {new Date(t.endTime).toLocaleString()}
-                </Typography>
-                <Button variant="outlined" onClick={() => setSelectedTask(t)}>
-                  <Message style={{ marginRight: "2px" }} />
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="success"
-                  onClick={() => handleMarkAsStarted(t._id)}
-                  style={{ marginLeft: "8px" }}
-                >
-                  <Check style={{ marginRight: "8px" }} />
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredTasks.length === 0 ? (
+            <div className="col-span-full text-center py-8">
+              <Typography variant="h6" color="textSecondary">
+                No tasks available
+              </Typography>
+            </div>
+          ) : (
+            filteredTasks.map((t) => (
+              <Card key={t._id} className="hover:shadow-lg transition-shadow border border-gray-100">
+                <CardHeader
+                  className="bg-gradient-to-r from-[#4a90e2]/5 to-[#f5a623]/5"
+                  title={
+                    <div className="space-y-2">
+                      {t.task.split(",").map((task, index) => (
+                        <Typography key={index} className="font-medium">
+                          {index + 1}. {task}
+                        </Typography>
+                      ))}
+                    </div>
+                  }
+                  subheader={
+                    <div className="flex items-center justify-between mt-2">
+                      <Chip
+                        label={t.status}
+                        size="small"
+                        style={{ backgroundColor: statusColor(t.status) }}
+                        className="text-white"
+                      />
+                      <Typography variant="caption" className="text-gray-500">
+                        Assigned by: {t.manager?.name}
+                      </Typography>
+                    </div>
+                  }
+                />
+                <CardContent>
+                  <div className="flex items-center gap-2 mb-4">
+                    <AccessTime className="text-gray-500" />
+                    <Typography variant="body2" color="textSecondary">
+                      Start: {new Date(t.startTime).toLocaleString()}
+                    </Typography>
+                  </div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Schedule className="text-gray-500" />
+                    <Typography variant="body2" color="textSecondary">
+                      End: {new Date(t.endTime).toLocaleString()}
+                    </Typography>
+                  </div>
+                  <div className="flex gap-2">
+                    <Tooltip title="Comments">
+                      <IconButton onClick={() => setSelectedTask(t)} color="primary">
+                        <Badge badgeContent={t.comments?.length || 0} color="primary">
+                          <Message />
+                        </Badge>
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Mark as Started">
+                      <IconButton
+                        onClick={() => handleMarkAsStarted(t._id)}
+                        color="success"
+                        disabled={t.status === "started" || t.status === "completed"}
+                      >
+                        <Check />
+                      </IconButton>
+                    </Tooltip>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
 
         {selectedTask && (
-          <Dialog open={!!selectedTask} onClose={() => setSelectedTask(null)}>
-            <DialogTitle>
-              <div className="mx-auto">
-                {selectedTask.task.split(",").map((task, index) => (
-                  <p className="font-bold" key={index}>
-                    {index + 1}
-                    {". "}
-                    {task}
-                  </p>
-                ))}
-              </div>
+          <Dialog
+            open={!!selectedTask}
+            onClose={() => setSelectedTask(null)}
+            maxWidth="md"
+            fullWidth
+          >
+            <DialogTitle className="bg-gray-50 flex justify-between items-center">
+              <Typography variant="h6">Task Details</Typography>
+              <IconButton onClick={() => setSelectedTask(null)}>
+                <Close />
+              </IconButton>
             </DialogTitle>
-            <DialogContent>
-              <div style={{ marginBottom: "16px" }}>
-                {selectedTask.comments?.map((comment) => (
-                  <div key={comment._id} style={{ marginBottom: "16px" }}>
-                    <div
-                      style={{
-                        background: "#f5f5f5",
-                        padding: "8px",
-                        borderRadius: "4px",
-                      }}
-                    >
-                      <Typography variant="body1">
-                        {comment?.user?.name}: {comment?.text}
-                      </Typography>
-                      <Button
-                        variant="outlined"
-                        onClick={() =>
-                          setReply({ commentId: comment._id, text: "" })
-                        }
-                      >
-                        Reply
-                      </Button>
+            <DialogContent className="mt-4">
+              <div className="space-y-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <Typography variant="subtitle1" className="font-semibold mb-2">
+                    Task Description
+                  </Typography>
+                  {selectedTask.task.split(",").map((task, index) => (
+                    <Typography key={index} className="mb-2">
+                      {index + 1}. {task}
+                    </Typography>
+                  ))}
+                </div>
+
+                <div className="space-y-4">
+                  <Typography variant="subtitle1" className="font-semibold">
+                    Comments
+                  </Typography>
+                  {selectedTask.comments?.map((comment) => (
+                    <div key={comment._id} className="bg-gray-50 p-4 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <Avatar className="bg-[#4a90e2]">
+                          {comment.user?.image ? <img src={comment.user.image} alt={comment.user.name} className="w-6 h-6 rounded-full" /> : comment.user?.name.charAt(0)}
+                        </Avatar>
+                        <div className="flex-1">
+                          <Typography variant="subtitle2" className="font-medium">
+                            {comment.user?.name}
+                          </Typography>
+                          <Typography variant="body2" className="text-gray-600">
+                            {comment.text}
+                          </Typography>
+                          <Typography variant="caption" className="text-gray-500">
+                            {new Date(comment.createdAt).toLocaleString()}
+                          </Typography>
+                        </div>
+                      </div>
+
                       {comment.replies?.map((replyComment) => (
                         <div
                           key={replyComment._id}
-                          style={{ marginLeft: "20px", marginTop: "8px" }}
+                          className="ml-8 mt-2 bg-white p-3 rounded-lg"
                         >
-                          <Typography
-                            variant="body2"
-                            style={{
-                              background: "#e0e0e0",
-                              padding: "4px",
-                              borderRadius: "4px",
-                            }}
-                          >
-                            {replyComment.user.name}: {replyComment.text}
-                          </Typography>
+                          <div className="flex items-start gap-2">
+                            <Avatar className="bg-[#f5a623]" style={{ width: 24, height: 24 }}>
+                              {replyComment.user?.image ? <img src={replyComment.user.image} alt={replyComment.user.name} className="w-6 h-6 rounded-full" /> : replyComment.user?.name.charAt(0)}
+                            </Avatar>
+                            <div className="flex-1">
+                              <Typography variant="subtitle2" className="font-medium">
+                                {replyComment.user?.name}
+                              </Typography>
+                              <Typography variant="body2" className="text-gray-600">
+                                {replyComment.text}
+                              </Typography>
+                              <Typography variant="caption" className="text-gray-500">
+                                {new Date(replyComment.createdAt).toLocaleString()}
+                              </Typography>
+                            </div>
+                          </div>
                         </div>
                       ))}
+
+                      {reply?.commentId === comment._id ? (
+                        <div className="mt-2">
+                          <TextField
+                            fullWidth
+                            multiline
+                            rows={2}
+                            placeholder="Write a reply..."
+                            value={reply.text}
+                            onChange={(e) => setReply({ ...reply, text: e.target.value })}
+                            className="mb-2"
+                          />
+                          <div className="flex justify-end">
+                            <Button
+                              variant="contained"
+                              onClick={() => handleAddReply(comment._id)}
+                              disabled={loading}
+                              startIcon={<Send />}
+                              className="bg-[#f5a623] hover:bg-[#e0961a]"
+                            >
+                              {loading ? "Sending..." : "Send Reply"}
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <Button
+                          variant="text"
+                          onClick={() => setReply({ commentId: comment._id, text: "" })}
+                          className="mt-2"
+                        >
+                          Reply
+                        </Button>
+                      )}
                     </div>
-                  </div>
-                ))}
-              </div>
-              {reply && (
-                <div>
-                  <TextField
-                    placeholder="Add a reply..."
-                    fullWidth
-                    value={reply.text}
-                    onChange={(e) =>
-                      setReply({ ...reply, text: e.target.value })
-                    }
-                  />
-                  <IconButton
-                    onClick={() => handleAddReply(reply.commentId)}
-                    color="primary"
-                  >
-                    <Send />
-                  </IconButton>
+                  ))}
                 </div>
-              )}
-              <TextField
-                placeholder="Add a comment..."
-                fullWidth
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-              />
-              <IconButton
-                onClick={() => handleAddComment(selectedTask._id)}
-                color="primary"
-              >
-                <Send />
-              </IconButton>
+
+                <div className="mt-4">
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={3}
+                    placeholder="Write a comment..."
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    className="mb-2"
+                  />
+                  <div className="flex justify-end">
+                    <Button
+                      variant="contained"
+                      onClick={() => handleAddComment(selectedTask._id)}
+                      disabled={loading}
+                      startIcon={<Send />}
+                      className="bg-[#4a90e2] hover:bg-[#357abd]"
+                    >
+                      {loading ? "Sending..." : "Add Comment"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </DialogContent>
           </Dialog>
         )}

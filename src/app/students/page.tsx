@@ -27,8 +27,8 @@ interface Student {
   email: string;
   phone: string;
   intake: string;
-  selectedCourse: string
-    message: string;
+  selectedCourse: { title: string; _id: string }
+  message: string;
   selectedShift: { _id: string; name: string; start: string; end: string };
   updatedAt: string;
   createdAt: string;
@@ -88,7 +88,7 @@ const StudentManagement: React.FC = () => {
   const [openPay, setOpenPay] = useState(false);
   const [commentText, setComment] = useState({ comment: "", student: "" });
   const [courses, setCourses] = useState<Course[]>([]);
-  const [student, setStudent] = useState<string | null>("");
+  const [student, setStudent] = useState<string|null>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [isPaying, setIsPaying] = useState<boolean>(false);
   const [isRecovering, setIsRecovering] = useState<boolean>(false);
@@ -180,11 +180,11 @@ const StudentManagement: React.FC = () => {
           {
             message,
             recipients: selectedValues,
-          },{
-            headers:{
-              "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
-            }
+          }, {
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
           }
+        }
         );
         setSucces(response.data.message);
         setMessage("");
@@ -208,7 +208,7 @@ const StudentManagement: React.FC = () => {
     const { name, value } = e.target;
     setRecoverFormData((prevData) => ({
       ...prevData,
-      [name]:  Number(value) ,
+      [name]: Number(value),
     }));
   };
   const handleViewP = (student: Student, type: string) => {
@@ -247,9 +247,9 @@ const StudentManagement: React.FC = () => {
         status: newStatus,
         user,
         paymentMethod,
-      },{
-        headers:{
-          "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
+      }, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
         }
       });
       setError(null);
@@ -276,11 +276,11 @@ const StudentManagement: React.FC = () => {
       formData.user = loggedUser?.name;
       const response = await axios.post(
         `${API_BASE_URL}/payment/pay/${id}`,
-        formData,{
-          headers:{
-            "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
-          }
+        formData, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
         }
+      }
       );
       setSucces(response.data.message);
       setError(null);
@@ -300,11 +300,11 @@ const StudentManagement: React.FC = () => {
       setIsRecovering(true);
       const response = await axios.post(
         `${API_BASE_URL}/payment/recover/${id}`,
-        RecoverFormData,{
-          headers:{
-            "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
-          }
+        RecoverFormData, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
         }
+      }
       );
       setSucces(response.data.message);
       setError(null);
@@ -321,11 +321,11 @@ const StudentManagement: React.FC = () => {
     try {
       const response = await axios.put(
         `${API_BASE_URL}/payment/discount/${id}`,
-        formData,{
-          headers:{
-            "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
-          }
+        formData, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
         }
+      }
       );
       setSucces(response.data.message);
       setError(null);
@@ -342,11 +342,11 @@ const StudentManagement: React.FC = () => {
       setIsLoading(true);
       const response = await axios.put(
         `${API_BASE_URL}/payment/extra/${id}`,
-        formData,{
-          headers:{
-            "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
-          }
+        formData, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
         }
+      }
       );
       setSucces(response.data.message);
       setError(null);
@@ -364,9 +364,9 @@ const StudentManagement: React.FC = () => {
   };
   const fetchStudents = async () => {
     try {
-      const response = await axios.get<Student[]>(`${API_BASE_URL}/students`,{
-        headers:{
-          "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
+      const response = await axios.get<Student[]>(`${API_BASE_URL}/students`, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
         }
       });
       await fetchLoggedUser();
@@ -374,7 +374,7 @@ const StudentManagement: React.FC = () => {
         (a, b) =>
           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       );
-      filterStudents(activeFilter,sortedStudents);
+      filterStudents(activeFilter, sortedStudents);
       setStudents(sortedStudents);
       setStudentCounts(getStudentCountByStatus(sortedStudents));
     } catch (error) {
@@ -386,9 +386,9 @@ const StudentManagement: React.FC = () => {
   };
   const fetchCourses = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/course`,{
-        headers:{
-          "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
+      const response = await axios.get(`${API_BASE_URL}/course`, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
         }
       });
       setCourses(response.data);
@@ -414,11 +414,11 @@ const StudentManagement: React.FC = () => {
           selectedShift: selectedStudent.selectedShift,
           intake: selectedStudent.intake,
           name: selectedStudent.name,
-        },{
-          headers:{
-            "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
-          }
+        }, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
         }
+      }
       );
       setSucces("updated student successfully");
       setError(null);
@@ -436,9 +436,9 @@ const StudentManagement: React.FC = () => {
 
   const fetchPayment = async () => {
     try {
-      const response = await axios.get<Payment[]>(`${API_BASE_URL}/payment`,{
-        headers:{
-          "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
+      const response = await axios.get<Payment[]>(`${API_BASE_URL}/payment`, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
         }
       });
       setPayment(response.data);
@@ -461,7 +461,7 @@ const StudentManagement: React.FC = () => {
 
   useEffect(() => {
     // setActiveFilter("pending")
-    fetchStudents()      
+    fetchStudents()
     fetchPayment();
     fetchCourses();
   }, []);
@@ -469,7 +469,7 @@ const StudentManagement: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
       setIsLoading(true);
-      await axios.delete(`${API_BASE_URL}/students/${id}`,{
+      await axios.delete(`${API_BASE_URL}/students/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
         },
@@ -528,7 +528,7 @@ const StudentManagement: React.FC = () => {
   const handleAttend = async (id: string) => {
     try {
       setIsLoading(true);
-      await axios.put(`${API_BASE_URL}/students/attend/${id}`,{
+      await axios.put(`${API_BASE_URL}/students/attend/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
         },
@@ -574,7 +574,7 @@ const StudentManagement: React.FC = () => {
       setIsLoading(true);
       await axios.put(`${API_BASE_URL}/students/comment/${student}`, {
         comment: commentText.comment,
-      },{
+      }, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
         },
@@ -875,22 +875,22 @@ const StudentManagement: React.FC = () => {
           </>
         );
       case "completed":
-        return(
+        return (
           <>
-          {hasPermission(loggedUser as TeamMember, "students", "dropout") ? (
-            <button
-              onClick={() => {
-                handleStatusClick(student._id, student.name, "droppedout");
-                setAction("drop student out");
-              }}
-              className="text-green-600 font-extrabold hover:text-green-900 ml-3"
-            >
-              DROPOUT
-            </button>
-          ) : (
-            ""
-          )}``
-        </>
+            {hasPermission(loggedUser as TeamMember, "students", "dropout") ? (
+              <button
+                onClick={() => {
+                  handleStatusClick(student._id, student.name, "droppedout");
+                  setAction("drop student out");
+                }}
+                className="text-green-600 font-extrabold hover:text-green-900 ml-3"
+              >
+                DROPOUT
+              </button>
+            ) : (
+              ""
+            )}``
+          </>
 
         )
       default:
@@ -1009,7 +1009,7 @@ const StudentManagement: React.FC = () => {
                 </button>
               ))}
             </div>
-           
+
             <div className="relative w-full sm:w-64">
               <input
                 type="text"
@@ -1079,7 +1079,7 @@ const StudentManagement: React.FC = () => {
                           scope="col"
                           className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell"
                         >
-                          Payment Status
+                          {status === 'pending' || status === 'accepted' ? 'Course' : 'Payment Status'}
                         </th>
                       ) : ("")}
                       <th
@@ -1130,36 +1130,37 @@ const StudentManagement: React.FC = () => {
                         {hasPermission(loggedUser as TeamMember, "payment", "pay") ? (
                           <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap hidden md:table-cell">
                             <div className="text-sm text-gray-900">
-                            {payment &&
-                           payment.find((payment) => payment.studentId === student._id) ?
-                            (
-                       payment &&
-                       payment
-                         .filter(
-                           (payment) => payment.studentId === student._id
-                         )
-                         .map((filteredPayment) => (
-                           <div key={filteredPayment._id}>
-                             
-                             
-                             <p className="flex mt-1">
-                               <span className=" text-blue-600 font-extrabold ">
-                                 {
-                                   filteredPayment.status
-                                 }
-                                
-                               </span>
-                             </p>
-                          
-                           </div>
-                         ))
-                     ): (
-                      <div>
-                        <p>No payment information found</p>
-                        {student.status==='registered'||student.status==='started'||student.status==='completed'?
-                        <button onClick={()=>{setIsRecoverModalOpen(true);setSelectedStudent(student)}} className="bg-green-600 p-2 text-white font-bold rounded-md">Recover</button>:''}
-                        </div>
-                    ) }
+                              {student.status === 'pending' || student.status === 'accepted' ? (
+                                <div>
+                                  <p className="text-blue-600 font-extrabold">
+                                    {student.selectedCourse.title || 'No course selected'}
+                                  </p>
+                                </div>
+                              ) : (
+                                payment &&
+                                  payment.find((payment) => payment.studentId === student._id) ? (
+                                  payment &&
+                                  payment
+                                    .filter(
+                                      (payment) => payment.studentId === student._id
+                                    )
+                                    .map((filteredPayment) => (
+                                      <div key={filteredPayment._id}>
+                                        <p className="flex mt-1">
+                                          <span className="text-blue-600 font-extrabold">
+                                            {filteredPayment.status}
+                                          </span>
+                                        </p>
+                                      </div>
+                                    ))
+                                ) : (
+                                  <div>
+                                    <p>No payment information found</p>
+                                    {student.status === 'registered' || student.status === 'started' || student.status === 'completed' ?
+                                      <button onClick={() => { setIsRecoverModalOpen(true); setSelectedStudent(student) }} className="bg-green-600 p-2 text-white font-bold rounded-md">Recover</button> : ''}
+                                  </div>
+                                )
+                              )}
                             </div>
                           </td>
                         ) : (
@@ -1191,11 +1192,11 @@ const StudentManagement: React.FC = () => {
                         SELECT COURSE
                       </label>
                       <select
-                        value={selectedStudent.selectedCourse}
+                        value={selectedStudent.selectedCourse._id}
                         onChange={(e) =>
                           setSelectedStudent({
                             ...selectedStudent,
-                            selectedCourse : e.target.value ,
+                            selectedCourse: courses.find((c) => c._id === e.target.value) || selectedStudent.selectedCourse,
 
                             selectedShift:
                               courses.find((c) => c._id === e.target.value)
@@ -1236,7 +1237,7 @@ const StudentManagement: React.FC = () => {
                         onChange={(e) =>
                           setSelectedStudent({
                             ...selectedStudent,
-                            selectedShift: courses.find((c) => c._id === selectedStudent.selectedCourse)?.shifts.find((s) => s._id === e.target.value) || selectedStudent.selectedShift,
+                            selectedShift: courses.find((c) => c._id === selectedStudent.selectedCourse._id)?.shifts.find((s) => s._id === e.target.value) || selectedStudent.selectedShift,
                           })
                         }
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -1244,7 +1245,7 @@ const StudentManagement: React.FC = () => {
                         {courses
                           .find(
                             (course) =>
-                              course._id === selectedStudent.selectedCourse
+                              course._id === selectedStudent.selectedCourse._id
                           )
                           ?.shifts?.map((shift) => (
                             <option key={shift._id} value={shift._id}>
@@ -1321,7 +1322,6 @@ const StudentManagement: React.FC = () => {
                     </p>
                     <p className="flex">
                       <span className="font-extrabold w-28 ">COURSE</span>{" "}
-                      {/* @ts-expect-error error */}
                       <span>{selectedStudent?.selectedCourse.title}</span>
                     </p>
 
@@ -1478,58 +1478,58 @@ const StudentManagement: React.FC = () => {
       )}
       {isRecoverModalOpen && (
         <div className="fixed inset-0 flex  items-center justify-center bg-gray-800 bg-opacity-75">
-        <div className="bg-white rounded-lg overflow-hidden h-64 shadow-xl transform transition-all sm:w-full sm:max-w-lg">
-          <div className="bg-gray-50  overflow-scroll">
-            <h3 className="text-lg text-center bg-blue-600 text-white font-extrabold">
-             RECOVER PAYMENT
-            </h3>
-            <div className="mt-4 flex  flex-col gap-5">
-              <span className="flex gap-10 items-center justify-between mx-10 mb-3">
-                <label className="font-extrabold" htmlFor="amount">
-                  AMOUNT DUE:
-                </label>
-                <input
-                  name="amountDue"
-                  type="number"
-                  onChange={handleRecoverFormData}
-                  placeholder="Amount in Frw"
-                  className="border-2 p-2 rounded-md border-blue-700"
-                />
-              </span>
-          
+          <div className="bg-white rounded-lg overflow-hidden h-64 shadow-xl transform transition-all sm:w-full sm:max-w-lg">
+            <div className="bg-gray-50  overflow-scroll">
+              <h3 className="text-lg text-center bg-blue-600 text-white font-extrabold">
+                RECOVER PAYMENT
+              </h3>
+              <div className="mt-4 flex  flex-col gap-5">
+                <span className="flex gap-10 items-center justify-between mx-10 mb-3">
+                  <label className="font-extrabold" htmlFor="amount">
+                    AMOUNT DUE:
+                  </label>
+                  <input
+                    name="amountDue"
+                    type="number"
+                    onChange={handleRecoverFormData}
+                    placeholder="Amount in Frw"
+                    className="border-2 p-2 rounded-md border-blue-700"
+                  />
+                </span>
+
+              </div>
+              <div className="mt-4 flex  flex-col gap-5">
+                <span className="flex gap-10 items-center justify-between mx-10 mb-3">
+                  <label className="font-extrabold" htmlFor="amount">
+                    AMOUNT PAID:
+                  </label>
+                  <input
+                    name="amountPaid"
+                    type="number"
+                    onChange={handleRecoverFormData}
+                    placeholder="Amount in Frw"
+                    className="border-2 p-2 rounded-md border-blue-700"
+                  />
+                </span>
+
+              </div>
             </div>
-            <div className="mt-4 flex  flex-col gap-5">
-              <span className="flex gap-10 items-center justify-between mx-10 mb-3">
-                <label className="font-extrabold" htmlFor="amount">
-                  AMOUNT PAID:
-                </label>
-                <input
-                  name="amountPaid"
-                  type="number"
-                  onChange={handleRecoverFormData}
-                  placeholder="Amount in Frw"
-                  className="border-2 p-2 rounded-md border-blue-700"
-                />
-              </span>
-          
+            <div className="bg-gray-50 p-4 flex justify-between  mx-5">
+              <button
+                onClick={() => handleRecover(selectedStudent._id)}
+                className="px-4 py-2 text-sm text-black font-extrabold hover:text-white bg-green-300 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
+              >
+                {isRecovering ? 'Recovering' : "Recover"}
+              </button>
+              <button
+                onClick={() => setIsRecoverModalOpen(false)}
+                className="px-4 py-2 text-sm text-black font-extrabold hover:text-white bg-red-300 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
+              >
+                Close
+              </button>
             </div>
-          </div>
-          <div className="bg-gray-50 p-4 flex justify-between  mx-5">
-            <button
-              onClick={()=>handleRecover(selectedStudent._id)}
-              className="px-4 py-2 text-sm text-black font-extrabold hover:text-white bg-green-300 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
-            >
-           {isRecovering?'Recovering':"Recover"}
-            </button>
-            <button
-              onClick={() => setIsRecoverModalOpen(false)}
-              className="px-4 py-2 text-sm text-black font-extrabold hover:text-white bg-red-300 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
-            >
-              Close
-            </button>
           </div>
         </div>
-      </div>
       )}
       {selectedStudent && type && openPay && (
         <div className="fixed inset-0 flex  items-center justify-center bg-gray-800 bg-opacity-75">

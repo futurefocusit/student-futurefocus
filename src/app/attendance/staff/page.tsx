@@ -121,7 +121,7 @@ const getLocationFromIP = async () => {
       const matchesEndDate = !endDate || recordDate <= new Date(endDate);
       const matchesName =
         !nameSearch ||
-        record.memberId.name.toLowerCase().includes(nameSearch.toLowerCase());
+        record.memberId?.name.toLowerCase().includes(nameSearch.toLowerCase());
       return matchesStatus && matchesStartDate && matchesEndDate && matchesName;
     });
   };

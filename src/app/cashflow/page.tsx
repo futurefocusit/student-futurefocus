@@ -39,6 +39,7 @@ const PaymentsPage: React.FC = () => {
   const { fetchLoggedUser, loggedUser } = useAuth()
   const [searchQuery, setSearchQuery] = useState("")
   const [searchField, setSearchField] = useState<"user" | "payment" | "reason">("user")
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
 
   const [formData, setFormData] = useState({
     user: loggedUser?.name,
@@ -102,7 +103,7 @@ const PaymentsPage: React.FC = () => {
       await fetchLoggedUser()
       const response = await axios.get(`${API_BASE_URL}/cashflow`, {
         headers: {
-          "Content-Type":'applicatio/json',
+          "Content-Type": 'applicatio/json',
           Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
         },
       })
@@ -122,6 +123,15 @@ const PaymentsPage: React.FC = () => {
     fetchCashflows()
   }, [])
 
+  // Add debounce effect for search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery)
+    }, 300) // 300ms delay
+
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
   const filteredCashflows = cashflows
     .filter((cashflow) => {
       const cashflowDate = new Date(cashflow.createdAt)
@@ -134,11 +144,28 @@ const PaymentsPage: React.FC = () => {
 
       const matchesDate = cashflowDate >= startDate && cashflowDate <= endDate
       const matchesType = cashflow.type === filter
-      const matchesSearch = searchQuery ? cashflow[searchField].toLowerCase().includes(searchQuery.toLowerCase()) : true
+
+      // Improved search functionality with better matching
+      if (!debouncedSearchQuery) return matchesDate && matchesType
+
+      const searchTerms = debouncedSearchQuery.toLowerCase().trim().split(/\s+/)
+      const fieldValue = String(cashflow[searchField]).toLowerCase()
+
+      // Check if all search terms are found in the field value
+      const matchesSearch = cashflow[`${searchField}`].includes(searchQuery) 
 
       return matchesDate && matchesType && matchesSearch
     })
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .sort((a, b) => {
+      // First sort by date (newest first)
+      const dateComparison = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      if (dateComparison !== 0) return dateComparison
+
+      // If same date, sort by time (newest first)
+      return new Date(b.createdAt).getHours() - new Date(a.createdAt).getHours() ||
+        new Date(b.createdAt).getMinutes() - new Date(a.createdAt).getMinutes()
+    })
+
   const handleDeleteClick = (itemId: string) => {
     setItemToDelete(itemId)
     SetConfirmModel(true)
@@ -235,9 +262,20 @@ const PaymentsPage: React.FC = () => {
       >,
     )
 
+    // Sort transactions within each date group by time (newest first)
+    Object.keys(allTransactionsByDate).forEach(date => {
+      allTransactionsByDate[date].transactions.sort((a, b) => {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      })
+    })
+
     // Filter out dates with no transactions matching the current filter
     return Object.entries(allTransactionsByDate)
       .filter(([_, data]) => data.transactions.length > 0)
+      .sort(([dateA], [dateB]) => {
+        // Sort dates in descending order (newest first)
+        return new Date(dateB).getTime() - new Date(dateA).getTime()
+      })
       .reduce(
         (acc, [date, data]) => {
           acc[date] = data
@@ -436,35 +474,43 @@ const PaymentsPage: React.FC = () => {
             <select
               value={searchField}
               onChange={(e) => setSearchField(e.target.value as "user" | "payment" | "reason")}
-              className="border-2 rounded px-3"
+              className="border-2 rounded px-3 py-2 bg-white focus:outline-none focus:border-blue-500 transition-colors"
             >
               <option value="user">Search by User</option>
               <option value="payment">Search by Payment Method</option>
               <option value="reason">Search by Reason</option>
             </select>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={`Search by ${searchField}...`}
-              className="border-2 rounded px-3"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={`Search by ${searchField}...`}
+                className="border-2 rounded px-3 py-2 w-64 focus:outline-none focus:border-blue-500 transition-colors"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  ×
+                </button>
+              )}
+            </div>
           </div>
 
           <div>
             <button
               onClick={() => setFilter("income")}
-              className={`px-4 py-2 font-semibold ${
-                filter === "income" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"
-              } rounded-l`}
+              className={`px-4 py-2 font-semibold ${filter === "income" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"
+                } rounded-l`}
             >
               CASH IN
             </button>
             <button
               onClick={() => setFilter("expenses")}
-              className={`px-4 py-2 font-semibold ${
-                filter === "expenses" ? "bg-red-500 text-white" : "bg-gray-200 text-gray-800"
-              } rounded-r`}
+              className={`px-4 py-2 font-semibold ${filter === "expenses" ? "bg-red-500 text-white" : "bg-gray-200 text-gray-800"
+                } rounded-r`}
             >
               CASH OUT
             </button>
@@ -484,109 +530,109 @@ const PaymentsPage: React.FC = () => {
           {hasPermission(loggedUser as TeamMember, "cashflow", "view") ? (
             <div className="overflow-x-auto">
               {Object.entries(groupedCashflows).sort(([dateB], [dateA]) => {
-    const dA = new Date(dateA);
-    const dB = new Date(dateB);
-    
-    // Compare years first
-    if (dA.getFullYear() !== dB.getFullYear()) {
-        return dA.getFullYear() - dB.getFullYear();
-    }
-    
-    // If years are the same, compare months
-    if (dA.getMonth() !== dB.getMonth()) {
-        return dA.getMonth() - dB.getMonth();
-    }
-    
-    // If both year and month are the same, compare days
-    return dA.getDate() - dB.getDate();
-})
-.map(([date, { total, transactions }]) => (
-                <div key={date} className="mb-4">
-                  <h3 className="text-lg font-bold text-gray-800">{date.toUpperCase()}</h3>
-                  <div className="text-sm text-gray-600 flex flex-wrap gap-4">
-                    <p>Total: {new Intl.NumberFormat().format(total)} Frw</p>
-                    <p>Income: {new Intl.NumberFormat().format(groupedCashflows[date].income)} Frw</p>
-                    <p>Expenses: {new Intl.NumberFormat().format(groupedCashflows[date].expenses)} Frw</p>
-                    <p className="font-semibold">
-                      Remaining Balance: {new Intl.NumberFormat().format(groupedCashflows[date].balance)} Frw
-                    </p>
-                  </div>
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          No
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          User
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Amount
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Payment Method
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Reason
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Time
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {transactions.map((cashflow, index) => (
-                        <tr key={index}>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">{index + 1}</div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">{cashflow.user || "N/A"}</div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
-                              {new Intl.NumberFormat().format(cashflow.amount)} Frw
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">{cashflow.payment}</div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">{cashflow.reason || "N/A"}</div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
-                              {new Date(cashflow.createdAt).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-bold text-red-500 hover:text-red-900">
-                              {hasPermission(loggedUser as TeamMember, "cashflow", "delete") ? (
-                                <button
-                                  onClick={() => {
-                                    handleDeleteClick(cashflow._id)
-                                    setAction(` delete ${cashflow.type} transaction`)
-                                  }}
-                                >
-                                  delete
-                                </button>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </td>
+                const dA = new Date(dateA);
+                const dB = new Date(dateB);
+
+                // Compare years first
+                if (dA.getFullYear() !== dB.getFullYear()) {
+                  return dA.getFullYear() - dB.getFullYear();
+                }
+
+                // If years are the same, compare months
+                if (dA.getMonth() !== dB.getMonth()) {
+                  return dA.getMonth() - dB.getMonth();
+                }
+
+                // If both year and month are the same, compare days
+                return dA.getDate() - dB.getDate();
+              })
+                .map(([date, { total, transactions }]) => (
+                  <div key={date} className="mb-4">
+                    <h3 className="text-lg font-bold text-gray-800">{date.toUpperCase()}</h3>
+                    <div className="text-sm text-gray-600 flex flex-wrap gap-4">
+                      <p>Total: {new Intl.NumberFormat().format(total)} Frw</p>
+                      <p>Income: {new Intl.NumberFormat().format(groupedCashflows[date].income)} Frw</p>
+                      <p>Expenses: {new Intl.NumberFormat().format(groupedCashflows[date].expenses)} Frw</p>
+                      <p className="font-semibold">
+                        Remaining Balance: {new Intl.NumberFormat().format(groupedCashflows[date].balance)} Frw
+                      </p>
+                    </div>
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            No
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            User
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Amount
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Payment Method
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Reason
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Time
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            actions
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ))}
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {transactions.map((cashflow, index) => (
+                          <tr key={index}>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm font-medium text-gray-900">{index + 1}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">{cashflow.user || "N/A"}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">
+                                {new Intl.NumberFormat().format(cashflow.amount)} Frw
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">{cashflow.payment}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">{cashflow.reason || "N/A"}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">
+                                {new Date(cashflow.createdAt).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm font-bold text-red-500 hover:text-red-900">
+                                {hasPermission(loggedUser as TeamMember, "cashflow", "delete") ? (
+                                  <button
+                                    onClick={() => {
+                                      handleDeleteClick(cashflow._id)
+                                      setAction(` delete ${cashflow.type} transaction`)
+                                    }}
+                                  >
+                                    delete
+                                  </button>
+                                ) : (
+                                  ""
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ))}
               <div className="mt-6">
                 <h4 className="text-lg font-bold text-gray-800">Monthly Totals</h4>
                 <ul>

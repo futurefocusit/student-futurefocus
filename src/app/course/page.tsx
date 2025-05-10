@@ -11,6 +11,8 @@ import { useAuth } from "@/context/AuthContext";
 import { hasPermission } from "@/libs/hasPermission";
 import Modal from "@/components/Modal";
 import SideBar from "@/components/SideBar";
+import { CloudUpload, School, Star, AttachMoney, Schedule } from "@mui/icons-material";
+import { TextField, FormControl, InputLabel, Grid, Rating, Chip, OutlinedInput, Select, MenuItem } from "@mui/material";
 
 const CoursesComponent: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -34,6 +36,8 @@ const CoursesComponent: React.FC = () => {
     shifts: [],
   });
   const { loggedUser, fetchLoggedUser } = useAuth()
+  const [isUploading, setIsUploading] = useState(false);
+
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -196,6 +200,20 @@ const CoursesComponent: React.FC = () => {
     setIsUpdateModalOpen(true);
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({
+          ...prev,
+          image: reader.result as string,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const canCreate = loggedUser
     ? hasPermission(loggedUser, "courses", "create")
     : false;
@@ -306,165 +324,312 @@ const CoursesComponent: React.FC = () => {
 
       {/* Add Course Modal */}
       <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>
-        <h2 className="text-xl font-bold mb-4">Add New Course</h2>
-        <form onSubmit={handleAddSubmit}>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            placeholder="Course Title"
-            className="input mb-4 w-full"
-            required
-          />
-          <input
-            type="number"
-            name="rating"
-            value={formData.rating}
-            onChange={handleChange}
-            placeholder="Rating"
-            className="input mb-4 w-full"
-            min="1"
-            max="5"
-            required
-          />
-          <input
-            type="text"
-            name="image"
-            value={formData.image}
-            onChange={handleChange}
-            placeholder="Image URL"
-            className="input mb-4 w-full"
-          />
-          <input
-            type="number"
-            name="scholarship"
-            value={formData.scholarship}
-            onChange={handleChange}
-            placeholder="Scholarship Available"
-            className="input mb-4 w-full"
-            required
-          />
-          <input
-            type="number"
-            name="nonScholarship"
-            value={formData.nonScholarship}
-            onChange={handleChange}
-            placeholder="Non-Scholarship Available"
-            className="input mb-4 w-full"
-            required
-          />
-          <div className="mb-4">
-            <p className="font-medium">Shifts:</p>
-            {shifts.map((shift) => (
-              <div key={shift._id}>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.shifts.includes(shift)}
-                    onChange={() => handleShiftChange(shift)}
-                    className="mr-2"
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-lg md:text-xl font-bold mb-6 text-center">
+            Add New Course
+          </h2>
+          <form onSubmit={handleAddSubmit} className="space-y-4">
+            <Grid container spacing={3}>
+              {/* Course Title */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Course Title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  required
+                  InputProps={{
+                    startAdornment: <School className="text-gray-400 mr-2" />,
+                  }}
+                />
+              </Grid>
+
+              {/* Rating */}
+              <Grid item xs={12} md={6}>
+                <FormControl fullWidth>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Rating
+                  </label>
+                  <Rating
+                    name="rating"
+                    value={Number(formData.rating)}
+                    onChange={(_, newValue) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        rating: newValue || 1
+                      }));
+                    }}
+                    precision={1}
+                    max={5}
                   />
-                  {shift.start} - {shift.end}
-                </label>
-              </div>
-            ))}
-          </div>
-          <div className="mb-4">
-            <button
-              type="submit"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-            >
-              Add Course
-            </button>
-          </div>
-        </form>
+                </FormControl>
+              </Grid>
+
+              {/* Image Upload */}
+              <Grid item xs={12}>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Course Image (WebP format only)
+                  </label>
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept=".webp"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        id="image-upload"
+                        disabled={isUploading}
+                      />
+                      <label
+                        htmlFor="image-upload"
+                        className={`flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer ${isUploading ? "opacity-50 cursor-not-allowed" : ""
+                          }`}
+                      >
+                        <CloudUpload className="mr-2" />
+                        {isUploading ? "Uploading..." : "Upload Image"}
+                      </label>
+                    </div>
+                    {formData.image && (
+                      <div className="relative w-20 h-20">
+                        <img
+                          src={formData.image}
+                          alt="Preview"
+                          className="w-full h-full object-cover rounded-md"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Maximum file size: 2MB. Only WebP format is supported.
+                  </p>
+                </div>
+              </Grid>
+
+              {/* Scholarship and Non-Scholarship */}
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Scholarship Available"
+                  name="scholarship"
+                  type="number"
+                  value={formData.scholarship}
+                  onChange={handleChange}
+                  required
+                  InputProps={{
+                    startAdornment: <AttachMoney className="text-gray-400 mr-2" />,
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Non-Scholarship Available"
+                  name="nonScholarship"
+                  type="number"
+                  value={formData.nonScholarship}
+                  onChange={handleChange}
+                  required
+                  InputProps={{
+                    startAdornment: <AttachMoney className="text-gray-400 mr-2" />,
+                  }}
+                />
+              </Grid>
+
+              {/* Shifts */}
+              <Grid item xs={12}>
+                <FormControl fullWidth>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Available Shifts
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-4 border rounded-md">
+                    {shifts.map((shift) => (
+                      <label key={shift._id} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={formData.shifts.some(s => s._id === shift._id)}
+                          onChange={() => handleShiftChange(shift)}
+                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-700">
+                          {shift.start} - {shift.end}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </FormControl>
+              </Grid>
+
+              {/* Submit Button */}
+              <Grid item xs={12}>
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-blue-600 text-white rounded-md text-sm md:text-base hover:bg-blue-700 transition-colors"
+                >
+                  Add Course
+                </button>
+              </Grid>
+            </Grid>
+          </form>
+        </div>
       </Modal>
 
-      {editingCourse && (
-        <Modal
-          isOpen={isUpdateModalOpen}
-          onClose={() => setIsUpdateModalOpen(false)}
-        >
-          <h2 className="text-xl font-bold mb-4">Update Course</h2>
-          <form onSubmit={handleUpdateSubmit}>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              placeholder="Course Title"
-              className="input mb-4 w-full border-2 rounded-md p-2 "
-              required
-            />
-            <input
-              type="number"
-              name="rating"
-              value={formData.rating}
-              onChange={handleChange}
-              placeholder="Rating"
-              className="input mb-4 w-full border-2 rounded-md p-2"
-              min="1"
-              max="5"
-              required
-            />
-            <input
-              type="text"
-              name="image"
-              value={formData.image}
-              onChange={handleChange}
-              placeholder="Image URL"
-              className="input mb-4 w-full border-2 rounded-md p-2"
-            />
-            <input
-              type="number"
-              name="scholarship"
-              value={formData.scholarship}
-              onChange={handleChange}
-              placeholder="Scholarship Available"
-              className="input mb-4 w-full border-2 rounded-md p-2"
-              required
-            />
-            <input
-              type="number"
-              name="nonScholarship"
-              value={formData.nonScholarship}
-              onChange={handleChange}
-              placeholder="Non-Scholarship Available"
-              className="input mb-4 w-full border-2 rounded-md p-2"
-              required
-            />
-            <div className="mb-4">
-              <p className="font-medium">Shifts:</p>
-              <div className="border-2 rounded-md p-2 ">
-                {shifts.map((shift) => (
-                  <label key={shift._id} className="flex items-center ">
-                    <input
-                      type="checkbox"
-                      checked={formData.shifts.some(
-                        (item) => item._id === shift._id
-                      )}
-                      onChange={() => handleShiftChange(shift)}
-                      className="mr-2"
-                    />
-                    {shift.start} - {shift.end}
-                  </label>
-                ))}
-              </div>
-            </div>
-            <div className="mb-4">
-              <button
-                type="submit"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-              >
-                Update Course
-              </button>
-            </div>
-          </form>
-        </Modal>
-      )}
-    </div>
+      {/* Update Course Modal */}
+      <Modal isOpen={isUpdateModalOpen} onClose={() => setIsUpdateModalOpen(false)}>
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-lg md:text-xl font-bold mb-6 text-center">
+            Update Course
+          </h2>
+          <form onSubmit={handleUpdateSubmit} className="space-y-4">
+            <Grid container spacing={3}>
+              {/* Course Title */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Course Title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  required
+                  InputProps={{
+                    startAdornment: <School className="text-gray-400 mr-2" />,
+                  }}
+                />
+              </Grid>
 
+              {/* Rating */}
+              <Grid item xs={12} md={6}>
+                <FormControl fullWidth>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Rating
+                  </label>
+                  <Rating
+                    name="rating"
+                    value={Number(formData.rating)}
+                    onChange={(_, newValue) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        rating: newValue || 1
+                      }));
+                    }}
+                    precision={1}
+                    max={5}
+                  />
+                </FormControl>
+              </Grid>
+
+              {/* Image Upload */}
+              <Grid item xs={12}>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Course Image (WebP format only)
+                  </label>
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept=".webp"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        id="image-upload-update"
+                        disabled={isUploading}
+                      />
+                      <label
+                        htmlFor="image-upload-update"
+                        className={`flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer ${isUploading ? "opacity-50 cursor-not-allowed" : ""
+                          }`}
+                      >
+                        <CloudUpload className="mr-2" />
+                        {isUploading ? "Uploading..." : "Upload Image"}
+                      </label>
+                    </div>
+                    {formData.image && (
+                      <div className="relative w-20 h-20">
+                        <img
+                          src={formData.image}
+                          alt="Preview"
+                          className="w-full h-full object-cover rounded-md"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Maximum file size: 2MB. Only WebP format is supported.
+                  </p>
+                </div>
+              </Grid>
+
+              {/* Scholarship and Non-Scholarship */}
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Scholarship Available"
+                  name="scholarship"
+                  type="number"
+                  value={formData.scholarship}
+                  onChange={handleChange}
+                  required
+                  InputProps={{
+                    startAdornment: <AttachMoney className="text-gray-400 mr-2" />,
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Non-Scholarship Available"
+                  name="nonScholarship"
+                  type="number"
+                  value={formData.nonScholarship}
+                  onChange={handleChange}
+                  required
+                  InputProps={{
+                    startAdornment: <AttachMoney className="text-gray-400 mr-2" />,
+                  }}
+                />
+              </Grid>
+
+              {/* Shifts */}
+              <Grid item xs={12}>
+                <FormControl fullWidth>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Available Shifts
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-4 border rounded-md">
+                    {shifts.map((shift) => (
+                      <label key={shift._id} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={formData.shifts.some(s => s._id === shift._id)}
+                          onChange={() => handleShiftChange(shift)}
+                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-700">
+                          {shift.start} - {shift.end}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </FormControl>
+              </Grid>
+
+              {/* Submit Button */}
+              <Grid item xs={12}>
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-blue-600 text-white rounded-md text-sm md:text-base hover:bg-blue-700 transition-colors"
+                >
+                  Update Course
+                </button>
+              </Grid>
+            </Grid>
+          </form>
+        </div>
+      </Modal>
+    </div>
   );
 };
 
