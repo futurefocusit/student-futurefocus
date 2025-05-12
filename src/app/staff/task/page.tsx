@@ -78,7 +78,7 @@ const MemberTasks: React.FC = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [tasks]);
 
   const statusColor = (status: string) => {
     switch (status) {
@@ -199,7 +199,7 @@ const MemberTasks: React.FC = () => {
               <Chip
                 key={status}
                 label={status.charAt(0).toUpperCase() + status.slice(1)}
-                onClick={() => setFilter(status as any)}
+                onClick={() => setFilter(status as "all" | "pending" | "started" | "completed")}
                 color={filter === status ? "primary" : "default"}
                 className={`cursor-pointer ${filter === status
                   ? "bg-[#4a90e2] text-white"

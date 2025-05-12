@@ -181,7 +181,7 @@ const Shift = () => {
               <FormControl className="w-1/2">
                 <Select
                   value={shift.days}
-                  onChange={handleDaysChange}
+                  onChange={()=>handleDaysChange}
                   displayEmpty
                   className="bg-white"
                 >

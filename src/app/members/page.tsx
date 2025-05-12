@@ -83,7 +83,7 @@ const MembersPage: React.FC = () => {
       }
     };
     loadTeamMembers();
-  }, []);
+  }, [members]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -241,7 +241,7 @@ const MembersPage: React.FC = () => {
     }
   };
 
-  const handleDaysChange = (event: any) => {
+  const handleDaysChange = (event) => {
     const selectedDays = event.target.value;
     setFormData(prev => ({
       ...prev,
