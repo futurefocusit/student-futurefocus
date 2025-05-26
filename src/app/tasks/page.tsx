@@ -90,10 +90,10 @@ const TaskManagement: React.FC = () => {
   const [filter, setFilter] = useState<string>("all");
 
   useEffect(() => {
-    const fetchloggedUser = async () => {
+    const getloggedUser = async () => {
       await fetchLoggedUser();
     };
-    fetchloggedUser();
+    getloggedUser();
   }, []);
 
   useEffect(() => {

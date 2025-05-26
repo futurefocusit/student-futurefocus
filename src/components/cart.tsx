@@ -65,7 +65,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose, loggedUser }) => {
                   <div>
                     <h3 className="font-semibold">{item.materialName}</h3>
                     <p className="text-sm text-gray-600">
-                      Category: {item.category.name}
+                      Category: {item.category?.name}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">

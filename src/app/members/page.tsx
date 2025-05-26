@@ -83,7 +83,7 @@ const MembersPage: React.FC = () => {
       }
     };
     loadTeamMembers();
-  }, [members]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -200,10 +200,10 @@ const MembersPage: React.FC = () => {
     if (!file) return;
 
     // Check if file is WebP format
-    if (file.type !== "image/webp") {
-      toast.error("Please upload only WebP format images");
-      return;
-    }
+    if (!file.type.startsWith("image/")) {
+  toast.error("Please upload only image format images");
+  return;
+}
 
     // Check file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
@@ -382,13 +382,13 @@ const MembersPage: React.FC = () => {
               <Grid item xs={12}>
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">
-                    Profile Image (WebP format only)
+                    Profile Image (image format only)
                   </label>
                   <div className="flex items-center space-x-4">
                     <div className="relative">
                       <input
                         type="file"
-                        accept=".webp"
+                        accept="image/*"
                         onChange={handleImageUpload}
                         className="hidden"
                         id="image-upload"
@@ -414,7 +414,7 @@ const MembersPage: React.FC = () => {
                     )}
                   </div>
                   <p className="text-xs text-gray-500">
-                    Maximum file size: 2MB. Only WebP format is supported.
+                    Maximum file size: 2MB. Only image format is supported.
                   </p>
                 </div>
               </Grid>

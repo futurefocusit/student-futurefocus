@@ -78,7 +78,7 @@ const MemberTasks: React.FC = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, [tasks]);
+  }, []);
 
   const statusColor = (status: string) => {
     switch (status) {
@@ -97,7 +97,7 @@ const MemberTasks: React.FC = () => {
       return;
     }
     try {
-      setLoading(true);
+      // setLoading(true);
       await axios.post(
         `${API_BASE_URL}/task/comment/${taskId}`,
         {
@@ -127,7 +127,7 @@ const MemberTasks: React.FC = () => {
       return;
     }
     try {
-      setLoading(true);
+      // setLoading(true);
       await axios.post(
         `${API_BASE_URL}/task/comment/reply/${commentId}`,
         {
@@ -153,7 +153,7 @@ const MemberTasks: React.FC = () => {
 
   const handleMarkAsStarted = async (taskId: string) => {
     try {
-      setLoading(true);
+      // setLoading(true);
       await axios.put(
         `${API_BASE_URL}/task/${taskId}`,
         { status: "started" },

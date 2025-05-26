@@ -64,7 +64,7 @@ const AttendancePage: React.FC = () => {
         ? record.studentId.intake
         : "Unknown Intake";
       const shift = record.studentId
-        ? record.studentId.selectedShift
+        ? record.studentId.selectedShift.name
         : "Unknown Shift";
 
       acc[date] = acc[date] || {};
