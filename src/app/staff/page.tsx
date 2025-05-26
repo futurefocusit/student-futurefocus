@@ -98,7 +98,6 @@ const AttendancePage: React.FC = () => {
   useEffect(() => {
     fetchAttendance();
     getLocationFromIP()
-    console.log(location)
   }, []);
 
 
