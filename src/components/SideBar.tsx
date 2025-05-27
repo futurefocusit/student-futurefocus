@@ -155,7 +155,7 @@ const SideBar = () => {
 
       <div
         className={`flex flex-col fixed top-0 left-0 ${isOpen ? " bg-gray-800" : ""
-          } lg:bg-gray-800 z-30 justify-between  h-full`}
+          } md:bg-gray-800 z-30 justify-between  h-full`}
       >
         <nav
           ref={sidebarRef}
