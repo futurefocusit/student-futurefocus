@@ -192,7 +192,7 @@ const AttendancePage: React.FC = () => {
       <SideBar />
       <h1 className="text-3xl font-bold mb-6 text-center">STUDENT ATTENDANCE RECORD</h1>
       <div className="bg-blue-100 p-4 mb-4 rounded-lg">
-        <p className="text-blue-800 font-medium">Note: Attendance can only be marked for today's records</p>
+        <p className="text-blue-800 font-medium">Note: Attendance can only be marked for today&apos;s records</p>
       </div>
 
       <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
