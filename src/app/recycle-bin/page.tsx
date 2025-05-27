@@ -164,7 +164,7 @@ const tabConfig = [
     { id: 'Course', label: 'Courses', icon: FaBookOpen },
     { id: 'Shift', label: 'Shifts', icon: FaClock },
     { id: 'Attendance', label: 'Attendance', icon: FaCalendarCheck },
-    { id: 'Inventory', label: 'Inventory', icon: FaToolbox },
+    { id: 'Material', label: 'Inventory', icon: FaToolbox },
     { id: 'Cashflow', label: 'Cashflow', icon: FaMoneyBillAlt },
     { id: 'Team', label: 'Team', icon: FaTeamspeak },
     { id: 'Task', label: 'Tasks', icon: FaTasks },

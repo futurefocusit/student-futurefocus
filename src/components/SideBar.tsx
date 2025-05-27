@@ -95,7 +95,7 @@ const SideBar = () => {
       admin: true,
     },
     {
-      label: "Recycle Bin",
+      label: "RECYCLE BIN",
       icon: FaRecycle,
       href: "/recycle-bin",
       admin: true,
