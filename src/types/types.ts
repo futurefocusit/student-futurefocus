@@ -55,7 +55,7 @@ export interface Student {
   email: string;
   phone: string;
   selectedCourse: string;
-  selectedShift: {name:string};
+  selectedShift: { name: string };
   intake: string;
   message: string;
   status: string;

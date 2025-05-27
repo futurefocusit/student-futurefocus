@@ -67,12 +67,9 @@ interface DeletedAttendance extends BaseDeletedItem {
 }
 
 interface DeletedInventory extends BaseDeletedItem {
-    name: string;
-    quantity: number;
-    category: string;
-    description?: string;
-    status: 'available' | 'out-of-stock';
-    lastRestocked?: string;
+    materialName: string;
+    amount: number;
+
 }
 
 interface DeletedCashflow extends BaseDeletedItem {
@@ -338,13 +335,9 @@ const RecycleBinPage: React.FC = () => {
                 const inventory = item as DeletedInventory;
                 return (
                     <>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{inventory.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inventory.quantity}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inventory.category}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inventory.status}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {inventory.lastRestocked ? new Date(inventory.lastRestocked).toLocaleDateString() : '-'}
-                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{inventory.materialName}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inventory.amount}</td>
+
                     </>
                 );
             case 'Cashflow':
@@ -411,7 +404,7 @@ const RecycleBinPage: React.FC = () => {
             case 'Attendance':
                 return ['Student ID', 'Date', 'Status', 'Type', 'Reason'];
             case 'Material':
-                return ['Name', 'Quantity', 'Category', 'Status', 'Last Restocked'];
+                return ['Name', 'Quantity'];
             case 'Cashflow':
                 return ['Type', 'Amount', 'Category', 'Payment Method', 'Date'];
             case 'Team':
@@ -419,7 +412,7 @@ const RecycleBinPage: React.FC = () => {
             case 'Task':
                 return ['Title', 'Assigned To', 'Status', 'Priority', 'Due Date'];
             case 'Transaction':
-                return ['Student ID', 'Type', 'Amount', 'Payment Method', 'Status'];
+                return ['Student', 'Type', 'Amount', 'Payment Method', 'Status'];
         }
     };
 

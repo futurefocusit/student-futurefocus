@@ -22,16 +22,64 @@ const AttendancePage: React.FC = () => {
   const [availableShifts, setAvailableShifts] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [totalResults, setTotalResults] = useState<number>(0);
+  const [location, setLocation] = useState({ latitude: "", longitude: "" });
+
+  const isToday = (date: string) => {
+    const today = new Date();
+    const recordDate = new Date(date);
+    return (
+      recordDate.getDate() === today.getDate() &&
+      recordDate.getMonth() === today.getMonth() &&
+      recordDate.getFullYear() === today.getFullYear()
+    );
+  };
+
+  const getLocationFromIP = async () => {
+    try {
+      const response = await fetch("https://ipapi.co/json/");
+      const data = await response.json();
+      setLocation({
+        latitude: data.latitude,
+        longitude: data.longitude,
+      });
+    } catch (error) {
+      console.error("Error getting location:", error);
+    }
+  };
+
+  const markAttendance = async (recordId: string) => {
+    try {
+      await getLocationFromIP();
+      await axios.put(
+        `${API_BASE_URL}/students/approve-attend/${recordId}`,
+        location,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+          },
+        }
+      );
+      // Refresh the attendance data
+      const response = await axios.get(`${API_BASE_URL}/students/attendance`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      });
+      groupAttendanceData(response.data);
+    } catch (error) {
+      console.error("Error marking attendance:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-          const response = await axios.get(`${API_BASE_URL}/students/attendance`,{
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
-            },
-          });
+        const response = await axios.get(`${API_BASE_URL}/students/attendance`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+          },
+        });
         const data: AttendanceRecord[] = response.data;
         groupAttendanceData(data);
       } catch (error) {
@@ -143,6 +191,9 @@ const AttendancePage: React.FC = () => {
     <div className="container mx-auto p-4">
       <SideBar />
       <h1 className="text-3xl font-bold mb-6 text-center">STUDENT ATTENDANCE RECORD</h1>
+      <div className="bg-blue-100 p-4 mb-4 rounded-lg">
+        <p className="text-blue-800 font-medium">Note: Attendance can only be marked for today's records</p>
+      </div>
 
       <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -174,11 +225,10 @@ const AttendancePage: React.FC = () => {
 
         <div className="flex flex-wrap gap-2">
           <button
-            className={`px-4 py-2 rounded-md transition-colors ${
-              selectedShift === null
-                ? "bg-blue-500 text-white"
-                : "bg-gray-100 hover:bg-gray-200"
-            }`}
+            className={`px-4 py-2 rounded-md transition-colors ${selectedShift === null
+              ? "bg-blue-500 text-white"
+              : "bg-gray-100 hover:bg-gray-200"
+              }`}
             onClick={() => setSelectedShift(null)}
           >
             All Shifts
@@ -186,11 +236,10 @@ const AttendancePage: React.FC = () => {
           {availableShifts.map((shift) => (
             <button
               key={shift}
-              className={`px-4 py-2 rounded-md transition-colors ${
-                selectedShift === shift
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-100 hover:bg-gray-200"
-              }`}
+              className={`px-4 py-2 rounded-md transition-colors ${selectedShift === shift
+                ? "bg-blue-500 text-white"
+                : "bg-gray-100 hover:bg-gray-200"
+                }`}
               onClick={() => setSelectedShift(shift)}
             >
               {shift}
@@ -237,6 +286,9 @@ const AttendancePage: React.FC = () => {
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Time
                             </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Action
+                            </th>
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -249,19 +301,31 @@ const AttendancePage: React.FC = () => {
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <span
-                                  className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                    record.status === "present"
-                                      ? "bg-green-100 text-green-800"
+                                  className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${record.status === "present"
+                                    ? "bg-green-100 text-green-800"
+                                    : record.status === "absent"
+                                      ? "bg-yellow-100 text-yellow-800"
                                       : "bg-red-100 text-red-800"
-                                  }`}
+                                    }`}
                                 >
                                   {record.status}
                                 </span>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                {new Date(
-                                  record.updatedAt
-                                ).toLocaleTimeString()}
+                                {new Date(record.updatedAt).toLocaleTimeString()}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                {record.status === "absent" && isToday(record.updatedAt) && (
+                                  <button
+                                    onClick={() => markAttendance(record._id)}
+                                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition-colors"
+                                  >
+                                    Attend Today
+                                  </button>
+                                )}
+                                {record.status === "absent" && !isToday(record.updatedAt) && (
+                                  <span className="text-gray-500 italic">Past record</span>
+                                )}
                               </td>
                             </tr>
                           ))}

@@ -49,17 +49,17 @@ const AttendancePage: React.FC = () => {
       setIsLoading(false);
     }
   };
-const getLocationFromIP = async () => {
-  const response = await fetch("https://ipapi.co/json/");
-  const data = await response.json();
-  setLocation({
-    latitude: data.latitude,
-    longitude: data.longitude,
-  });
-};
-  const handleResponse = async (id: string,phone:string) => {
+  const getLocationFromIP = async () => {
+    const response = await fetch("https://ipapi.co/json/");
+    const data = await response.json();
+    setLocation({
+      latitude: data.latitude,
+      longitude: data.longitude,
+    });
+  };
+  const handleResponse = async (id: string, phone: string) => {
     try {
-      await axios.put(`${API_BASE_URL}/member/response/${id}`, { response,phone },{
+      await axios.put(`${API_BASE_URL}/member/response/${id}`, { response, phone }, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
         },
@@ -263,14 +263,14 @@ const getLocationFromIP = async () => {
                         </td>
                         <td className="border-b border-gray-200 p-2">
                           {record.status === "present" ||
-                          record.status === "pending"
+                            record.status === "pending"
                             ? new Date(record.updatedAt).toLocaleTimeString()
                             : "---"}
                         </td>
                         <td className="border-b border-gray-200 p-2">
                           {record.timeOut
                             ? new Date(record.timeOut).toLocaleTimeString() ||
-                              "--"
+                            "--"
                             : "---"}
                         </td>
                         {hasPermission(
@@ -305,7 +305,7 @@ const getLocationFromIP = async () => {
                             className="text-black px-2 py-1 rounded"
                           />
                           <button
-                            onClick={() => handleResponse(record._id,record.memberId.phone)}
+                            onClick={() => handleResponse(record._id, record.memberId.phone)}
                             className="bg-blue-500 text-white px-2 py-1 mx-10 rounded"
                           >
                             +
