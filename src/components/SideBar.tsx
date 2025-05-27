@@ -20,6 +20,7 @@ import {
   FaBookOpen,
   FaCalendar,
   FaTeamspeak,
+  FaRecycle,
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import { FaHouseCrack, FaLockOpen, FaMessage, FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
@@ -93,12 +94,12 @@ const SideBar = () => {
       href: "/manage-role",
       admin: true,
     },
-    // {
-    //   label: "MESSAGE",
-    //   icon: FaMessage,
-    //   href: "/message",
-    //   admin: true,
-    // },
+    {
+      label: "Recycle Bin",
+      icon: FaRecycle,
+      href: "/recycle-bin",
+      admin: true,
+    },
 
     // {
     //   label: "TECHUP PROGRAM",
