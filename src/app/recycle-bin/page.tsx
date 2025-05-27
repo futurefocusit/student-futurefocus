@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { FaTrashRestore, FaTrash, FaUser, FaMoneyBill, FaBookOpen, FaCalendar, FaClock } from 'react-icons/fa';
+import { FaTrashRestore, FaTrash, FaUser, FaMoneyBill, FaBookOpen, FaCalendar, FaClock, FaCalendarCheck, FaToolbox, FaExchangeAlt, FaTeamspeak, FaTasks, FaMoneyBillAlt } from 'react-icons/fa';
 import withAdminAuth from '@/components/withAdminAuth';
 import SideBar from '@/components/SideBar';
 import Loader from '@/components/loader';
@@ -57,7 +57,72 @@ interface DeletedShift extends BaseDeletedItem {
     days: string;
 }
 
-type DeletedItem = DeletedStudent | DeletedPayment | DeletedCourse | DeletedShift;
+// Add new interfaces for additional types
+interface DeletedAttendance extends BaseDeletedItem {
+    studentId: string;
+    date: string;
+    status: 'present' | 'absent' | 'late';
+    type: 'student' | 'staff';
+    reason?: string;
+}
+
+interface DeletedInventory extends BaseDeletedItem {
+    name: string;
+    quantity: number;
+    category: string;
+    description?: string;
+    status: 'available' | 'out-of-stock';
+    lastRestocked?: string;
+}
+
+interface DeletedCashflow extends BaseDeletedItem {
+    type: 'income' | 'expense';
+    amount: number;
+    category: string;
+    description: string;
+    date: string;
+    paymentMethod: string;
+}
+
+interface DeletedTeam extends BaseDeletedItem {
+    name: string;
+    position: string;
+    email: string;
+    phone: string;
+    role: string;
+    status: 'active' | 'inactive';
+}
+
+interface DeletedTask extends BaseDeletedItem {
+    title: string;
+    description: string;
+    assignedTo: string;
+    dueDate: string;
+    status: 'pending' | 'in-progress' | 'completed';
+    priority: 'low' | 'medium' | 'high';
+}
+
+interface DeletedTransaction extends BaseDeletedItem {
+    studentId: string;
+    type: 'payment' | 'refund';
+    amount: number;
+    paymentMethod: string;
+    status: 'pending' | 'completed' | 'failed';
+    reference: string;
+}
+
+// Update the DeletedItem type
+type DeletedItem =
+    | DeletedStudent
+    | DeletedPayment
+    | DeletedCourse
+    | DeletedShift
+    | DeletedAttendance
+    | DeletedInventory
+    | DeletedCashflow
+    | DeletedTeam
+    | DeletedTask
+    | DeletedTransaction;
 
 interface DeletedItemsResponse {
     message: string;
@@ -66,6 +131,12 @@ interface DeletedItemsResponse {
         Payment?: DeletedPayment[];
         Course?: DeletedCourse[];
         Shift?: DeletedShift[];
+        Attendance?: DeletedAttendance[];
+        Inventory?: DeletedInventory[];
+        Cashflow?: DeletedCashflow[];
+        Team?: DeletedTeam[];
+        Task?: DeletedTask[];
+        Transaction?: DeletedTransaction[];
     };
 }
 
@@ -74,13 +145,30 @@ interface Message {
     text: string;
 }
 
-type ItemType = 'Student' | 'Payment' | 'Course' | 'Shift';
+// Update the ItemType type
+type ItemType =
+    | 'Student'
+    | 'Payment'
+    | 'Course'
+    | 'Shift'
+    | 'Attendance'
+    | 'Inventory'
+    | 'Cashflow'
+    | 'Team'
+    | 'Task'
+    | 'Transaction';
 
 const tabConfig = [
     { id: 'Student', label: 'Students', icon: FaUser },
     { id: 'Payment', label: 'Payments', icon: FaMoneyBill },
     { id: 'Course', label: 'Courses', icon: FaBookOpen },
     { id: 'Shift', label: 'Shifts', icon: FaClock },
+    { id: 'Attendance', label: 'Attendance', icon: FaCalendarCheck },
+    { id: 'Inventory', label: 'Inventory', icon: FaToolbox },
+    { id: 'Cashflow', label: 'Cashflow', icon: FaMoneyBillAlt },
+    { id: 'Team', label: 'Team', icon: FaTeamspeak },
+    { id: 'Task', label: 'Tasks', icon: FaTasks },
+    { id: 'Transaction', label: 'Transactions', icon: FaExchangeAlt },
 ] as const;
 
 const RecycleBinPage: React.FC = () => {
@@ -235,6 +323,78 @@ const RecycleBinPage: React.FC = () => {
                         </td>
                     </>
                 );
+            case 'Attendance':
+                const attendance = item as DeletedAttendance;
+                return (
+                    <>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{attendance.studentId}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(attendance.date).toLocaleDateString()}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{attendance.status}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{attendance.type}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{attendance.reason || '-'}</td>
+                    </>
+                );
+            case 'Inventory':
+                const inventory = item as DeletedInventory;
+                return (
+                    <>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{inventory.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inventory.quantity}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inventory.category}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inventory.status}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {inventory.lastRestocked ? new Date(inventory.lastRestocked).toLocaleDateString() : '-'}
+                        </td>
+                    </>
+                );
+            case 'Cashflow':
+                const cashflow = item as DeletedCashflow;
+                return (
+                    <>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{cashflow.type}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">RWF {cashflow.amount.toLocaleString()}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cashflow.category}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cashflow.paymentMethod}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {new Date(cashflow.date).toLocaleDateString()}
+                        </td>
+                    </>
+                );
+            case 'Team':
+                const team = item as DeletedTeam;
+                return (
+                    <>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{team.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.position}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.email}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.role}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.status}</td>
+                    </>
+                );
+            case 'Task':
+                const task = item as DeletedTask;
+                return (
+                    <>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{task.title}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{task.assignedTo}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{task.status}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{task.priority}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {new Date(task.dueDate).toLocaleDateString()}
+                        </td>
+                    </>
+                );
+            case 'Transaction':
+                const transaction = item as DeletedTransaction;
+                return (
+                    <>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.studentId}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.type}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">RWF {transaction.amount.toLocaleString()}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.paymentMethod}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.status}</td>
+                    </>
+                );
         }
     };
 
@@ -248,6 +408,18 @@ const RecycleBinPage: React.FC = () => {
                 return ['Title', 'Rating', 'Scholarship', 'Non-Scholarship', 'Status'];
             case 'Shift':
                 return ['Name', 'Start Time', 'End Time', 'Days', 'Created At'];
+            case 'Attendance':
+                return ['Student ID', 'Date', 'Status', 'Type', 'Reason'];
+            case 'Inventory':
+                return ['Name', 'Quantity', 'Category', 'Status', 'Last Restocked'];
+            case 'Cashflow':
+                return ['Type', 'Amount', 'Category', 'Payment Method', 'Date'];
+            case 'Team':
+                return ['Name', 'Position', 'Email', 'Role', 'Status'];
+            case 'Task':
+                return ['Title', 'Assigned To', 'Status', 'Priority', 'Due Date'];
+            case 'Transaction':
+                return ['Student ID', 'Type', 'Amount', 'Payment Method', 'Status'];
         }
     };
 
