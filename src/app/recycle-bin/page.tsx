@@ -11,7 +11,7 @@ import { useAuth } from '@/context/AuthContext';
 import { hasPermission } from '@/libs/hasPermission';
 import API_BASE_URL from '@/config/baseURL';
 
-// Define interfaces for different types of deleted items
+
 interface BaseDeletedItem {
     _id: string;
     institution: string;
@@ -32,7 +32,7 @@ interface DeletedStudent extends BaseDeletedItem {
 }
 
 interface DeletedPayment extends BaseDeletedItem {
-    studentId: string;
+    studentId: {name:string};
     status: string;
     amountDue: number;
     amountPaid: number;
@@ -59,7 +59,7 @@ interface DeletedShift extends BaseDeletedItem {
 
 // Add new interfaces for additional types
 interface DeletedAttendance extends BaseDeletedItem {
-    studentId: string;
+    studentId: {name:string};
     date: string;
     status: 'present' | 'absent' | 'late';
     type: 'student' | 'staff';
@@ -94,16 +94,16 @@ interface DeletedTeam extends BaseDeletedItem {
 }
 
 interface DeletedTask extends BaseDeletedItem {
-    title: string;
+    task: string;
     description: string;
-    assignedTo: string;
+    user: {name:string};
     dueDate: string;
     status: 'pending' | 'in-progress' | 'completed';
     priority: 'low' | 'medium' | 'high';
 }
 
 interface DeletedTransaction extends BaseDeletedItem {
-    studentId: string;
+    studentId:{name: string};
     type: 'payment' | 'refund';
     amount: number;
     paymentMethod: string;
@@ -152,7 +152,7 @@ type ItemType =
     | 'Course'
     | 'Shift'
     | 'Attendance'
-    | 'Inventory'
+    | 'Material'
     | 'Cashflow'
     | 'Team'
     | 'Task'
@@ -292,7 +292,7 @@ const RecycleBinPage: React.FC = () => {
                 const payment = item as DeletedPayment;
                 return (
                     <>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{payment.studentId}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{payment.studentId?.name}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{payment.status}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">RWF {payment.amountDue.toLocaleString()}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">RWF {payment.amountPaid.toLocaleString()}</td>
@@ -327,14 +327,14 @@ const RecycleBinPage: React.FC = () => {
                 const attendance = item as DeletedAttendance;
                 return (
                     <>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{attendance.studentId}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{attendance.studentId?.name}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(attendance.date).toLocaleDateString()}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{attendance.status}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{attendance.type}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{attendance.reason || '-'}</td>
                     </>
                 );
-            case 'Inventory':
+            case 'Material':
                 const inventory = item as DeletedInventory;
                 return (
                     <>
@@ -375,8 +375,8 @@ const RecycleBinPage: React.FC = () => {
                 const task = item as DeletedTask;
                 return (
                     <>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{task.title}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{task.assignedTo}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{task.task}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{task.user.name}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{task.status}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{task.priority}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -388,7 +388,7 @@ const RecycleBinPage: React.FC = () => {
                 const transaction = item as DeletedTransaction;
                 return (
                     <>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.studentId}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.studentId.name}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.type}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">RWF {transaction.amount.toLocaleString()}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.paymentMethod}</td>
@@ -410,7 +410,7 @@ const RecycleBinPage: React.FC = () => {
                 return ['Name', 'Start Time', 'End Time', 'Days', 'Created At'];
             case 'Attendance':
                 return ['Student ID', 'Date', 'Status', 'Type', 'Reason'];
-            case 'Inventory':
+            case 'Material':
                 return ['Name', 'Quantity', 'Category', 'Status', 'Last Restocked'];
             case 'Cashflow':
                 return ['Type', 'Amount', 'Category', 'Payment Method', 'Date'];
