@@ -94,12 +94,12 @@ const SideBar = () => {
       href: "/manage-role",
       admin: true,
     },
-    // {
-    //   label: "RECYCLE BIN",
-    //   icon: FaRecycle,
-    //   href: "/recycle-bin",
-    //   admin: true,
-    // },
+    {
+      label: "RECYCLE BIN",
+      icon: FaRecycle,
+      href: "/recycle-bin",
+      admin: true,
+    },
 
     // {
     //   label: "TECHUP PROGRAM",
