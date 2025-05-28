@@ -43,7 +43,20 @@ const RegisterPage = () => {
   const [logoPreview, setLogoPreview] = useState<string>('')
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
-
+  const handleAxiosError = (error: unknown) => {
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        const errorMessage = error.response.data.message || "An error occurred";
+        toast.error(errorMessage);
+      } else if (error.request) {
+        toast.error("Failed to connect to server");
+      } else {
+        toast.error("Error sending request. Please try again.");
+      }
+    } else {
+      toast.error("An unexpected error occurred");
+    }
+  };
   const validateForm = (): boolean => {
     const errors: FormErrors = {}
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -159,10 +172,7 @@ const RegisterPage = () => {
       // Redirect to login page after successful registration
       window.location.href = '/login'
     } catch (err) {
-      const errorMessage = err.response?.data?.message ||
-        err.request ? 'Failed to connect to server' :
-        err.message || 'An error occurred'
-      toast.error(errorMessage)
+      handleAxiosError(err)
     } finally {
       setLoading(false)
     }

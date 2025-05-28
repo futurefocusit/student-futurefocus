@@ -46,7 +46,7 @@ const StudentManagement: React.FC = () => {
   const [studentCounts, setStudentCounts] = useState<Record<string, number>>(
     {}
   );
-  const [loading,setIsLoading]=useState(false)
+  const [loading, setIsLoading] = useState(false)
   const [confirmModelOpen, SetConfirmModel] = useState(false);
   const [action, setAction] = useState("");
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
@@ -67,7 +67,7 @@ const StudentManagement: React.FC = () => {
     try {
       await axios.put(`${API_BASE_URL}/payment/comment/${studentId}`, {
         comment: commentText.comment,
-      },{
+      }, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
         },
@@ -82,14 +82,14 @@ const StudentManagement: React.FC = () => {
     user: loggedUser?.name,
     method: "",
   });
-   const getStudentCountByStatus = (
-     students: Student[]
-   ): Record<string, number> => {
-     return students.reduce((acc, student) => {
-       acc[student.status] = (acc[student.status] || 0) + 1;
-       return acc;
-     }, {} as Record<string, number>);
-   };
+  const getStudentCountByStatus = (
+    students: Student[]
+  ): Record<string, number> => {
+    return students.reduce((acc, student) => {
+      acc[student.status] = (acc[student.status] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+  };
 
   const handleFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -102,7 +102,7 @@ const StudentManagement: React.FC = () => {
   const fetchStudents = async () => {
     try {
       setIsFetching(true);
-      const response = await axios.get<Student[]>(`${API_BASE_URL}/students`,{
+      const response = await axios.get<Student[]>(`${API_BASE_URL}/students`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
         },
@@ -125,7 +125,7 @@ const StudentManagement: React.FC = () => {
 
   const fetchPayment = async () => {
     try {
-      const response = await axios.get<Payment[]>(`${API_BASE_URL}/payment`,{
+      const response = await axios.get<Payment[]>(`${API_BASE_URL}/payment`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
         },
@@ -164,11 +164,11 @@ const StudentManagement: React.FC = () => {
       formData.user = loggedUser?.name;
       const response = await axios.post(
         `${API_BASE_URL}/payment/pay/${id}`,
-        formData,{
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
-          },
-        }
+        formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      }
       );
       toast.success(response.data.message);
       const ourlogo = await convertImageUrlToBase64(imageUrl as string);
@@ -177,7 +177,7 @@ const StudentManagement: React.FC = () => {
     } catch (error) {
       console.log(error);
       setError("Error happened! check payment and try again");
-    }finally{
+    } finally {
       setIsLoading(false)
     }
   };
@@ -185,7 +185,7 @@ const StudentManagement: React.FC = () => {
     try {
       setIsLoading(true);
 
-      const response = await axios.delete(`${API_BASE_URL}/payment/${id}`,{
+      const response = await axios.delete(`${API_BASE_URL}/payment/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
         },
@@ -195,33 +195,33 @@ const StudentManagement: React.FC = () => {
     } catch (error) {
       toast.error("failed to delete data");
       throw error
-    }finally{
+    } finally {
       SetConfirmModel(false)
       setIsLoading(true);
 
     }
   };
-   const handleDeleteClick = (itemId: string) => {
-     setItemToDelete(itemId); // Set the item that will be deleted
-     SetConfirmModel(true); // Open the modal
-   };
+  const handleDeleteClick = (itemId: string) => {
+    setItemToDelete(itemId); // Set the item that will be deleted
+    SetConfirmModel(true); // Open the modal
+  };
   const handleDiscount = async (id: string) => {
     try {
       setIsLoading(true);
       const response = await axios.put(
         `${API_BASE_URL}/payment/discount/${id}`,
-        formData,{
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
-          },
-        }
+        formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      }
       );
       toast.success(response.data.message);
       fetchPayment();
     } catch (error) {
       console.log(error)
       setError("Error happened! check payment and try again");
-    }finally{
+    } finally {
       setIsLoading(true);
 
     }
@@ -232,18 +232,18 @@ const StudentManagement: React.FC = () => {
 
       const response = await axios.put(
         `${API_BASE_URL}/payment/extra/${id}`,
-        formData,{
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
-          },
-        }
+        formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+        },
+      }
       );
       toast.success(response.data.message);
       fetchPayment();
     } catch (error) {
       console.log(error)
       setError("Error happened! check payment and try again");
-    }finally{
+    } finally {
       setIsLoading(true);
 
     }
@@ -340,49 +340,47 @@ const StudentManagement: React.FC = () => {
                         status === "active"
                           ? "started"
                           : status === "dropout"
-                          ? "droppedout"
-                          : status
+                            ? "droppedout"
+                            : status
                       )
                     }
                     className={`px-4 py-2 text-sm font-medium text-white  gap-1  flex  border border-gray-300 rounded-md shadow-sm hover:bg-gray-500  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
                     
                       ${activeFilter === status ? "bg-indigo-1i00" : ""}
-                     ${
-                       status === "completed"
-                         ? "bg-yellow-600"
-                         : status === "accepted"
-                         ? "bg-blue-600"
-                         : status === "dropout"
-                         ? "bg-red-900"
-                         : status === "registered"
-                         ? "bg-green-800"
-                         : status === "active"
-                         ? "bg-green-600"
-                         : "bg-green-900"
-                     }`}
+                     ${status === "completed"
+                        ? "bg-yellow-600"
+                        : status === "accepted"
+                          ? "bg-blue-600"
+                          : status === "dropout"
+                            ? "bg-red-900"
+                            : status === "registered"
+                              ? "bg-green-800"
+                              : status === "active"
+                                ? "bg-green-600"
+                                : "bg-green-900"
+                      }`}
                   >
                     <p>{status.toUpperCase()} </p>
                     <p
-                      className={`items-start   bg-white rounded-full  w-5 h-5 text-center font-extrabold ${
-                        status === "completed"
+                      className={`items-start   bg-white rounded-full  w-12  text-center font-extrabold ${status === "completed"
                           ? "text-yellow-600"
                           : status === "accepted"
-                          ? "text-blue-600"
-                          : status === "dropout"
-                          ? "text-red-600"
-                          : status === "registered"
-                          ? "text-green-400"
-                          : status === "active"
-                          ? "text-green-500"
-                          : "text-green-900"
-                      }`}
+                            ? "text-blue-600"
+                            : status === "dropout"
+                              ? "text-red-600"
+                              : status === "registered"
+                                ? "text-green-400"
+                                : status === "active"
+                                  ? "text-green-500"
+                                  : "text-green-900"
+                        }`}
                     >
                       {studentCounts[
                         status === "active"
                           ? "started"
                           : status === "dropout"
-                          ? "droppedout"
-                          : status
+                            ? "droppedout"
+                            : status
                       ] || 0}
                     </p>
                   </button>
@@ -585,7 +583,7 @@ const StudentManagement: React.FC = () => {
                                 "delete"
                               ) ? (
                                 <button
-                                  onClick={() =>{handleDeleteClick(student._id);setAction('delete payment')}}
+                                  onClick={() => { handleDeleteClick(student._id); setAction('delete payment') }}
                                   className="bg-red-700 text-white font-extrabold px-5 py-2 rounded-md hover:bg-red-900"
                                 >
                                   DELETE
@@ -671,8 +669,8 @@ const StudentManagement: React.FC = () => {
                     {type === "pay"
                       ? "Pay School Fees"
                       : type === "discount"
-                      ? "Add Discount"
-                      : "Add Extra"}
+                        ? "Add Discount"
+                        : "Add Extra"}
                   </h3>
                   <div className="mt-4 flex  flex-col gap-5">
                     <span className="flex gap-10 items-center mx-auto mb-3">
@@ -709,16 +707,16 @@ const StudentManagement: React.FC = () => {
                       type === "pay"
                         ? () => handlePay(selectedStudent._id)
                         : type === "discount"
-                        ? () => handleDiscount(selectedStudent._id)
-                        : () => handleExtra(selectedStudent._id)
+                          ? () => handleDiscount(selectedStudent._id)
+                          : () => handleExtra(selectedStudent._id)
                     }
                     className="px-4 py-2 text-sm text-black font-extrabold hover:text-white bg-green-300 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
                   >
                     {type === "pay"
                       ? "Pay"
                       : type === "discount"
-                      ? "Add Discount"
-                      : "Add Extra"}
+                        ? "Add Discount"
+                        : "Add Extra"}
                   </button>
                   <button
                     onClick={() => setSelectedStudent(null)}

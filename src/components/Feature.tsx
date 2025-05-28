@@ -21,11 +21,15 @@ const FeaturesSection = () => {
             <p>Monitor and manage your matarials and equipments with detailed availability and renting records insights.</p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-xl font-semibold mb-4">HR Management</h3>
+            <p> Human resources management</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-lg">
             <h3 className="text-xl font-semibold mb-4">overal dashboard</h3>
             <p>Provides Dashboard that summerize all information in your systems</p>
           </div>
         </div>
-        <p className="text-3xl font-bold mt-12">For detailed features of <span className="text-green-400 font-bold">Xcool system</span> you can view <a href="/documentation" className="text-green-600">this page</a> </p>
+        <p className="text-3xl font-bold mt-12">For detailed features of <span className="text-green-400 font-bold">Xcool system</span> you can view <a href="https://rodrigue.xcooll.com/projects/681657d868a443a000b43a99" className="text-green-600">this page</a> </p>
 
       </div>
 

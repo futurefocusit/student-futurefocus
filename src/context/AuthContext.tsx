@@ -181,7 +181,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
-  const handleAxiosError = (error: unknown) => {
+   const handleAxiosError = (error: unknown) => {
     if (axios.isAxiosError(error)) {
       if (error.response) {
         const errorMessage = error.response.data.message || "An error occurred";

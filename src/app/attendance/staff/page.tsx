@@ -292,23 +292,23 @@ const AttendancePage: React.FC = () => {
                           ""
                         )}
                         <td>
-                          <p className="text-green-700 font-bold">
+                          <p className="text-green-700 font-bold max-w-48  overflow-x-auto">
                             {record.comment}
                           </p>
                         </td>
-                        <td>
+                        <td className="flex">
                           <input
                             type="text"
                             value={record.response}
-                            placeholder="Response"
+                            placeholder="admin comment"
                             onChange={(e) => setresponse(e.target.value)}
-                            className="text-black px-2 py-1 rounded"
+                            className="text-black px-2 py-1 border-2 border-black border-solid rounded"
                           />
                           <button
                             onClick={() => handleResponse(record._id, record.memberId.phone)}
                             className="bg-blue-500 text-white px-2 py-1 mx-10 rounded"
                           >
-                            +
+                            add
                           </button>
                         </td>
                       </tr>

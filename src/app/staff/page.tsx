@@ -256,14 +256,12 @@ const AttendancePage: React.FC = () => {
                       ACTION
                     </th>
                     <th className="border-b-2 border-gray-300 p-2 text-left">
-                      COMMENT
+                      YOUR COMMENT
                     </th>
                     <th className="border-b-2 border-gray-300 p-2 text-left">
-                      RESPONSE
+                      ADMIN COMMENT
                     </th>
-                    <th className="border-b-2 border-gray-300 p-2 text-left">
-                      Reward 
-                    </th>
+                  
                   </tr>
                 </thead>
                 <tbody>
@@ -308,19 +306,19 @@ const AttendancePage: React.FC = () => {
                             </button>
                           )}
                       </td>
-                      <td className="border-b flex flex-col gap-2 flex-wrap border-gray-200 p-2 ">
+                      <td className="border-b flex flex-wrap  gap-2  border-gray-200 p-2 ">
                         <input
                           type="text"
                           value={record.comment}
                           placeholder="add comment"
                           onChange={(e) => setcomment(e.target.value)}
-                          className=" text-black px-2 py-1 rounded"
+                          className=" text-black px-2 py-1 border-1 border-black rounded"
                         />
                         <button
                           onClick={() => handleComment(record._id)}
                           className="bg-blue-500 mx-auto text-white px-2 py-1 gap-2 rounded"
                         >
-                          +
+                          add
                         </button>
                       </td>
                       <td className="border-b  border-gray-200 p-2 ">

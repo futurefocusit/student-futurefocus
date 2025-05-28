@@ -599,16 +599,6 @@ const StudentManagement: React.FC = () => {
         >
           VIEW
         </button>
-        {hasPermission(loggedUser as TeamMember, "students", "attend") ? (
-          <button
-            onClick={() => handleUpdateStudent(student)}
-            className="text-green-600 font-extrabold hover:text-green-900 ml-3"
-          >
-            UPDATE
-          </button>
-        ) : (
-          ""
-        )}
         {hasPermission(loggedUser as TeamMember, "students", "delete") ? (
           <button
             onClick={() => {
@@ -622,32 +612,7 @@ const StudentManagement: React.FC = () => {
         ) : (
           ""
         )}
-        {hasPermission(loggedUser as TeamMember, "students", "complete") ? (
-          <button
-            onClick={() => {
-              handleStatusClick(student._id, student.name, "completed");
-              setAction("complete student");
-            }}
-            className="text-green-600 font-extrabold hover:text-green-900 ml-3"
-          >
-            COMPLETE
-          </button>
-        ) : (
-          ""
-        )}
-        {hasPermission(loggedUser as TeamMember, "students", "dropout") ? (
-          <button
-            onClick={() => {
-              handleStatusClick(student._id, student.name, "droppedout");
-              setAction("drop student out");
-            }}
-            className="text-green-600 font-extrabold hover:text-green-900 ml-3"
-          >
-            DROPOUT
-          </button>
-        ) : (
-          ""
-        )}
+        
         {hasPermission(loggedUser as TeamMember, "students", "comment") ? (
           <div className="">
             <input
@@ -798,6 +763,32 @@ const StudentManagement: React.FC = () => {
         return (
           <>
             {commonButtons}
+            {hasPermission(loggedUser as TeamMember, "students", "complete") ? (
+          <button
+            onClick={() => {
+              handleStatusClick(student._id, student.name, "completed");
+              setAction("complete student");
+            }}
+            className="text-green-600 font-extrabold hover:text-green-900 ml-3"
+          >
+            COMPLETE
+          </button>
+        ) : (
+          ""
+        )}
+        {hasPermission(loggedUser as TeamMember, "students", "dropout") ? (
+          <button
+            onClick={() => {
+              handleStatusClick(student._id, student.name, "droppedout");
+              setAction("drop student out");
+            }}
+            className="text-red-600 font-extrabold hover:text-green-900 ml-3"
+          >
+            DROPOUT
+          </button>
+        ) : (
+          ""
+        )}
             {hasPermission(loggedUser as TeamMember, "students", "update") ? (
               <button
                 onClick={() => handleUpdateStudent(student)}

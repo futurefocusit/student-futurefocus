@@ -11,10 +11,10 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul>
               <li><Link href="/"className="hover:text-yellow-400">Home</Link></li>
-              <li><Link href="/docs"  className="hover:text-yellow-400">Documentation</Link></li>
+              {/* <li><Link href="/docs"  className="hover:text-yellow-400">Documentation</Link></li>
               <li><Link href="/pricing" className="hover:text-yellow-400">Pricing</Link></li>
               <li><Link href="/about" className="hover:text-yellow-400">Terms and Conditions</Link></li>
-              <li><Link href="/contact" className="hover:text-yellow-400">Contact</Link></li>
+              <li><Link href="/contact" className="hover:text-yellow-400">Contact</Link></li> */}
             </ul>
           </div>
 
@@ -38,7 +38,7 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Company Info</h3>
             <p>Developed by <strong>Future Focus IT</strong></p>
-            <p>Developer <strong>Rwigara Rodrigue</strong></p>
+            <p >Developer <a href='https://rodrigue.xcooll.com/'  className='text-emerald-500'>Rwigara Rodrigue</a></p>
           </div>
 
           {/* Newsletter Signup */}

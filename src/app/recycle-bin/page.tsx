@@ -32,7 +32,7 @@ interface DeletedStudent extends BaseDeletedItem {
 }
 
 interface DeletedPayment extends BaseDeletedItem {
-    studentId: {name:string};
+    studentId: { name: string };
     status: string;
     amountDue: number;
     amountPaid: number;
@@ -56,10 +56,14 @@ interface DeletedShift extends BaseDeletedItem {
     end: string;
     days: string;
 }
+interface DeletedRole extends BaseDeletedItem {
+    role: string;
+
+}
 
 // Add new interfaces for additional types
 interface DeletedAttendance extends BaseDeletedItem {
-    studentId: {name:string};
+    studentId: { name: string };
     date: string;
     status: 'present' | 'absent' | 'late';
     type: 'student' | 'staff';
@@ -93,14 +97,14 @@ interface DeletedTeam extends BaseDeletedItem {
 interface DeletedTask extends BaseDeletedItem {
     task: string;
     description: string;
-    user: {name:string};
+    user: { name: string };
     dueDate: string;
     status: 'pending' | 'in-progress' | 'completed';
     priority: 'low' | 'medium' | 'high';
 }
 
 interface DeletedTransaction extends BaseDeletedItem {
-    studentId:{name: string};
+    studentId: { name: string };
     type: 'payment' | 'refund';
     amount: number;
     paymentMethod: string;
@@ -119,6 +123,7 @@ type DeletedItem =
     | DeletedCashflow
     | DeletedTeam
     | DeletedTask
+    | DeletedRole
     | DeletedTransaction;
 
 interface DeletedItemsResponse {
@@ -134,6 +139,7 @@ interface DeletedItemsResponse {
         Team?: DeletedTeam[];
         Task?: DeletedTask[];
         Transaction?: DeletedTransaction[];
+        Role?: DeletedRole[];
     };
 }
 
@@ -152,6 +158,7 @@ type ItemType =
     | 'Material'
     | 'Cashflow'
     | 'Team'
+    | 'Role'
     | 'Task'
     | 'Transaction';
 
@@ -162,6 +169,7 @@ const tabConfig = [
     { id: 'Shift', label: 'Shifts', icon: FaClock },
     { id: 'Attendance', label: 'Attendance', icon: FaCalendarCheck },
     { id: 'Material', label: 'Inventory', icon: FaToolbox },
+    { id: 'Role', label: 'Role', icon: FaUser },
     { id: 'Cashflow', label: 'Cashflow', icon: FaMoneyBillAlt },
     { id: 'Team', label: 'Team', icon: FaTeamspeak },
     { id: 'Task', label: 'Tasks', icon: FaTasks },

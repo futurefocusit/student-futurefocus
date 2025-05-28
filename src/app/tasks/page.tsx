@@ -447,7 +447,7 @@ const TaskManagement: React.FC = () => {
                 <CardHeader
                   className="bg-gradient-to-r from-[#4a90e2]/5 to-[#f5a623]/5"
                   title={
-                    <div className="space-y-2">
+                    <div className="space-y-2 max-h-28 overflow-y-auto">
                       {t.task.split(",").map((task, index) => (
                         <Typography key={index} className="font-medium">
                           {index + 1}. {task}

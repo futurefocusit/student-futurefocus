@@ -51,7 +51,7 @@ const AttendancePage: React.FC = () => {
     try {
       await getLocationFromIP();
       await axios.put(
-        `${API_BASE_URL}/students/approve-attend/${recordId}`,
+        `${API_BASE_URL}/students/attend/${recordId}`,
         location,
         {
           headers: {
@@ -317,7 +317,7 @@ const AttendancePage: React.FC = () => {
                               <td className="px-6 py-4 whitespace-nowrap">
                                 {record.status === "absent" && isToday(record.updatedAt) && (
                                   <button
-                                    onClick={() => markAttendance(record._id)}
+                                    onClick={() => markAttendance(record.studentId._id)}
                                     className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition-colors"
                                   >
                                     Attend Today
