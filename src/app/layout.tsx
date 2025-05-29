@@ -1,14 +1,14 @@
-// import type { Metadata } from "next";
+import type { Metadata } from "next";
 import "./globals.css";
 import React from "react";
 import AuthContextAPI  from "@/context/AuthContext";
 import { CartProvider } from "@/context/cartContext";
 
 
-// export const metadata: Metadata = {
-//   title: "Students",
-//   description: "Xcool management system",
-// };
+export const metadata: Metadata = {
+  title: "Students",
+  description: "Xcool management system",
+};
 
 export default function RootLayout({
   children,
