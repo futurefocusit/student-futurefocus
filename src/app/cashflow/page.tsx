@@ -95,7 +95,8 @@ const PaymentsPage: React.FC = () => {
       }
       const data = await response.data
       setCashflows(data)
-    } catch (error: any) {
+    } catch (error) {
+      
       setError(error.message)
     } finally {
       setIsFetching(false)
@@ -450,7 +451,7 @@ const PaymentsPage: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center">You don't have permission to view this</div>
+            <div className="text-center">You don&apos;t have permission to view this</div>
           )}
         </div>
       </div>
