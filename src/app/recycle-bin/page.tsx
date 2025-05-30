@@ -10,6 +10,7 @@ import Popup from '@/components/Popup';
 import { useAuth } from '@/context/AuthContext';
 import { hasPermission } from '@/libs/hasPermission';
 import API_BASE_URL from '@/config/baseURL';
+import { headers } from 'next/headers';
 
 
 interface BaseDeletedItem {
@@ -212,17 +213,16 @@ const RecycleBinPage: React.FC = () => {
     const handleRestore = async (itemType: ItemType, itemId: string) => {
         try {
             setRestoringId(itemId);
-            const response = await axios.post(
-                `${API_BASE_URL}/recycle-bin/restore/${itemType.toLowerCase()}/${itemId}`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`
+            const response = await axios.put(
+                `${API_BASE_URL}/deleted/restore/${itemType}/${itemId}`,{},{
+                    headers:{
+                        "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
                     }
                 }
+               
             );
 
-            // Update the items list by removing the restored item
+         
             setDeletedItems(prev => ({
                 ...prev,
                 [itemType]: prev[itemType]?.filter(item => item._id !== itemId)
@@ -250,7 +250,7 @@ const RecycleBinPage: React.FC = () => {
 
         try {
             setDeletingId(itemId);
-            await axios.delete(`${API_BASE_URL}/recycle-bin/${itemType.toLowerCase()}/${itemId}`, {
+            await axios.delete(`${API_BASE_URL}/deleted/${itemType}/${itemId}`, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`
                 }
@@ -508,9 +508,9 @@ const RecycleBinPage: React.FC = () => {
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
                                                 <button
                                                     onClick={() => handleRestore(activeTab, item._id)}
-                                                    disabled={!canRestore || restoringId === item._id}
+                                                    disabled={restoringId === item._id}
                                                     className={`inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white 
-                            ${!canRestore || restoringId === item._id
+                            ${ restoringId === item._id
                                                             ? 'bg-gray-400 cursor-not-allowed'
                                                             : 'bg-green-600 hover:bg-green-700'
                                                         }`}
@@ -520,9 +520,9 @@ const RecycleBinPage: React.FC = () => {
                                                 </button>
                                                 <button
                                                     onClick={() => handleDeletePermanently(activeTab, item._id)}
-                                                    disabled={!canDeletePermanently || deletingId === item._id}
+                                                    disabled={ deletingId === item._id}
                                                     className={`inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white 
-                            ${!canDeletePermanently || deletingId === item._id
+                            ${ deletingId === item._id
                                                             ? 'bg-gray-400 cursor-not-allowed'
                                                             : 'bg-red-600 hover:bg-red-700'
                                                         }`}
