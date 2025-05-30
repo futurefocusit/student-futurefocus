@@ -370,8 +370,8 @@ const PaymentsPage: React.FC = () => {
               {debouncedSearchQuery && filteredCashflows.length > 0 && (
                 <div className="bg-green-50 border border-green-200 rounded p-3 text-sm mb-4">
                   <div className="font-medium text-green-800">
-                    Found {filteredCashflows.length} transaction{filteredCashflows.length !== 1 ? "s" : ""} matching "
-                    {debouncedSearchQuery}"
+                    Found {filteredCashflows.length} transaction{filteredCashflows.length !== 1 ? "s" : ""} matching &quot;
+                    {debouncedSearchQuery}&quot;
                   </div>
                 </div>
               )}
@@ -380,7 +380,7 @@ const PaymentsPage: React.FC = () => {
                 <div className="text-center py-8 bg-gray-50 rounded-lg">
                   <div className="text-gray-500 text-lg mb-2">No transactions found</div>
                   <div className="text-gray-400 text-sm">
-                    No transactions match your search for "{debouncedSearchQuery}"
+                    No transactions match your search for &quot;{debouncedSearchQuery}&quot;
                   </div>
                 </div>
               )}
