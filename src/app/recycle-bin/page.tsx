@@ -449,7 +449,7 @@ const RecycleBinPage: React.FC = () => {
                 {/* Tabs */}
                 <div className="border-b border-gray-200 mb-6">
                     <nav className="-mb-px flex space-x-8">
-                        {tabConfig.map(({ id, label, icon: Icon }) => (
+                        {tabConfig?.map(({ id, label, icon: Icon }) => (
                             <button
                                 key={id}
                                 onClick={() => setActiveTab(id as ItemType)}
@@ -487,7 +487,7 @@ const RecycleBinPage: React.FC = () => {
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        {getTableHeaders(activeTab).map((header, index) => (
+                                        {getTableHeaders(activeTab)?.map((header, index) => (
                                             <th
                                                 key={index}
                                                 scope="col"
@@ -502,7 +502,7 @@ const RecycleBinPage: React.FC = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {deletedItems[activeTab]!.map((item) => (
+                                    {deletedItems[activeTab]?.map((item) => (
                                         <tr key={item._id} className="hover:bg-gray-50">
                                             {renderItemDetails(item, activeTab)}
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
