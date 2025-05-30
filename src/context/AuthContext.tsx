@@ -65,7 +65,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
         toast.error("An unexpected error occurred");
       }
 
-      // localStorage.removeItem("ffa-admin");
+      localStorage.removeItem("ffa-admin");
       setLoggedUser(null);
     } finally {
       setIsLoading(false)
