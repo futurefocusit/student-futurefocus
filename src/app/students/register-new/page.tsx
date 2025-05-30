@@ -37,24 +37,25 @@ const Registration: React.FC = () => {
    const [submiting, setSubmiting] = useState<boolean>(false);
    const [error, setError] = useState<string | null>(null);
   const { fetchLoggedUser, loggedUser } = useAuth();
+  const [intakes, setIntakes] = useState<{ _id: string; intake: string }[]>(
+    []
+  );
+  const [submissionResult, setSubmissionResult] = useState<string | null>(
+    null
+  );
    const [formData, setFormData] = useState<registrationData>({
      name: "",
      email: "",
      phone: "",
-     selectedCourse: "",
-     selectedShift: "",
-     intake: "",
-     referer:'default',
+     selectedCourse: courses.length > 0 ? courses[0].title : "",
+     selectedShift: courses.length > 0 ? courses[0].shifts[0]._id : "",
      message: "",
+     intake: intakes.length > 0 ? intakes[0].intake : "",
+     referer:'default',
      user: loggedUser?.name,
      payment: "cash",
    });
-   const [intakes, setIntakes] = useState<{ _id: string; intake: string }[]>(
-     []
-   );
-   const [submissionResult, setSubmissionResult] = useState<string | null>(
-     null
-   );
+   
 
    useEffect(() => {
      const fetchCourses = async () => {
@@ -164,7 +165,7 @@ const data:IInvoice = {
        setFormData({
          name: "",
          referer:"default",
-         email: "",
+         email: "invalid@gmail.com",
          phone: "",
          selectedCourse: courses.length > 0 ? courses[0].title : "",
          selectedShift: courses.length > 0 ? courses[0].shifts[0]._id : "",
