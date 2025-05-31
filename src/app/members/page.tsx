@@ -214,10 +214,10 @@ const MembersPage: React.FC = () => {
     try {
       setIsUploading(true);
       const formData = new FormData();
-      formData.append("image", file);
+      formData.append("file", file);
 
       const response = await axios.post(
-        `${API_BASE_URL}/upload/image`,
+        `${API_BASE_URL}/upload/file`,
         formData,
         {
           headers: {
