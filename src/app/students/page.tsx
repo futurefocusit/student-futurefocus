@@ -27,12 +27,18 @@ interface Student {
   email: string;
   phone: string;
   intake: string;
+  location:  string ,
+    gender:  string ,
+    identity:  string ,
+    nationality:  string 
   selectedCourse: { title: string; _id: string }
   message: string;
   selectedShift: { _id: string; name: string; start: string; end: string };
   updatedAt: string;
   createdAt: string;
   status: string;
+  admitted:Date
+  registered:Date
   comment: string;
 }
 
@@ -1321,6 +1327,22 @@ const StudentManagement: React.FC = () => {
                       <span> {selectedStudent.selectedShift?.name}</span>
                     </p>
                     <p className="flex">
+                      <span className="font-extrabold w-28 ">Nationality</span>{" "}
+                      <span> {selectedStudent?.nationality}</span>
+                    </p>
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">Location</span>{" "}
+                      <span> {selectedStudent?.location}</span>
+                    </p>
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">Gender</span>{" "}
+                      <span> {selectedStudent?.gender}</span>
+                    </p>
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">ID document</span>{" "}
+                      <a href={selectedStudent?.identity} target="_blank" className="text-blue-500 underline"> {selectedStudent.identity?'click here':'no docs'}</a>
+                    </p>
+                    <p className="flex">
                       <span className="font-extrabold w-28 ">APPLIED</span>{" "}
                       <span>{formatDate(selectedStudent.createdAt)}</span>
                     </p>
@@ -1329,6 +1351,20 @@ const StudentManagement: React.FC = () => {
                       <span>
                         {" "}
                         <span> {selectedStudent.status}</span>
+                      </span>
+                    </p>
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">Admitted At</span>{" "}
+                      <span>
+                        
+                        <span> {selectedStudent?.admitted? new Date(selectedStudent?.admitted).toLocaleDateString():'no record found'}</span>
+                      </span>
+                    </p>
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">Registered At</span>{" "}
+                      <span>
+                        
+                        <span> { selectedStudent?.registered? new Date(selectedStudent?.registered).toLocaleDateString():'no record found'}</span>
                       </span>
                     </p>
                     {payment &&

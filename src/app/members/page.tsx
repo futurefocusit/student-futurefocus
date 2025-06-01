@@ -205,7 +205,7 @@ const MembersPage: React.FC = () => {
   return;
 }
 
-    // Check file size (max 2MB)
+
     if (file.size > 2 * 1024 * 1024) {
       toast.error("Image size should be less than 2MB");
       return;
