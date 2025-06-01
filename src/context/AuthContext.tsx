@@ -57,7 +57,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
           const errorMessage = error.response.data.message || "An error occurred";
           toast.error(errorMessage);
         } else if (error.request) {
-          toast.error("Failed to connect to server");
+          toast.error("network error");
         } else {
           toast.error("Error sending request. Please try again.");
         }
@@ -191,7 +191,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
           logout();
         }
       } else if (error.request) {
-        toast.error("Failed to connect to server");
+        toast.error("network error ");
       } else {
         toast.error("Error sending request. Please try again.");
       }
