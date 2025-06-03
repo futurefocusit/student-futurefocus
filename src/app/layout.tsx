@@ -3,6 +3,7 @@ import "./globals.css";
 import React from "react";
 import AuthContextAPI  from "@/context/AuthContext";
 import { CartProvider } from "@/context/cartContext";
+import WhatsAppButton from "@/components/whatsApp";
 
 
 export const metadata: Metadata = {
@@ -24,6 +25,7 @@ export default function RootLayout({
         <CartProvider>
           <main className="flex-1 inline  bg-gray-100 min-h-screen">
             {children}
+            <WhatsAppButton/>
           </main>
           </CartProvider>
     </AuthContextAPI>
