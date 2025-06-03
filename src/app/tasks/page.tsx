@@ -313,8 +313,8 @@ const TaskManagement: React.FC = () => {
       </Head>
       <SideBar />
       <div className="p-6 max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <Typography variant="h4" className="font-bold text-gray-800">
+        <div className="flex justify-between items-center mb-6 mt-10">
+          <Typography variant="h4" className="font-bold text-gray-800 ">
             Task Management
           </Typography>
           <Button
@@ -331,7 +331,7 @@ const TaskManagement: React.FC = () => {
         </div>
 
         <div className="flex gap-2 mb-6">
-          {["all", "pending", "started", "completed"].map((status) => (
+          {["pending", "started", "completed"].map((status) => (
             <Chip
               key={status}
               label={status.charAt(0).toUpperCase() + status.slice(1)}

@@ -29,7 +29,7 @@ const FeaturesSection = () => {
             <p>Provides Dashboard that summerize all information in your systems</p>
           </div>
         </div>
-        <p className="text-3xl font-bold mt-12">For detailed features of <span className="text-green-400 font-bold">Xcool system</span> you can view <a href="https://rodrigue.xcooll.com/projects/681657d868a443a000b43a99" className="text-green-600">this page</a> </p>
+        {/* <p className="text-3xl font-bold mt-12">For detailed features of <span className="text-green-400 font-bold">Xcool system</span> you can view <a href="https://rodrigue.xcooll.com/projects/681657d868a443a000b43a99" className="text-green-600">this page</a> </p> */}
 
       </div>
 

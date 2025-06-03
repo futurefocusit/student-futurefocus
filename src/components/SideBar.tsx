@@ -33,20 +33,29 @@ const SideBar = () => {
   const { fetchLoggedUser, logout, loggedUser, loading } = useAuth();
 
 
-  const menuItems = [
-    { label: "DASHBOARD", icon: FaTachometerAlt, href: "/dashboard", admin: true },
+  const menuItems = {
+    general:[
+       { label: "DASHBOARD", icon: FaTachometerAlt, href: "/dashboard", admin: true },
+       {
+      label: "Team",
+      icon: FaTeamspeak,
+      href: "/members",
+      admin: true,
+    },
+    {
+      label: "MANAGE ROLE",
+      icon: FaLockOpen,
+      href: "/manage-role",
+      admin: true,
+    }
+    ],
+   students:[
+    
     { label: "STUDENTS", icon: FaUser, href: "/students", admin: true },
     {
       label: "STUDENT ATTENDANCE",
       icon: FaCalendarCheck,
       href: "/attendance",
-      admin: true,
-    },
-
-    {
-      label: "Team",
-      icon: FaTeamspeak,
-      href: "/members",
       admin: true,
     },
     {
@@ -67,6 +76,18 @@ const SideBar = () => {
       href: "/shift",
       admin: true,
     },
+    { label: "PAYMENT", 
+      icon: FaMoneyBill, 
+      href: "/payment", admin: true },
+    {
+      label: "TRANSACTIONS",
+      icon: FaExchangeAlt,
+      href: "/transactions",
+      admin: true,
+    },
+   ],
+
+    hr:[
     {
       label: "STAFF ATTENDANCE",
       icon: FaClock,
@@ -77,29 +98,20 @@ const SideBar = () => {
 
     { label: "TASK", icon: FaTasks, href: "/tasks", admin: true },
     { label: "MY TASK", icon: FaClipboardList, href: "/staff/task" },
+     ],
 
-    { label: "PAYMENT", icon: FaMoneyBill, href: "/payment", admin: true },
-    {
-      label: "TRANSACTIONS",
-      icon: FaExchangeAlt,
-      href: "/transactions",
-      admin: true,
-    },
+  cashFlow:[
     { label: "CASHFLOW", icon: FaMoneyBillAlt, href: "/cashflow", admin: true },
 
     { label: "INVENTORY", icon: FaToolbox, href: "/inventory", admin: true },
-    {
-      label: "MANAGE ROLE",
-      icon: FaLockOpen,
-      href: "/manage-role",
-      admin: true,
-    },
+   
     {
       label: "RECYCLE BIN",
       icon: FaRecycle,
       href: "/recycle-bin",
       admin: true,
     },
+  ]
 
     // {
     //   label: "TECHUP PROGRAM",
@@ -107,7 +119,7 @@ const SideBar = () => {
     //   href: "/techups",
     //   admin: true,
     // },
-  ];
+  }
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -154,13 +166,13 @@ const SideBar = () => {
       </button>
 
       <div
-        className={`flex flex-col fixed top-0 left-0 ${isOpen ? " bg-gray-800" : ""
+        className={`flex flex-col fixed top-0 left-0 ${isOpen ? "bg-gray-800" : "-z-30"
           } md:bg-gray-800 z-30 justify-between  h-full`}
       >
         <nav
           ref={sidebarRef}
           className={` flex flex-col h-screen justify-between  py-8 overflow-y-auto transition-all duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"
-            } md:translate-x-0 w-42 md:${isExpanded ? "w-72" : "w-20"}`}
+            } md:translate-x-0 md:w-42 md:${isExpanded ? "w-72" : "w-20"}`}
         >
           <div className="flex items-center justify-between mb-6 px-4">
             <h2
@@ -184,8 +196,8 @@ const SideBar = () => {
             <img src={loggedUser?.institution?.logo} alt={`${loggedUser?.institution?.logo}'s logo`} className="rounded-full  bg-gray-600 w-10 h-10 " />
             {isExpanded && <h2 className="text-white text-sm font-semibold">{loggedUser?.institution?.name}</h2>}
           </Link>
-          <div className="flex flex-col items-start">
-            {menuItems
+          <div className="flex flex-col items-start border-b-2 mb-2 border-b-gray-500">
+            {menuItems.general
               .filter(
                 (item) => !item.admin || (item.admin && loggedUser?.isAdmin)
               )
@@ -206,6 +218,73 @@ const SideBar = () => {
                 </Link>
               ))}
           </div>
+          <div className="flex flex-col items-start border-b-2  mb-2 border-b-gray-500">
+            {menuItems.students
+              .filter(
+                (item) => !item.admin || (item.admin && loggedUser?.isAdmin)
+              )
+              .map((item, index) => (
+                <Link
+                  key={index}
+                  href={item.href}
+                  className={`flex items-center px-4 py-2 mt-2 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white ${isExpanded ? "" : "justify-center"
+                    }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span
+                    className={`mx-4 font-medium   md:${isExpanded ? "" : "hidden"}`}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              ))}
+          </div>
+          <div className="flex flex-col items-start border-b-2  mb-2 border-b-gray-500">
+            {menuItems.hr
+              .filter(
+                (item) => !item.admin || (item.admin && loggedUser?.isAdmin)
+              )
+              .map((item, index) => (
+                <Link
+                  key={index}
+                  href={item.href}
+                  className={`flex items-center px-4 py-2 mt-2 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white ${isExpanded ? "" : "justify-center"
+                    }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span
+                    className={`mx-4 font-medium   md:${isExpanded ? "" : "hidden"}`}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              ))}
+          </div>
+          <div className="flex flex-col items-start border-b-2  mb-2 border-b-gray-500">
+            {menuItems.cashFlow
+              .filter(
+                (item) => !item.admin || (item.admin && loggedUser?.isAdmin)
+              )
+              .map((item, index) => (
+                <Link
+                  key={index}
+                  href={item.href}
+                  className={`flex items-center px-4 py-2 mt-2 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white ${isExpanded ? "" : "justify-center"
+                    }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span
+                    className={`mx-4 font-medium   md:${isExpanded ? "" : "hidden"}`}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              ))}
+          </div>
+
 
           <div className="px-4">
             <a
