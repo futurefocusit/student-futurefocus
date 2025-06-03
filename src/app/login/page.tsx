@@ -3,7 +3,8 @@ import { useAuth } from "@/context/AuthContext";
 import { TeamMemberLogin } from "@/types/types";
 import React, { FormEvent, useState } from "react";
 import Message from "@/components/message";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaArrowAltCircleLeft, FaEye, FaEyeSlash } from "react-icons/fa";
+import Link from "next/link";
 
 const LoginForm = () => {
   const { login, loading } = useAuth();
@@ -37,6 +38,7 @@ const LoginForm = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+        <Link href='/' className="text-blue-600 font-bold underline flex items-center gap-2 " ><FaArrowAltCircleLeft/> Back Home</Link>
         <div className="text-center mb-6">
           <img src="/xcooll.png" alt="Logo" className="w-32 h-32 mx-auto" />
         </div>
