@@ -932,7 +932,7 @@ const StudentManagement: React.FC = () => {
               href="/past-student"
               className="px-4 mx-10 py-2 bg-blue-400 hover:bg-blue-700 rounded-lg text-white font-bold"
             >
-              PAST-STUDENT
+             ADD ALUMNI
             </a>
           )}
         </div>
