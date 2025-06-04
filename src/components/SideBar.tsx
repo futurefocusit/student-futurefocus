@@ -166,7 +166,7 @@ const SideBar = () => {
       </button>
 
       <div
-        className={`flex flex-col fixed top-0 left-0 ${isOpen ? "bg-gray-800" : "w-fit h-fit"
+        className={`flex flex-col fixed top-0 left-0 ${isOpen ? "bg-gray-800" : "w-0"
           } md:bg-gray-800 z-30 justify-between  h-full`}
       >
         <nav
