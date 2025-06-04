@@ -908,7 +908,7 @@ const StudentManagement: React.FC = () => {
     <div className="min-h-screen bg-gray-100 p-2 sm:p-4 lg:p-6">
       <SideBar />
       <div className="max-w-7xl mx-auto  ml-10 ld:ml-20 bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="bg-gray-50 flex flex-col sm:flex-row justify-between items-center shadow-md rounded-lg p-4">
+        <div className="bg-gray-50 flex flex-col gap-5 sm:flex-row justify-between items-center shadow-md rounded-lg p-4">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
             STUDENTS
           </h2>
@@ -923,7 +923,7 @@ const StudentManagement: React.FC = () => {
           {hasPermission(loggedUser as TeamMember, "students", "register") && (
             <a
               href="/students/register-new"
-              className="px-4 py-2 bg-green-400 hover:bg-green-700 rounded-lg text-white font-bold"
+              className="px-4 py-2 bg-green-400  hover:bg-green-700 rounded-lg text-white font-bold"
             >
               REGISTER NEW
             </a>
