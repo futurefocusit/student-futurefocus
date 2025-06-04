@@ -334,7 +334,7 @@ const TaskManagement: React.FC = () => {
           {["pending", "started", "completed"].map((status) => (
             <Chip
               key={status}
-              label={status.charAt(0).toUpperCase() + status.slice(1)}
+              label={status.charAt(0).toUpperCase() + status.slice(1)+" ("+tasks.filter(task=>task.status===status).length+")" }
               onClick={() => setFilter(status)}
               color={filter === status ? "primary" : "default"}
               className={`cursor-pointer ${filter === status
@@ -342,6 +342,7 @@ const TaskManagement: React.FC = () => {
                 : "bg-gray-100 hover:bg-gray-200"
                 }`}
             />
+            
           ))}
         </div>
 
