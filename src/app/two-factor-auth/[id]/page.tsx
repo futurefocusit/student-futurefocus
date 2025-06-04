@@ -10,6 +10,7 @@ import {  FaKey, FaEnvelope, FaArrowLeft } from "react-icons/fa";
 const TwoFactorAuthPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '']);
+  const [isResnding,setIsResending]= useState(false)
   const [id, setId] = useState<string | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [popupType, setPopupType] = useState<'success' | 'error' | 'info' | 'warning'>('info');
@@ -89,6 +90,26 @@ const TwoFactorAuthPage = () => {
       setIsLoading(false);
     }
   };
+  const resendOTP = async () => {
+    try {
+      setIsResending(true);
+
+
+
+      const response = await axios.get(
+        `${API_BASE_URL}/member/two-factor/${id}`,
+      );
+      showNotification('success', response.data.message);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        showNotification('error', error.response.data.message);
+      } else {
+        showNotification('error', 'Failed! Try again');
+      }
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   if (isLoading) {
     return <Loader fullScreen text="Verifying OTP..." />;
@@ -151,10 +172,10 @@ const TwoFactorAuthPage = () => {
                   <p>Didn&rsquo;t receive the code?</p>
                   <button
                     className="text-blue-600 hover:text-blue-800 font-medium flex items-center justify-center mx-auto"
-                    onClick={() => window.location.reload()}
+                    onClick={resendOTP}
                   >
                     <FaEnvelope className="mr-2" />
-                    Resend Code
+                  {isResnding?"Resending":"Resend Code"}
                   </button>
                 </div>
               </div>

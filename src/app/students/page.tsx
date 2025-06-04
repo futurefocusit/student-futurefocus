@@ -27,6 +27,7 @@ interface Student {
   email: string;
   phone: string;
   intake: string;
+  secondPhone:string
   location:  string ,
     gender:  string ,
     identity:  string ,
@@ -1312,7 +1313,11 @@ const StudentManagement: React.FC = () => {
                     </p>
                     <p className="flex">
                       <span className="font-extrabold w-28 ">PHONE</span>{" "}
-                      <span> {selectedStudent.phone}</span>
+                      <span> {selectedStudent.phone} </span>
+                    </p>
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">Relative PHONE</span>{" "}
+                      <span> {selectedStudent.secondPhone} </span>
                     </p>
                     <p className="flex">
                       <span className="font-extrabold w-28 ">INTAKE</span>{" "}

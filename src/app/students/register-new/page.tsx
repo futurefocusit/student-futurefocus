@@ -21,6 +21,7 @@ interface registrationData {
   name: string;
   email: string;
   phone: string;
+  secondPhone: string;
   referer:string
   selectedCourse: string;
   selectedShift: string;
@@ -47,6 +48,7 @@ const Registration: React.FC = () => {
      name: "",
      email: "",
      phone: "",
+     secondPhone:"",
      selectedCourse: courses.length > 0 ? courses[0].title : "",
      selectedShift: courses.length > 0 ? courses[0].shifts[0]._id : "",
      message: "",
@@ -167,6 +169,7 @@ const data:IInvoice = {
          referer:"default",
          email: "invalid@gmail.com",
          phone: "",
+         secondPhone: "",
          selectedCourse: courses.length > 0 ? courses[0].title : "",
          selectedShift: courses.length > 0 ? courses[0].shifts[0]._id : "",
          message: "",
@@ -267,6 +270,20 @@ const data:IInvoice = {
              type="tel"
              name="phone"
              value={formData.phone}
+             onChange={handleChange}
+             required
+             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+           />
+         </div>
+         <div>
+           <label className="block text-sm font-extrabold text-gray-700">
+            {"SECOND NUMBER ('optional')"}
+           </label>
+           <input
+             type="tel"
+             name="phone"
+             value={formData.secondPhone}
+             placeholder="Parent phone number"
              onChange={handleChange}
              required
              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
