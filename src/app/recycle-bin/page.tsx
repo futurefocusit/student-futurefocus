@@ -429,7 +429,7 @@ const RecycleBinPage: React.FC = () => {
             <SideBar />
             <div className="md:overflow-x-hidden">
                 <div className="flex justify-around items-center mb-6">
-                    <h1 className="text-2xl font-semibold text-gray-900">Recycle Bin</h1>
+                    <h1 className="text-2xl font-semibold text-gray-900">RECYCLE BIN</h1>
                     <button
                         onClick={fetchDeletedItems}
                         className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
