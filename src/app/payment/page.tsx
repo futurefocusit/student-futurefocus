@@ -312,7 +312,7 @@ const StudentManagement: React.FC = () => {
 
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <div className="bg-gray-50 flex justify-between shadow-md rounded-lg px-2 items-center">
-          <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
+          <h2 className="text-2xl font-bold ml-20 p-6 text-gray-900 text-center border-b">
             STUDENT PAYMENT
           </h2>
           {hasPermission(loggedUser as TeamMember, "students", "register") ? (

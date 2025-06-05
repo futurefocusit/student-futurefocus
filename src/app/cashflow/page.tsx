@@ -273,7 +273,7 @@ const PaymentsPage: React.FC = () => {
       <SideBar />
       <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <div className="flex gap-72">
-          <h1 className="lg:text-left ml-7">TODAY SUMMARY</h1>
+          <h1 className="lg:text-left ml-16">TODAY SUMMARY</h1>
           <h2 className="text-2xl font-bold text-gray-900 text-center">CASHFLOW</h2>
         </div>
 

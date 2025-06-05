@@ -64,7 +64,11 @@ const Past: React.FC = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/course`);
+        const response = await axios.get(`${API_BASE_URL}/course`,{
+          headers:{
+     "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
+          }
+        });
         await fetchLoggedUser();
         setCourses(response.data);
 
@@ -85,7 +89,11 @@ const Past: React.FC = () => {
 
     const getIntakes = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/others/intake`);
+        const response = await axios.get(`${API_BASE_URL}/others/intake`,{
+          headers:{
+     "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
+          }
+        });
         setIntakes(response.data.intakes);
         if (response.data.length > 0) {
           setFormData((prevData) => ({

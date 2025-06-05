@@ -192,7 +192,7 @@ const MemberTasks: React.FC = () => {
       <div className="p-6 max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <Typography variant="h4" className="font-bold text-gray-800">
-            My Tasks
+           MY TASKs
           </Typography>
           <div className="flex gap-2">
             {["all", "pending", "started", "completed"].map((status) => (

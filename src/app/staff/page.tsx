@@ -198,7 +198,7 @@ const AttendancePage: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <SideBar />
       <div className="container mx-auto px-2 sm:px-4 py-4 md:py-6 lg:py-8">
-        <h1 className="text-xl sm:text-2xl font-bold mb-4">MY ATTENDANCE RECORDS</h1>
+        <h1 className="text-xl sm:text-2xl font-bold mb-4 ml-20">MY ATTENDANCE RECORDS</h1>
 
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="w-full sm:flex-1">

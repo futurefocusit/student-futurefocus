@@ -121,15 +121,7 @@ const ManageRolesPermissions: React.FC = () => {
     setNewRole({ role: "", permission: [] });
   };
 
-  // const handleDeleteFeature = async (id: string) => {
-  //   await axios.delete(`${API_BASE_URL}/role/feature`, { data: { id } });
-  //   fetchFeatures();
-  // };
-
-  // const handleDeletePermission = async (id: string) => {
-  //   await axios.delete(`${API_BASE_URL}/role/permission`, { data: { id } });
-  //   fetchPermissions();
-  // };
+ 
 
   const handleDeleteRole = async (id: string) => {
     try {
@@ -181,134 +173,7 @@ if (error) return <div>{error}</div>;
   return (
     <div className="max-w-6xl mx-auto p-5">
       <SideBar />
-      <h1 className="text-3xl font-bold mb-6">Manage Roles and Permissions</h1>
-
-      {/* Feature Management */}
-      {/* <div className="mb-10">
-          <h2 className="text-2xl font-semibold mb-4">Add Feature</h2>
-          <div className="flex mb-4">
-            <input
-              type="text"
-              className="border rounded px-3 py-2 flex-grow mr-2"
-              value={newFeature.feature}
-              onChange={(e) =>
-                setNewFeature({ ...newFeature, feature: e.target.value })
-              }
-              placeholder="Feature"
-            />
-            <select
-              className="border rounded px-3 py-2"
-              value={newFeature.web}
-              onChange={(e) =>
-                setNewFeature({
-                  ...newFeature,
-                  web: e.target.value as "website" | "academic-portal",
-                })
-              }
-            >
-              <option value="website">Website</option>
-              <option value="academic-portal">Academic Portal</option>
-            </select>
-            <button
-              onClick={handleAddFeature}
-              className="bg-blue-500 text-white rounded px-4 ml-2"
-            >
-              Add Feature
-            </button>
-          </div>
-          <h2 className="text-lg font-semibold mb-2">Features</h2>
-          <table className="min-w-full bg-white border">
-            <thead>
-              <tr className="border-b">
-                <th className="px-4 py-2 text-left">Feature</th>
-                <th className="px-4 py-2 text-left">Web</th>
-                <th className="px-4 py-2 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {features.map((feature) => (
-                <tr key={feature._id} className="border-b">
-                  <td className="px-4 py-2">{feature.feature}</td>
-                  <td className="px-4 py-2">{feature.web}</td>
-                  <td className="px-4 py-2 text-right">
-                    <button
-                      onClick={() => handleDeleteFeature(feature._id)}
-                      className="text-red-500"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div> */}
-
-      {/* Permission Management */}
-      {/* <div className="mb-10">
-          <h2 className="text-2xl font-semibold mb-4">Add Permission</h2>
-          <div className="flex mb-4">
-            <select
-              className="border rounded px-3 py-2 flex-grow mr-2"
-              value={newPermission.feature}
-              onChange={(e) =>
-                setNewPermission({ ...newPermission, feature: e.target.value })
-              }
-            >
-              <option value="">Select Feature</option>
-              {features.map((feature) => (
-                <option key={feature._id} value={feature._id}>
-                  {feature.feature}
-                </option>
-              ))}
-            </select>
-            <input
-              type="text"
-              className="border rounded px-3 py-2 flex-grow mr-2"
-              value={newPermission.permission}
-              onChange={(e) =>
-                setNewPermission({
-                  ...newPermission,
-                  permission: e.target.value,
-                })
-              }
-              placeholder="Permission"
-            />
-            <button
-              onClick={handleAddPermission}
-              className="bg-blue-500 text-white rounded px-4 ml-2"
-            >
-              Add Permission
-            </button>
-          </div>
-          <h2 className="text-lg font-semibold mb-2">Permissions</h2>
-          <table className="min-w-full bg-white border">
-            <thead>
-              <tr className="border-b">
-                <th className="px-4 py-2 text-left">Permission</th>
-                <th className="px-4 py-2 text-left">Feature</th>
-                <th className="px-4 py-2 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {permissions.map((permission) => (
-                <tr key={permission._id} className="border-b">
-                  <td className="px-4 py-2">{permission.permission}</td>
-                  <td className="px-4 py-2">{permission.feature?.feature}</td>
-                  <td className="px-4 py-2 text-right">
-                    <button
-                      onClick={() => handleDeletePermission(permission._id)}
-                      className="text-red-500"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div> */}
-
+      <h1 className="text-3xl font-bold ml-10 mb-6">Manage Roles and Permissions</h1>
       {/* Role Management */}
       <div className="mb-10">
         <h2 className="text-2xl font-semibold mb-4">Add Role</h2>

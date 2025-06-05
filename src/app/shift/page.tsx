@@ -143,7 +143,7 @@ const Shift = () => {
     <div>
       <SideBar />
       <div className="">
-        <h1 className="text-3xl font-bold mb-4 text-center">Shift</h1>
+        <h1 className="text-3xl font-bold mb-4 text-center">SHIFT</h1>
         <div className="flex gap-3 items-center justify-center">
           <div className="flex flex-col gap-2">
             <span className="flex gap-10">
@@ -210,9 +210,9 @@ const Shift = () => {
               "intake",
               editingShift ? "create" : "create"
             )
-                ? "bg-gray-400 cursor-not-allowed"
+                ? "bg-gray-400 cursor-not-allowed "
                 : "bg-blue-700  hover:bg-blue-500"
-              } text-white rounded p-2`}
+              } text-white rounded text-xs md:text-sm lg:text-xl p-2`}
             onClick={handleSubmit}
           >
             {isSubmitting

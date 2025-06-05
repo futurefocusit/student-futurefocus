@@ -227,8 +227,8 @@ const CoursesComponent: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <SideBar />
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold text-gray-900">Courses</h1>
+      <div className="flex justify-end gap-5 ld:justify-between  items-center mb-4">
+        <h1 className="text-xl font-semibold text-gray-900 ">COURSES</h1>
         <button
           disabled={!canCreate}
           onClick={() => setIsAddModalOpen(true)}
@@ -237,7 +237,7 @@ const CoursesComponent: React.FC = () => {
             : "bg-indigo-600 hover:bg-indigo-700"
             }`}
         >
-          Add New Course
+          ADD NEW COURSE
         </button>
       </div>
 

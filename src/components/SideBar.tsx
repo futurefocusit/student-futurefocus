@@ -25,6 +25,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { FaHouseCrack, FaLockOpen, FaMessage, FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
 import { MdEventAvailable } from "react-icons/md";
+import { toast } from "react-toastify";
 
 const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -143,11 +144,7 @@ const SideBar = () => {
     fetchUserData();
   }, []);
 
-  useEffect(() => {
-    if (!loading && !loggedUser) {
-      logout();
-    }
-  }, [loading, loggedUser, logout]);
+
 
   const handleLogout = async () => {
     await logout();
@@ -176,7 +173,7 @@ const SideBar = () => {
         >
           <div className="flex items-center justify-between mb-6 px-4">
             <h2
-              className={`text-2xl font-semibold text-white mt-5 md:${isExpanded ? "" : "hidden"
+              className={`text-2xl  font-semibold  text-white mt-10 md:${isExpanded ? "" : "hidden"
                 }`}
             >
               MENU

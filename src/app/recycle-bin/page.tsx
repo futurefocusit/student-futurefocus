@@ -447,7 +447,7 @@ const RecycleBinPage: React.FC = () => {
                 )}
 
                 {/* Tabs */}
-                <div className="border-b border-gray-200 mb-6">
+                <div className="border-b border-gray-200 overflow-auto mb-6">
                     <nav className="-mb-px flex space-x-8">
                         {tabConfig?.map(({ id, label, icon: Icon }) => (
                             <button

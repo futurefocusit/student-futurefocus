@@ -56,17 +56,22 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
         if (error.response) {
           const errorMessage = error.response.data.message || "An error occurred";
           toast.error(errorMessage);
+          if(error.response.status===401){
+            localStorage.removeItem("ffa-admin");
+             setLoggedUser(null);
+          }
         } else if (error.request) {
-          toast.error("network error");
+          toast.error("network error! try again");
         } else {
           toast.error("Error sending request. Please try again.");
         }
       } else {
+        localStorage.removeItem("ffa-admin");
+      setLoggedUser(null);
         toast.error("An unexpected error occurred");
       }
 
-      localStorage.removeItem("ffa-admin");
-      setLoggedUser(null);
+      
     } finally {
       setIsLoading(false)
     }

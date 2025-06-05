@@ -86,7 +86,7 @@ const {loggedUser,fetchLoggedUser}=useAuth()
     <div>
       <SideBar/>
         <div className="">
-          <h1 className="text-3xl font-bold mb-4 text-center">Intakes</h1>
+          <h1 className="text-3xl font-bold mb-4 text-center">INTAKE</h1>
           <div className="flex gap-3 justify-center">
             <input type="month" name="" id="" onChange={handleChange} />
             <button

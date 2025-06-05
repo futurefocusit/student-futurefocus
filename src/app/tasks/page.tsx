@@ -305,7 +305,7 @@ const TaskManagement: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Task Management</title>
+        <title> TASK MANAGEMENT</title>
         <meta name="description" content="Manage Tasks For your Team" />
         <meta property="og:title" content="Task Management" />
         <meta property="og:description" content="Manage Tasks For your Team" />

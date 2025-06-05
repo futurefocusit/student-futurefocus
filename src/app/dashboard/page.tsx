@@ -318,11 +318,11 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex flex-col md:items-center p-4">
+    <div className="flex flex-col md:items-center p-4 overflow-x-hidden">
       <SideBar />
-      <h1 className="text-3xl font-bold mb-4">DASHBOARD</h1>
+      <h1 className="text-3xl font-bold  ml-20  mb-4">DASHBOARD</h1>
       {/* Overview Section with Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6  gap-4 w-full max-w-64 md:max-w-xl lg:max-w-6xl">
+      <div className="grid grid-cols-1 overflow-x-hidden md:grid-cols-2 lg:grid-cols-6  gap-4 w-full max-w-64 md:max-w-xl lg:max-w-6xl">
         {/* Student Status Cards */}
 
         <a
@@ -471,14 +471,14 @@ const Dashboard = () => {
           ""
         )}
       </div>
-      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl  mt-6">
+      <div className="bg-white p-6 rounded-lg shadow-md overflow-x-auto w-full max-w-2xl  mt-6">
         <h2 className="text-2xl font-semibold text-center mb-4">
           STUDENTS STATISTICS BY SHIFT
         </h2>
         {/* @ts-expect-error error */}
         <Bar data={studentsData} options={options} />
       </div>
-      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl  mt-6">
+      <div className="bg-white p-6 rounded-lg shadow-md w-full overflow-x-auto max-w-2xl  mt-6">
         <h2 className="text-2xl font-semibold text-center mb-4">
           STUDENT STATISTICS BY DEPARTMENT
         </h2>
@@ -490,7 +490,7 @@ const Dashboard = () => {
         "dashboard",
         "view-dashboard"
       ) ? (
-        <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mt-6">
+        <div className="bg-white p-6 rounded-lg shadow-md overflow-x-auto w-full max-w-2xl mt-6">
           <h2 className="text-2xl font-semibold mb-4 text-center">
             PAYMENT STATISTICS
           </h2>
