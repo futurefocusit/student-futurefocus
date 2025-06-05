@@ -188,11 +188,14 @@ const PaymentsPage: React.FC = () => {
         groups[dateString] = {
           total: 0,
           transactions: [],
+        
         }
       }
+ 
 
       groups[dateString].total += cashflow.amount
       groups[dateString].transactions.push(cashflow)
+
     })
 
     return groups
