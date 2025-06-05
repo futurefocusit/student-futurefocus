@@ -36,7 +36,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gray-300">
       <div className="bg-white p-8 rounded-lg shadow-lg w-96">
         <Link href='/' className="text-blue-600 font-bold underline flex items-center gap-2 " ><FaArrowAltCircleLeft/> Back Home</Link>
         <div className="text-center mb-6">
