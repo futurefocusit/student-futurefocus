@@ -190,7 +190,7 @@ const MemberTasks: React.FC = () => {
       <SideBar />
       <div className="p-6 max-w-5xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <Typography variant="h4" className="font-bold text-gray-800 ml-20">
+          <Typography variant="h4" className="font-bold mt-5 text-gray-800 ml-20">
            MY TASKS
           </Typography>
           <div className="flex gap-2">
