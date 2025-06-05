@@ -157,7 +157,7 @@ const SideBar = () => {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-40 md:hidden text-white bg-gray-800 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center"
+        className="fixed top-4 left-4 z-40 md:hidden text-white bg-red-300 -800 hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center"
       >
         {isOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
       </button>
