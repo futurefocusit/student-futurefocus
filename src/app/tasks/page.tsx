@@ -304,15 +304,8 @@ const TaskManagement: React.FC = () => {
 
   return (
     <>
-      <Head>
-        <title> TASK MANAGEMENT</title>
-        <meta name="description" content="Manage Tasks For your Team" />
-        <meta property="og:title" content="Task Management" />
-        <meta property="og:description" content="Manage Tasks For your Team" />
-        <meta property="og:image" content="/xcooll.png" />
-      </Head>
       <SideBar />
-      <div className="p-6 max-w-7xl mx-auto">
+      <div className="p-6 max-w-5xl mx-auto">
         <div className="flex justify-between items-center mb-6 mt-10">
           <Typography variant="h4" className="font-bold text-gray-800 ">
             TASK MANAGEMENT

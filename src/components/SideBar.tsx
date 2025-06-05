@@ -72,18 +72,18 @@ const SideBar = () => {
       admin: true,
     },
     {
-      label: "INTAKE",
+      label: "INTAKES",
       icon: FaCalendar,
       href: "/intake",
       admin: true,
     },
     {
-      label: "SHIFT",
+      label: "SHIFTS",
       icon: FaHouseCrack,
       href: "/shift",
       admin: true,
     },
-    { label: "PAYMENT", 
+    { label: "PAYMENTS", 
       icon: FaMoneyBill, 
       href: "/payment", admin: true },
     {
@@ -103,8 +103,8 @@ const SideBar = () => {
     },
     { label: "MY ATTENDANCE", icon: MdEventAvailable, href: "/staff" },
 
-    { label: "TASK", icon: FaTasks, href: "/tasks", admin: true },
-    { label: "MY TASK", icon: FaClipboardList, href: "/staff/task" },
+    { label: "TASKS", icon: FaTasks, href: "/tasks", admin: true },
+    { label: "MY TASKS", icon: FaClipboardList, href: "/staff/task" },
      ],
 
   cashFlow:[

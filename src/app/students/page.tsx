@@ -905,9 +905,9 @@ const StudentManagement: React.FC = () => {
     );
   }
   return (
-    <div className="min-h-screen bg-gray-100 p-2 sm:p-4 lg:p-6">
+    <div className="min-h-screen max-w-6xl mx-auto bg-gray-100 p-2 sm:p-4   md:overflow-x-hidden">
       <SideBar />
-      <div className="max-w-7xl mx-auto  ml-10 ld:ml-20 bg-white shadow-md rounded-lg overflow-hidden">
+      <div className="max-w-7xl mx-auto  ml-10 ld:ml-20 bg-white shadow-md rounded-lg overflow-x-hidden">
         <div className="bg-gray-50 flex flex-col gap-5 sm:flex-row justify-between items-center shadow-md rounded-lg p-4">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
             STUDENTS
@@ -949,7 +949,7 @@ const StudentManagement: React.FC = () => {
 
         <div className="p-4 space-y-4">
           <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1 ">
               {[
                 "pending",
                 "accepted",
@@ -964,7 +964,7 @@ const StudentManagement: React.FC = () => {
                     filterStudents(status);
                     setStatus(status);
                   }}
-                  className={`px-3 py-1 flex gap-1  text-xs sm:text-sm font-extrabold text-white   border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${activeFilter === status ? "bg-green-20" : ""
+                  className={`px-3 py-1 flex gap-1  text items-center sm:text-sm  font-extrabold text-white   border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${activeFilter === status ? "bg-green-20" : ""
                     } ${status === "pending"
                       ? "bg-yellow-600"
                       : status === "accepted"
@@ -1009,7 +1009,7 @@ const StudentManagement: React.FC = () => {
               ))}
             </div>
 
-            <div className="relative w-full sm:w-64">
+            <div className="relative w-full sm:w-52">
               <input
                 type="text"
                 placeholder="Search students"

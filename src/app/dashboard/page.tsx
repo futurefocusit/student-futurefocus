@@ -318,8 +318,9 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex flex-col md:items-center p-4 overflow-x-hidden">
-      <SideBar />
+     <><SideBar />
+     <div className="flex flex-col md:items-center p-4  md:ml-20 md:px-20  overflow-x-hidden">
+
       <h1 className="text-3xl font-bold  ml-20  mb-4">DASHBOARD</h1>
       {/* Overview Section with Cards */}
       <div className="grid grid-cols-1 overflow-x-hidden md:grid-cols-2 lg:grid-cols-6  gap-4 w-full max-w-64 md:max-w-xl lg:max-w-6xl">
@@ -515,7 +516,7 @@ const Dashboard = () => {
       ) : (
         ""
       )}
-    </div>
+    </div></>
   );
 };
 

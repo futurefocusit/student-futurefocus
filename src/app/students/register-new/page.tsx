@@ -211,7 +211,7 @@ const data:IInvoice = {
    }
 
    return (
-     <div className="max-w-3xl mx-auto p-6 my-32 pl-32 lg:pl-6 my bg-white shadow-md rounded-lg ">
+     <div className="max-w-5xl mx-auto p-6 my-32 pl-32 lg:pl-6 my bg-white shadow-md rounded-lg ">
        <SideBar />
        <a
          href="/students"

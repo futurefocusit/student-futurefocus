@@ -425,10 +425,10 @@ const RecycleBinPage: React.FC = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="py-6 w-fit md:max-w-6xl  sm:px-6 md:mx-auto ">
             <SideBar />
-            <div className="pl-20 md:pl-72">
-                <div className="flex justify-between items-center mb-6">
+            <div className="md:overflow-x-hidden">
+                <div className="flex justify-around items-center mb-6">
                     <h1 className="text-2xl font-semibold text-gray-900">Recycle Bin</h1>
                     <button
                         onClick={fetchDeletedItems}
@@ -447,8 +447,8 @@ const RecycleBinPage: React.FC = () => {
                 )}
 
                 {/* Tabs */}
-                <div className="border-b border-gray-200 overflow-auto mb-6">
-                    <nav className="-mb-px flex space-x-8">
+                <div className="border-b border-gray-200 mb-6 overflow-x-auto">
+                    <nav className=" flex space-x-8">
                         {tabConfig?.map(({ id, label, icon: Icon }) => (
                             <button
                                 key={id}
@@ -482,9 +482,9 @@ const RecycleBinPage: React.FC = () => {
                         <p className="text-gray-500 text-lg">No deleted {activeTab.toLowerCase()}s found</p>
                     </div>
                 ) : (
-                    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
+                    <div className="bg-white shadow md:overflow-x-auto sm:rounded-lg">
+                        <div className="">
+                            <table className="divide-y divide-gray-200 overflow-x-auto">
                                 <thead className="bg-gray-50">
                                     <tr>
                                         {getTableHeaders(activeTab)?.map((header, index) => (
@@ -501,7 +501,7 @@ const RecycleBinPage: React.FC = () => {
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="bg-white divide-y divide-gray-200 overflow-x-scroll">
                                     {deletedItems[activeTab]?.map((item) => (
                                         <tr key={item._id} className="hover:bg-gray-50">
                                             {renderItemDetails(item, activeTab)}

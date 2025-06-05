@@ -99,17 +99,6 @@ const ManageRolesPermissions: React.FC = () => {
     setUsers(res.data);
   };
 
-  // const handleAddFeature = async () => {
-  //   await axios.post(`${API_BASE_URL}/role/feature`, newFeature);
-  //   fetchFeatures();
-  //   setNewFeature({ feature: "", web: "website" });
-  // };
-
-  // const handleAddPermission = async () => {
-  //   await axios.post(`${API_BASE_URL}/role/permission`, newPermission);
-  //   fetchPermissions();
-  //   setNewPermission({ feature: "", permission: "" });
-  // };
 
   const handleAddRole = async () => {
     await axios.post(`${API_BASE_URL}/role`, newRole,{
@@ -171,10 +160,9 @@ const ManageRolesPermissions: React.FC = () => {
 if (isLoading) return <Loader />;
 if (error) return <div>{error}</div>;
   return (
-    <div className="max-w-6xl mx-auto p-5">
-      <SideBar />
-      <h1 className="text-3xl font-bold ml-10 mb-6">Manage Roles and Permissions</h1>
-      {/* Role Management */}
+     <><SideBar /><div className="max-w-6xl mx-40 p-5">
+
+      <h1 className="text-3xl font-bold ml-10 mb-6">MANAGE ROLES AND PERMISSIONS</h1>
       <div className="mb-10">
         <h2 className="text-2xl font-semibold mb-4">Add Role</h2>
         <div className="flex mb-4">
@@ -183,19 +171,14 @@ if (error) return <div>{error}</div>;
             type="text"
             className="border rounded px-3 py-2 flex-grow mr-2"
             value={newRole.role}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setNewRole({ ...newRole, role: e.target.value })
-            }
-            placeholder="Role"
-          />
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewRole({ ...newRole, role: e.target.value })}
+            placeholder="Role" />
           <button
             disabled={!hasPermission(userData as TeamMember, "roles", "add")}
             onClick={handleAddRole}
-            className={`${
-              !hasPermission(userData as TeamMember, "roles", "add")
+            className={`${!hasPermission(userData as TeamMember, "roles", "add")
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-500"
-            } text-white rounded px-4 ml-2`}
+                : "bg-blue-500"} text-white rounded px-4 ml-2`}
           >
             Add Role
           </button>
@@ -214,15 +197,11 @@ if (error) return <div>{error}</div>;
                 <td className="px-4 py-2">{role.role}</td>
                 <td className="px-4 py-2 text-right">
                   <button
-                    disabled={
-                      !hasPermission(userData as TeamMember, "roles", "delete")
-                    }
+                    disabled={!hasPermission(userData as TeamMember, "roles", "delete")}
                     onClick={() => handleDeleteRole(role._id)}
-                    className={`${
-                      !hasPermission(userData as TeamMember, "roles", "delete")
+                    className={`${!hasPermission(userData as TeamMember, "roles", "delete")
                         ? "text-gray-400 cursor-not-allowed"
-                        : "text-red-500"
-                    }`}
+                        : "text-red-500"}`}
                   >
                     Delete
                   </button>
@@ -245,7 +224,7 @@ if (error) return <div>{error}</div>;
           onChange={(e) => {
             setSelectedRole(e.target.value);
             setSelectedPermissions([]); // Reset selected permissions when role changes
-          }}
+          } }
         >
           <option value="">Select Role</option>
           {roles.map((role) => (
@@ -259,21 +238,17 @@ if (error) return <div>{error}</div>;
           {permissions.map((permission) => (
             <label key={permission._id} className="mr-4">
               <input
-                disabled={
-                  !hasPermission(userData as TeamMember, "roles", "permit")
-                }
+                disabled={!hasPermission(userData as TeamMember, "roles", "permit")}
                 type="checkbox"
                 value={permission._id}
                 checked={selectedPermissions.includes(permission._id)} // Check if the permission is included
                 onChange={(e) => {
                   const value = e.target.value;
-                  setSelectedPermissions((prev) =>
-                    prev.includes(value)
-                      ? prev.filter((id) => id !== value)
-                      : [...prev, value]
+                  setSelectedPermissions((prev) => prev.includes(value)
+                    ? prev.filter((id) => id !== value)
+                    : [...prev, value]
                   );
-                }}
-              />
+                } } />
               {permission.permission} ({permission.feature?.feature})
             </label>
           ))}
@@ -281,11 +256,9 @@ if (error) return <div>{error}</div>;
         <button
           disabled={!hasPermission(userData as TeamMember, "roles", "permit")}
           onClick={handleAssignPermissionsToRole}
-          className={`${
-            !hasPermission(userData as TeamMember, "roles", "permit")
+          className={`${!hasPermission(userData as TeamMember, "roles", "permit")
               ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-500"
-          } text-white rounded px-4`}
+              : "bg-blue-500"} text-white rounded px-4`}
         >
           Assign Permissions
         </button>
@@ -322,16 +295,14 @@ if (error) return <div>{error}</div>;
         <button
           disabled={!hasPermission(userData as TeamMember, "roles", "assign")}
           onClick={handleAssignRoleToUser}
-          className={`${
-            !hasPermission(userData as TeamMember, "roles", "assign")
+          className={`${!hasPermission(userData as TeamMember, "roles", "assign")
               ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-500"
-          } text-white rounded px-4`}
+              : "bg-blue-500"} text-white rounded px-4`}
         >
           Assign Role
         </button>
       </div>
-    </div>
+    </div></>
   );
 };
 

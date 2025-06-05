@@ -195,9 +195,9 @@ const AttendancePage: React.FC = () => {
   const groupedAttendance = groupAttendanceByDate(filteredAttendance);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen md:mx-auto md:max-w-5xl bg-gray-50">
       <SideBar />
-      <div className="container mx-auto px-2 sm:px-4 py-4 md:py-6 lg:py-8">
+      <div className="container mx-auto  sm:px-4 py-4 md:py-6 lg:py-8">
         <h1 className="text-xl sm:text-2xl font-bold mb-4 ml-20">MY ATTENDANCE RECORDS</h1>
 
         <div className="flex flex-col sm:flex-row gap-4 mb-6">

@@ -225,7 +225,7 @@ const CoursesComponent: React.FC = () => {
     : false;
 
   return (
-    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto py-6 md:mx-36 sm:px-6 lg:px-8">
       <SideBar />
       <div className="flex justify-end gap-5 ld:justify-between  items-center mb-4">
         <h1 className="text-xl font-semibold text-gray-900 ">COURSES</h1>

@@ -129,7 +129,7 @@ const PaymentsPage: React.FC = () => {
     <div className="min-h-screen bg-gray-100 p-4">
       <SideBar />
 
-      <div className="max-w-7xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+      <div className="max-w-5xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <h2 className="text-2xl font-bold p-6 text-gray-900 text-center border-b">
           TRANSACTIONS
         </h2>
