@@ -389,7 +389,14 @@ const PaymentsPage: React.FC = () => {
               {Object.entries(groupedCashflows).map(([date, { total, transactions }]) => (
                 <div key={date} className="mb-4">
                   <h3 className="text-lg font-bold text-gray-800">{date.toUpperCase()}</h3>
-                  <div className="text-sm text-gray-600 mb-2">Total: {new Intl.NumberFormat().format(total)} Frw</div>
+                  <div className="text-sm text-gray-600 flex flex-wrap gap-4">
+                  <p>Total: {new Intl.NumberFormat().format(total)} Frw</p>
+                        <p>Income: {new Intl.NumberFormat().format(transactions.filter(t=>t.type==='income').reduce((total,t)=>{ return total+t.amount},0))} Frw</p>
+                      <p>Expenses: {new Intl.NumberFormat().format(transactions.filter(t=>t.type==='expenses').reduce((total,t)=>{ return total+t.amount},0))} Frw</p>
+                      <p className="font-semibold">
+                        Remaining Balance: {new Intl.NumberFormat().format(transactions.reduce((total,t)=>{ return t.type==='income'?total+t.amount:total-t.amount},0))}   Frw
+                      </p>
+                  </div>
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>

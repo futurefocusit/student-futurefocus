@@ -38,7 +38,7 @@ const SideBar = () => {
     general:[
        { label: "DASHBOARD", icon: FaTachometerAlt, href: "/dashboard", admin: true },
        {
-      label: "Team",
+      label: "TEAM",
       icon: FaTeamspeak,
       href: "/members",
       admin: true,
@@ -48,7 +48,13 @@ const SideBar = () => {
       icon: FaLockOpen,
       href: "/manage-role",
       admin: true,
-    }
+    },
+    {
+      label: "RECYCLE BIN",
+      icon: FaRecycle,
+      href: "/recycle-bin",
+      admin: true,
+    },
     ],
    students:[
     
@@ -106,12 +112,7 @@ const SideBar = () => {
 
     { label: "INVENTORY", icon: FaToolbox, href: "/inventory", admin: true },
    
-    {
-      label: "RECYCLE BIN",
-      icon: FaRecycle,
-      href: "/recycle-bin",
-      admin: true,
-    },
+   
   ]
 
     // {

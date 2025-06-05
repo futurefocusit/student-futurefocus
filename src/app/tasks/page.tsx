@@ -315,7 +315,7 @@ const TaskManagement: React.FC = () => {
       <div className="p-6 max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6 mt-10">
           <Typography variant="h4" className="font-bold text-gray-800 ">
-            Task Management
+            TASK MANAGEMENT
           </Typography>
           <Button
             variant="contained"

@@ -53,7 +53,7 @@ const MemberTasks: React.FC = () => {
     text: string;
   } | null>(null);
   const [loading, setLoading] = useState(false);
-  const [filter, setFilter] = useState<"all" | "pending" | "started" | "completed">("all");
+  const [filter, setFilter] = useState<"pending" | "started" | "completed">("pending");
 
   const fetchTasks = async () => {
     try {
@@ -174,7 +174,6 @@ const MemberTasks: React.FC = () => {
   };
 
   const filteredTasks = tasks.filter((task) => {
-    if (filter === "all") return true;
     return task.status === filter;
   });
 
@@ -191,15 +190,15 @@ const MemberTasks: React.FC = () => {
       <SideBar />
       <div className="p-6 max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <Typography variant="h4" className="font-bold text-gray-800">
-           MY TASKs
+          <Typography variant="h4" className="font-bold text-gray-800 ml-20">
+           MY TASKS
           </Typography>
           <div className="flex gap-2">
-            {["all", "pending", "started", "completed"].map((status) => (
+            {[ "pending", "started", "completed"].map((status) => (
               <Chip
                 key={status}
-                label={status.charAt(0).toUpperCase() + status.slice(1)}
-                onClick={() => setFilter(status as "all" | "pending" | "started" | "completed")}
+                label={status.charAt(0).toUpperCase() + status.slice(1)+"("+ tasks.filter(t=>t.status===status).length +")"}
+                onClick={() => setFilter(status as "pending" | "started" | "completed")}
                 color={filter === status ? "primary" : "default"}
                 className={`cursor-pointer ${filter === status
                   ? "bg-[#4a90e2] text-white"

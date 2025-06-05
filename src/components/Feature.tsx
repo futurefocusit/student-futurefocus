@@ -13,7 +13,7 @@ const FeaturesSection = () => {
             <p>Track attendance for both staff and students in real-time with ease.</p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h3 className="text-xl font-semibold mb-4">Cash Flow Management</h3>
+            <h3 className="text-xl font-semibold mb-4">Financial Management</h3>
             <p>Monitor and manage cash flow with detailed reports and financial insights.</p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -25,7 +25,7 @@ const FeaturesSection = () => {
             <p> Human resources management</p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h3 className="text-xl font-semibold mb-4">overal dashboard</h3>
+            <h3 className="text-xl font-semibold mb-4">Overal dashboard</h3>
             <p>Provides Dashboard that summerize all information in your systems</p>
           </div>
         </div>
