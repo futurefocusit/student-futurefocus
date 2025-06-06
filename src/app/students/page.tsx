@@ -16,7 +16,7 @@ import {
 import { convertImageUrlToBase64 } from "@/libs/convertImage";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { FaCommentSms } from "react-icons/fa6";
+import { FaCommentSms, FaUser } from "react-icons/fa6";
 import ConfirmDeleteModal from "@/components/confirmPopupmodel";
 import { toast } from "react-toastify";
 const imageUrl = "/futurefocuslogo.png";
@@ -1296,10 +1296,11 @@ const StudentManagement: React.FC = () => {
               <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg ">
                 <div className="bg-gray-50 p-6 h-96 overflow-scroll">
                   <div className="flex gap-10 items-center">
-                    <img src={selectedStudent.image} alt="passport" className="w-24 rounded-full" />
+                   {selectedStudent.image?<img src={selectedStudent.image} alt="passport" className="w-24 rounded-full" />:<FaUser className="w-24"/>}
                     <h3 className="text-lg font-extrabold text-center text-gray-900">
                     STUDENT DETAILS
                   </h3>
+
                   </div>
                   <div className="mt-4 space-y-4">
                     <p className="flex gap-10">
@@ -1390,7 +1391,7 @@ const StudentManagement: React.FC = () => {
                         )
                         .map((filteredPayment) => (
                           <div key={filteredPayment._id}>
-                            <p className="flex items-center">
+                            <p className="flex items-center gap-10 mt-10">
                               <span className="font-extrabold w-28 ">
                                 STATUS
                               </span>{" "}
@@ -1407,7 +1408,7 @@ const StudentManagement: React.FC = () => {
                                 {filteredPayment.status.toUpperCase()}
                               </span>
                             </p>
-                            <p className="flex mt-1 ">
+                            <p className="flex mt-4 gap-10 ">
                               <span className="font-extrabold w-28 ">
                                 TO PAY
                               </span>{" "}
@@ -1418,7 +1419,7 @@ const StudentManagement: React.FC = () => {
                                 Frw
                               </span>
                             </p>
-                            <p className="flex mt-1">
+                            <p className="flex mt-1 gap-10 mt-4">
                               <span className="font-extrabold w-28 ">PAID</span>{" "}
                               <span className=" text-blue-600 font-extrabold ">
                                 {new Intl.NumberFormat().format(
@@ -1427,7 +1428,7 @@ const StudentManagement: React.FC = () => {
                                 Frw
                               </span>
                             </p>
-                            <p className="flex mt-1">
+                            <p className="flex mt-1 gap-10 mt-4">
                               <span className="font-extrabold w-28  ">
                                 REMAINING
                               </span>{" "}
@@ -1442,7 +1443,7 @@ const StudentManagement: React.FC = () => {
                           </div>
                         ))
                     )}
-                    <p className="flex flex-col">
+                    <p className="flex flex-col mt-10 gap-10">
                       <span className="font-extrabold w-28">Message</span>{" "}
                       <p> {selectedStudent.message}</p>
                     </p>
