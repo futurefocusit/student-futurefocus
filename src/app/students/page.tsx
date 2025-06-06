@@ -1177,7 +1177,7 @@ const StudentManagement: React.FC = () => {
               <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg">
                 <div className="bg-gray-50 p-6 h-96 overflow-scroll">
                   <h3 className="text-lg font-medium text-gray-900">
-                    UPADATE STUDENT INFO
+                    UPDATE STUDENT INFO
                   </h3>
                   <div className="mt-4 space-y-2">
                     <div>

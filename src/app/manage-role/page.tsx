@@ -160,7 +160,7 @@ const ManageRolesPermissions: React.FC = () => {
 if (isLoading) return <Loader />;
 if (error) return <div>{error}</div>;
   return (
-     <><SideBar /><div className="max-w-6xl mx-40 p-5">
+     <><SideBar /><div className="max-w-6xl  mx-auto p-5">
 
       <h1 className="text-3xl font-bold ml-10 mb-6">MANAGE ROLES AND PERMISSIONS</h1>
       <div className="mb-10">
