@@ -21,7 +21,7 @@ import ConfirmDeleteModal from "@/components/confirmPopupmodel";
 import { toast } from "react-toastify";
 const imageUrl = "/futurefocuslogo.png";
 
-interface Student {
+export interface Student {
   _id: string;
   nid:string
   name: string;
@@ -1311,11 +1311,11 @@ const StudentManagement: React.FC = () => {
                       <span> {selectedStudent.email}</span>
                     </p>
                     <p className="flex">
-                      <span className="font-extrabold w-28 ">PHONE</span>{" "}
+                      <span className="font-extrabold w-28 ">PHONE1</span>{" "}
                       <span> {selectedStudent.phone} </span>
                     </p>
                     <p className="flex">
-                      <span className="font-extrabold w-28 ">SECOND PHONE</span>{" "}
+                      <span className="font-extrabold w-28 ">PHONE2</span>{" "}
                       <span> {selectedStudent.secondPhone} </span>
                     </p>
                     <p className="flex">
@@ -1331,16 +1331,16 @@ const StudentManagement: React.FC = () => {
                       <span className="font-extrabold w-28 ">SHIFT</span>{" "}
                       <span> {selectedStudent.selectedShift?.name}</span>
                     </p>
-                    <p className="flex">
-                      <span className="font-extrabold w-28 ">Nationality</span>{" "}
+                    <p className="flex gap-2">
+                      <span className="font-extrabold w-28 ">NATIONALITY</span>{" "}
                       <span> {selectedStudent?.nationality}</span>
                     </p>
                     <p className="flex">
-                      <span className="font-extrabold w-28 ">Address</span>{" "}
+                      <span className="font-extrabold w-28 ">ADDRESS</span>{" "}
                       <span> {selectedStudent?.location}</span>
                     </p>
                     <p className="flex">
-                      <span className="font-extrabold w-28 ">Gender</span>{" "}
+                      <span className="font-extrabold w-28 ">GENDER</span>{" "}
                       <span> {selectedStudent?.gender}</span>
                     </p>
                      <p className="flex">
@@ -1348,7 +1348,7 @@ const StudentManagement: React.FC = () => {
                       <span>{selectedStudent?.dob}</span>
                     </p>
                     <p className="flex gap-2">
-                      <span className="font-extrabold w-28  ">NID/ Passport</span>{" "}
+                      <span className="font-extrabold w-28  ">NID/ PASSPORT</span>{" "}
                       <p className=""> {selectedStudent.nid}</p>
                     </p>
                     <p className="flex">
@@ -1364,14 +1364,14 @@ const StudentManagement: React.FC = () => {
                       </span>
                     </p>
                     <p className="flex">
-                      <span className="font-extrabold w-28 ">Admitted </span>{" "}
+                      <span className="font-extrabold w-28 ">ADMITTED </span>{" "}
                       <span>
                         
                         <span> {selectedStudent?.admitted? formatDate(selectedStudent?.admitted):'no record found'}</span>
                       </span>
                     </p>
                     <p className="flex">
-                      <span className="font-extrabold w-28 ">Registered </span>{" "}
+                      <span className="font-extrabold w-28 ">REGISTERED </span>{" "}
                       <span>
                         
                         <span> { selectedStudent?.registered? formatDate(selectedStudent?.registered):'no record found'}</span>

@@ -12,6 +12,7 @@ import { hasPermission } from '@/libs/hasPermission';
 import API_BASE_URL from '@/config/baseURL';
 import { headers } from 'next/headers';
 import { formatDate } from '@/libs/dateConverter';
+import { Student } from '../students/page';
 
 
 interface BaseDeletedItem {
@@ -192,6 +193,9 @@ const tabConfig = [
 ] as const;
 
 const RecycleBinPage: React.FC = () => {
+      const [openView, setOpenView] = useState(false);
+      const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+    
     const [deletedItems, setDeletedItems] = useState<DeletedItemsResponse['data']>({});
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState<Message | null>(null);
@@ -200,7 +204,16 @@ const RecycleBinPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<ItemType>('Student');
     const { loggedUser } = useAuth();
 
+     const handleView = (student: Student) => {
+        setOpenView(true);
+        setSelectedStudent(student);
+      };
+      const handleDisableView = () => {
+        setOpenView(false);
+        setSelectedStudent(null);
+      };
     const fetchDeletedItems = async () => {
+
         try {
             setLoading(true);
             const response = await axios.get<DeletedItemsResponse>(`${API_BASE_URL}/deleted/all`, {
@@ -540,6 +553,14 @@ const RecycleBinPage: React.FC = () => {
                                         <tr key={item._id} className="hover:bg-gray-50">
                                             {renderItemDetails(item, activeTab)}
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                                                {activeTab==='Student'&&(
+                                                    <button
+          onClick={() => handleView(item)}
+          className="text-indigo-600 font-extrabold hover:text-indigo-900 mr-3"
+        >
+          VIEW
+        </button>
+                                                )}
                                                 <button
                                                     onClick={() => handleRestore(activeTab, item._id)}
                                                     disabled={restoringId === item._id}
@@ -573,6 +594,110 @@ const RecycleBinPage: React.FC = () => {
                     </div>
                 )}
             </div>
+             {selectedStudent && openView && (
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+              <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg ">
+                <div className="bg-gray-50 p-6 h-96 overflow-scroll">
+                  <div className="flex gap-10 items-center">
+                    <img src={selectedStudent.image} alt="passport" className="w-24 rounded-full" />
+                    <h3 className="text-lg font-extrabold text-center text-gray-900">
+                    STUDENT DETAILS
+                  </h3>
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    <p className="flex">
+                      <span className="font-extrabold w-28">NAME</span>{" "}
+                      <span> {selectedStudent.name} </span>
+                    </p>
+                    <p className="flex">
+                      <span className="font-extrabold  w-28 ">EMAIL</span>{" "}
+                      <span> {selectedStudent.email}</span>
+                    </p>
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">PHONE 1</span>{" "}
+                      <span> {selectedStudent.phone} </span>
+                    </p>
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">PHONE 2</span>{" "}
+                      <span> {selectedStudent.secondPhone} </span>
+                    </p>
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">INTAKE</span>{" "}
+                      <span>{selectedStudent.intake}</span>
+                    </p>
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">COURSE</span>{" "}
+                      <span>{selectedStudent?.selectedCourse.title}</span>
+                    </p>
+
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">SHIFT</span>{" "}
+                      <span> {selectedStudent.selectedShift?.name}</span>
+                    </p>
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">NATIONALITY</span>{" "}
+                      <span> {selectedStudent?.nationality}</span>
+                    </p>
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">ADDRESS</span>{" "}
+                      <span> {selectedStudent?.location}</span>
+                    </p>
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">GENDER</span>{" "}
+                      <span> {selectedStudent?.gender}</span>
+                    </p>
+                     <p className="flex">
+                      <span className="font-extrabold w-28 ">DOB</span>{" "}
+                      <span>{selectedStudent?.dob}</span>
+                    </p>
+                    <p className="flex gap-2">
+                      <span className="font-extrabold w-28  ">NID/ Passport</span>{" "}
+                      <p className=""> {selectedStudent.nid}</p>
+                    </p>
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">APPLIED</span>{" "}
+                      <span>{formatDate(new Date(selectedStudent.createdAt))}</span>
+                    </p>
+                   
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">STATUS</span>{" "}
+                      <span>
+                        {" "}
+                        <span> {selectedStudent.status}</span>
+                      </span>
+                    </p>
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">ADMITTED </span>{" "}
+                      <span>
+                        
+                        <span> {selectedStudent?.admitted? formatDate(new Date(selectedStudent?.admitted)):'no record found'}</span>
+                      </span>
+                    </p>
+                    <p className="flex">
+                      <span className="font-extrabold w-28 ">REGISTRED </span>{" "}
+                      <span>
+                        
+                        <span> { selectedStudent?.registered? formatDate(new Date(selectedStudent?.registered)):'no record found'}</span>
+                      </span>
+                    </p>
+            
+                    <p className="flex flex-col">
+                      <span className="font-extrabold w-28">MESSAGE</span>{" "}
+                      <p> {selectedStudent.message}</p>
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-gray-50 p-4 flex justify-end">
+                  <button
+                    onClick={() => handleDisableView()}
+                    className="inline-flex justify-center px-4 py-2 text-sm  text-black font-extrabold hover:text-white  bg-red-300 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
     );
 };
