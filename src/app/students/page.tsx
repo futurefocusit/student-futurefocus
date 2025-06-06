@@ -1301,77 +1301,77 @@ const StudentManagement: React.FC = () => {
                     STUDENT DETAILS
                   </h3>
                   </div>
-                  <div className="mt-4 space-y-2">
-                    <p className="flex">
-                      <span className="font-extrabold w-28">NAME</span>{" "}
+                  <div className="mt-4 space-y-4">
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28">Name</span>{" "}
                       <span> {selectedStudent.name} </span>
                     </p>
-                    <p className="flex">
-                      <span className="font-extrabold  w-28 ">EMAIL</span>{" "}
+                    <p className="flex gap-10">
+                      <span className="font-extrabold  w-28 ">Email</span>{" "}
                       <span> {selectedStudent.email}</span>
                     </p>
-                    <p className="flex">
-                      <span className="font-extrabold w-28 ">PHONE1</span>{" "}
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Phone 1</span>{" "}
                       <span> {selectedStudent.phone} </span>
                     </p>
-                    <p className="flex">
-                      <span className="font-extrabold w-28 ">PHONE2</span>{" "}
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Phone 2</span>{" "}
                       <span> {selectedStudent.secondPhone} </span>
                     </p>
-                    <p className="flex">
-                      <span className="font-extrabold w-28 ">INTAKE</span>{" "}
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Intake</span>{" "}
                       <span>{selectedStudent.intake}</span>
                     </p>
-                    <p className="flex">
-                      <span className="font-extrabold w-28 ">COURSE</span>{" "}
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Course</span>{" "}
                       <span>{selectedStudent?.selectedCourse.title}</span>
                     </p>
 
-                    <p className="flex">
-                      <span className="font-extrabold w-28 ">SHIFT</span>{" "}
+                    <p className="flex  gap-10">
+                      <span className="font-extrabold w-28 ">Shift</span>{" "}
                       <span> {selectedStudent.selectedShift?.name}</span>
                     </p>
-                    <p className="flex gap-2">
-                      <span className="font-extrabold w-28 ">NATIONALITY</span>{" "}
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Nationality</span>{" "}
                       <span> {selectedStudent?.nationality}</span>
                     </p>
-                    <p className="flex">
-                      <span className="font-extrabold w-28 ">ADDRESS</span>{" "}
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Address</span>{" "}
                       <span> {selectedStudent?.location}</span>
                     </p>
-                    <p className="flex">
-                      <span className="font-extrabold w-28 ">GENDER</span>{" "}
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Gender</span>{" "}
                       <span> {selectedStudent?.gender}</span>
                     </p>
-                     <p className="flex">
-                      <span className="font-extrabold w-28 ">DOB</span>{" "}
+                     <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">D.O.B</span>{" "}
                       <span>{selectedStudent?.dob}</span>
                     </p>
-                    <p className="flex gap-2">
-                      <span className="font-extrabold w-28  ">NID/ PASSPORT</span>{" "}
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28  ">NID/ Passport</span>{" "}
                       <p className=""> {selectedStudent.nid}</p>
                     </p>
-                    <p className="flex">
-                      <span className="font-extrabold w-28 ">APPLIED</span>{" "}
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Applied</span>{" "}
                       <span>{formatDate(selectedStudent.createdAt)}</span>
                     </p>
                    
-                    <p className="flex">
-                      <span className="font-extrabold w-28 ">STATUS</span>{" "}
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Status</span>{" "}
                       <span>
                         {" "}
                         <span> {selectedStudent.status}</span>
                       </span>
                     </p>
-                    <p className="flex">
-                      <span className="font-extrabold w-28 ">ADMITTED </span>{" "}
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Admitted </span>{" "}
                       <span>
                         
                         <span> {selectedStudent?.admitted? formatDate(selectedStudent?.admitted):'no record found'}</span>
                       </span>
                     </p>
-                    <p className="flex">
-                      <span className="font-extrabold w-28 ">REGISTERED </span>{" "}
+                    <p className="flex gap-10 ">
+                      <span className="font-extrabold w-28 ">Registered </span>{" "}
                       <span>
                         
                         <span> { selectedStudent?.registered? formatDate(selectedStudent?.registered):'no record found'}</span>
