@@ -107,7 +107,6 @@ const PaymentsPage: React.FC = () => {
     fetchCashflows()
   }, [fetchCashflows])
 
-  // Debounce effect for search
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery)
@@ -116,7 +115,6 @@ const PaymentsPage: React.FC = () => {
     return () => clearTimeout(timer)
   }, [searchQuery])
 
-  // Optimized search function
   const searchMatches = useCallback((cashflow: CashflowType, query: string, field: string) => {
     if (!query.trim()) return true
 
@@ -140,7 +138,6 @@ const PaymentsPage: React.FC = () => {
     }
   }, [])
 
-  // Memoized filtered cashflows
   const filteredCashflows = useMemo(() => {
     const startDate = selectedDates[0]
       ? new Date(selectedDates[0].getFullYear(), selectedDates[0].getMonth(), 1)
@@ -153,10 +150,12 @@ const PaymentsPage: React.FC = () => {
       .filter((cashflow) => {
         const cashflowDate = new Date(cashflow.createdAt)
         const matchesDate = cashflowDate >= startDate && cashflowDate <= endDate
-        const matchesType = cashflow.type === filter
+        // const matchesType = cashflow.type === filter
         const matchesSearch = searchMatches(cashflow, debouncedSearchQuery, searchField)
 
-        return matchesDate && matchesType && matchesSearch
+        return matchesDate &&
+        //  matchesType &&
+         matchesSearch
       })
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   }, [cashflows, selectedDates, filter, debouncedSearchQuery, searchField, searchMatches])
@@ -371,7 +370,7 @@ const PaymentsPage: React.FC = () => {
         <div className="p-4">
           {hasPermission(loggedUser as TeamMember, "cashflow", "view") ? (
             <div className="overflow-x-auto">
-              {debouncedSearchQuery && filteredCashflows.length > 0 && (
+              {/* {debouncedSearchQuery && filteredCashflows.length > 0 && (
                 <div className="bg-green-50 border border-green-200 rounded p-3 text-sm mb-4">
                   <div className="font-medium text-green-800">
                     Found {filteredCashflows.length} transaction{filteredCashflows.length !== 1 ? "s" : ""} matching &quot;
@@ -387,7 +386,7 @@ const PaymentsPage: React.FC = () => {
                     No transactions match your search for &quot;{debouncedSearchQuery}&quot;
                   </div>
                 </div>
-              )}
+              )} */}
 
               {Object.entries(groupedCashflows).map(([date, { total, transactions }]) => (
                 <div key={date} className="mb-4">
@@ -413,7 +412,7 @@ const PaymentsPage: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {transactions.map((cashflow, index) => (
+                      {transactions.filter(t=>t.type==filter).map((cashflow, index) => (
                         <tr key={cashflow._id}>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">{index + 1}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">

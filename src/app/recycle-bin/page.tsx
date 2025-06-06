@@ -11,14 +11,17 @@ import { useAuth } from '@/context/AuthContext';
 import { hasPermission } from '@/libs/hasPermission';
 import API_BASE_URL from '@/config/baseURL';
 import { headers } from 'next/headers';
+import { formatDate } from '@/libs/dateConverter';
 
 
 interface BaseDeletedItem {
     _id: string;
     institution: string;
     createdAt: string;
-    updatedAt: string;
+    updatedAt: Date;
     deleted: boolean;
+    deletedBy:{name:string}
+
 }
 
 interface DeletedStudent extends BaseDeletedItem {
@@ -30,6 +33,7 @@ interface DeletedStudent extends BaseDeletedItem {
     intake: string;
     message?: string;
     status: string;
+
 }
 
 interface DeletedPayment extends BaseDeletedItem {
@@ -39,6 +43,7 @@ interface DeletedPayment extends BaseDeletedItem {
     amountPaid: number;
     amountDiscounted: number;
     extraAmount: number;
+
 }
 
 interface DeletedCourse extends BaseDeletedItem {
@@ -49,6 +54,7 @@ interface DeletedCourse extends BaseDeletedItem {
     nonScholarship: number;
     active: boolean;
     shifts: string[];
+
 }
 
 interface DeletedShift extends BaseDeletedItem {
@@ -56,9 +62,11 @@ interface DeletedShift extends BaseDeletedItem {
     start: string;
     end: string;
     days: string;
+
 }
 interface DeletedRole extends BaseDeletedItem {
     role: string;
+
 
 }
 
@@ -69,11 +77,13 @@ interface DeletedAttendance extends BaseDeletedItem {
     status: 'present' | 'absent' | 'late';
     type: 'student' | 'staff';
     reason?: string;
+
 }
 
 interface DeletedInventory extends BaseDeletedItem {
     materialName: string;
     amount: number;
+    
 
 }
 
@@ -84,6 +94,7 @@ interface DeletedCashflow extends BaseDeletedItem {
     description: string;
     date: string;
     paymentMethod: string;
+
 }
 
 interface DeletedTeam extends BaseDeletedItem {
@@ -93,6 +104,7 @@ interface DeletedTeam extends BaseDeletedItem {
     phone: string;
     role: string;
     status: 'active' | 'inactive';
+
 }
 
 interface DeletedTask extends BaseDeletedItem {
@@ -102,6 +114,7 @@ interface DeletedTask extends BaseDeletedItem {
     dueDate: string;
     status: 'pending' | 'in-progress' | 'completed';
     priority: 'low' | 'medium' | 'high';
+
 }
 
 interface DeletedTransaction extends BaseDeletedItem {
@@ -111,6 +124,7 @@ interface DeletedTransaction extends BaseDeletedItem {
     paymentMethod: string;
     status: 'pending' | 'completed' | 'failed';
     reference: string;
+
 }
 
 // Update the DeletedItem type
@@ -291,6 +305,8 @@ const RecycleBinPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.phone}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.intake}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.status}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(student?.updatedAt))}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student?.deletedBy?.name}</td>
                     </>
                 );
             case 'Payment':
@@ -302,6 +318,8 @@ const RecycleBinPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">RWF {payment.amountDue.toLocaleString()}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">RWF {payment.amountPaid.toLocaleString()}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">RWF {payment.amountDiscounted.toLocaleString()}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(payment?.updatedAt))}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{payment.deletedBy?.name}</td>
                     </>
                 );
             case 'Course':
@@ -313,6 +331,8 @@ const RecycleBinPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">RWF {course.scholarship.toLocaleString()}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">RWF {course.nonScholarship.toLocaleString()}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{course.active ? 'Active' : 'Inactive'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(course?.updatedAt))}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{course?.deletedBy?.name}</td>
                     </>
                 );
             case 'Shift':
@@ -326,6 +346,8 @@ const RecycleBinPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {new Date(shift.createdAt).toLocaleDateString()}
                         </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(shift?.updatedAt))}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{shift?.deletedBy?.name}</td>
                     </>
                 );
             case 'Attendance':
@@ -337,6 +359,8 @@ const RecycleBinPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{attendance.status}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{attendance.type}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{attendance.reason || '-'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(attendance?.updatedAt))}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{attendance?.deletedBy?.name}</td>
                     </>
                 );
             case 'Material':
@@ -345,6 +369,8 @@ const RecycleBinPage: React.FC = () => {
                     <>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{inventory.materialName}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inventory.amount}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(inventory?.updatedAt))}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inventory?.deletedBy?.name}</td>
 
                     </>
                 );
@@ -359,6 +385,8 @@ const RecycleBinPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {new Date(cashflow.date).toLocaleDateString()}
                         </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(cashflow?.updatedAt))}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cashflow?.deletedBy?.name}</td>
                     </>
                 );
             case 'Team':
@@ -370,6 +398,8 @@ const RecycleBinPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.email}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.role}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.status}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(team?.updatedAt))}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team?.deletedBy?.name}</td>
                     </>
                 );
             case 'Task':
@@ -383,6 +413,8 @@ const RecycleBinPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {new Date(task.dueDate).toLocaleDateString()}
                         </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(task?.updatedAt))}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{task?.deletedBy?.name}</td>
                     </>
                 );
             case 'Transaction':
@@ -394,6 +426,8 @@ const RecycleBinPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">RWF {transaction.amount.toLocaleString()}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.paymentMethod}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.status}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(student?.updatedAt))}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction?.deletedBy?.name}</td>
                     </>
                 );
         }
@@ -402,25 +436,25 @@ const RecycleBinPage: React.FC = () => {
     const getTableHeaders = (type: ItemType) => {
         switch (type) {
             case 'Student':
-                return ['Name', 'Email', 'Phone', 'Intake', 'Status'];
+                return ['Name', 'Email', 'Phone', 'Intake', 'Status','deletedAt','User'];
             case 'Payment':
-                return ['Student ID', 'Status', 'Amount Due', 'Amount Paid', 'Amount Discounted'];
+                return ['Student ID', 'Status', 'Amount Due', 'Amount Paid', 'Amount Discounted','deletedAt','User'];
             case 'Course':
-                return ['Title', 'Rating', 'Scholarship', 'Non-Scholarship', 'Status'];
+                return ['Title', 'Rating', 'Scholarship', 'Non-Scholarship', 'Status','deletedAt','User'];
             case 'Shift':
-                return ['Name', 'Start Time', 'End Time', 'Days', 'Created At'];
+                return ['Name', 'Start Time', 'End Time', 'Days', 'Created At','deletedAt','User'];
             case 'Attendance':
-                return ['Student ID', 'Date', 'Status', 'Type', 'Reason'];
+                return ['Student ID', 'Date', 'Status', 'Type', 'Reason','deletedAt','User'];
             case 'Material':
-                return ['Name', 'Quantity'];
+                return ['Name', 'Quantity','deletedAt','User'];
             case 'Cashflow':
-                return ['Type', 'Amount', 'Category', 'Payment Method', 'Date'];
+                return ['Type', 'Amount', 'Category', 'Payment Method', 'Date','deletedAt','User'];
             case 'Team':
-                return ['Name', 'Position', 'Email', 'Role', 'Status'];
+                return ['Name', 'Position', 'Email', 'Role', 'Status','deletedAt','User'];
             case 'Task':
-                return ['Title', 'Assigned To', 'Status', 'Priority', 'Due Date'];
+                return ['Title', 'Assigned To', 'Status', 'Priority', 'Due Date','deletedAt','User'];
             case 'Transaction':
-                return ['Student', 'Type', 'Amount', 'Payment Method', 'Status'];
+                return ['Student', 'Type', 'Amount', 'Payment Method', 'Status','deletedAt','User'];
         }
     };
 
