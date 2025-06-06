@@ -23,7 +23,9 @@ const imageUrl = "/futurefocuslogo.png";
 
 interface Student {
   _id: string;
+  nid:string
   name: string;
+  image:string
   email: string;
   phone: string;
   intake: string;
@@ -1293,9 +1295,12 @@ const StudentManagement: React.FC = () => {
             <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
               <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg ">
                 <div className="bg-gray-50 p-6 h-96 overflow-scroll">
-                  <h3 className="text-lg font-extrabold text-center text-gray-900">
+                  <div className="flex gap-10 items-center">
+                    <img src={selectedStudent.image} alt="passport" className="w-24 rounded-full" />
+                    <h3 className="text-lg font-extrabold text-center text-gray-900">
                     STUDENT DETAILS
                   </h3>
+                  </div>
                   <div className="mt-4 space-y-2">
                     <p className="flex">
                       <span className="font-extrabold w-28">NAME</span>{" "}
@@ -1310,7 +1315,7 @@ const StudentManagement: React.FC = () => {
                       <span> {selectedStudent.phone} </span>
                     </p>
                     <p className="flex">
-                      <span className="font-extrabold w-28 ">Relative PHONE</span>{" "}
+                      <span className="font-extrabold w-28 ">SECOND PHONE</span>{" "}
                       <span> {selectedStudent.secondPhone} </span>
                     </p>
                     <p className="flex">
@@ -1331,7 +1336,7 @@ const StudentManagement: React.FC = () => {
                       <span> {selectedStudent?.nationality}</span>
                     </p>
                     <p className="flex">
-                      <span className="font-extrabold w-28 ">Location</span>{" "}
+                      <span className="font-extrabold w-28 ">Address</span>{" "}
                       <span> {selectedStudent?.location}</span>
                     </p>
                     <p className="flex">
@@ -1342,9 +1347,9 @@ const StudentManagement: React.FC = () => {
                       <span className="font-extrabold w-28 ">DOB</span>{" "}
                       <span>{selectedStudent?.dob}</span>
                     </p>
-                    <p className="flex">
-                      <span className="font-extrabold w-28 ">ID document</span>{" "}
-                      <a href={selectedStudent?.identity} target="_blank" className="text-blue-500 underline"> {selectedStudent.identity?'click here':'no docs'}</a>
+                    <p className="flex gap-2">
+                      <span className="font-extrabold w-28  ">NID/ Passport</span>{" "}
+                      <p className=""> {selectedStudent.nid}</p>
                     </p>
                     <p className="flex">
                       <span className="font-extrabold w-28 ">APPLIED</span>{" "}
@@ -1359,14 +1364,14 @@ const StudentManagement: React.FC = () => {
                       </span>
                     </p>
                     <p className="flex">
-                      <span className="font-extrabold w-28 ">Admitted At</span>{" "}
+                      <span className="font-extrabold w-28 ">Admitted </span>{" "}
                       <span>
                         
                         <span> {selectedStudent?.admitted? formatDate(selectedStudent?.admitted):'no record found'}</span>
                       </span>
                     </p>
                     <p className="flex">
-                      <span className="font-extrabold w-28 ">Registered At</span>{" "}
+                      <span className="font-extrabold w-28 ">Registered </span>{" "}
                       <span>
                         
                         <span> { selectedStudent?.registered? formatDate(selectedStudent?.registered):'no record found'}</span>
