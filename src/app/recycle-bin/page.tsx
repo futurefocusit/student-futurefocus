@@ -436,25 +436,25 @@ const RecycleBinPage: React.FC = () => {
     const getTableHeaders = (type: ItemType) => {
         switch (type) {
             case 'Student':
-                return ['Name', 'Email', 'Phone', 'Intake', 'Status','deletedAt','User'];
+                return ['Name', 'Email', 'Phone', 'Intake', 'Status','deleted','User'];
             case 'Payment':
-                return ['Student ID', 'Status', 'Amount Due', 'Amount Paid', 'Amount Discounted','deletedAt','User'];
+                return ['Student ID', 'Status', 'Amount Due', 'Amount Paid', 'Amount Discounted','deleted','User'];
             case 'Course':
-                return ['Title', 'Rating', 'Scholarship', 'Non-Scholarship', 'Status','deletedAt','User'];
+                return ['Title', 'Rating', 'Scholarship', 'Non-Scholarship', 'Status','deleted','User'];
             case 'Shift':
-                return ['Name', 'Start Time', 'End Time', 'Days', 'Created At','deletedAt','User'];
+                return ['Name', 'Start Time', 'End Time', 'Days', 'Created At','deleted','User'];
             case 'Attendance':
-                return ['Student ID', 'Date', 'Status', 'Type', 'Reason','deletedAt','User'];
+                return ['Student ID', 'Date', 'Status', 'Type', 'Reason','deleted','User'];
             case 'Material':
-                return ['Name', 'Quantity','deletedAt','User'];
+                return ['Name', 'Quantity','deleted','User'];
             case 'Cashflow':
-                return ['Type', 'Amount', 'Category', 'Payment Method', 'Date','deletedAt','User'];
+                return ['Type', 'Amount', 'Category', 'Payment Method', 'Date','deleted','User'];
             case 'Team':
-                return ['Name', 'Position', 'Email', 'Role', 'Status','deletedAt','User'];
+                return ['Name', 'Position', 'Email', 'Role', 'Status','deleted','User'];
             case 'Task':
-                return ['Title', 'Assigned To', 'Status', 'Priority', 'Due Date','deletedAt','User'];
+                return ['Title', 'Assigned To', 'Status', 'Priority', 'Due Date','deleted','User'];
             case 'Transaction':
-                return ['Student', 'Type', 'Amount', 'Payment Method', 'Status','deletedAt','User'];
+                return ['Student', 'Type', 'Amount', 'Payment Method', 'Status','deleted','User'];
         }
     };
 
