@@ -73,7 +73,7 @@ const StudentManagement: React.FC = () => {
   );
   const [openView, setOpenView] = useState(false);
   const [loading, setIsLoading] = useState(false)
-  const [transactions, setTransaction] = useState<any[]>([])
+  const [transactions, setTransaction] = useState<Transaction[]>([])
   const [confirmModelOpen, SetConfirmModel] = useState(false);
   const [action, setAction] = useState("");
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);

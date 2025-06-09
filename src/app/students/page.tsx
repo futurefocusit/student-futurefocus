@@ -100,7 +100,7 @@ const StudentManagement: React.FC = () => {
   const [type, setType] = useState("");
   const [studentCounts, setStudentCounts] = useState<Record<string, number>>({});
   const [char, Setchar] = useState(145);
-  const [transactions, setTransaction] = useState<any[]>([])
+  const [transactions, setTransaction] = useState<Transaction[]>([])
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("pending");
   const [isOpenMessage, setOpenMessage] = useState(false);
