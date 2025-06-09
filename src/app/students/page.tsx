@@ -21,6 +21,16 @@ import ConfirmDeleteModal from "@/components/confirmPopupmodel";
 import { toast } from "react-toastify";
 const imageUrl = "/futurefocuslogo.png";
 
+interface Transaction {
+  _id: string;
+  method: string,
+  receiver: { name: string }
+  studentId: Student | null;
+  amount: number;
+  reason: string;
+  createdAt: string;
+  updatedAt: string;
+}
 export interface Student {
   _id: string;
   nid:string
@@ -47,7 +57,8 @@ export interface Student {
 }
 
 interface Payment {
-  studentId: string;
+  transactions:Transaction[]
+  studentId: {_id:string};
   amountDue: number;
   amountPaid: number;
   status: string;
@@ -89,6 +100,7 @@ const StudentManagement: React.FC = () => {
   const [type, setType] = useState("");
   const [studentCounts, setStudentCounts] = useState<Record<string, number>>({});
   const [char, Setchar] = useState(145);
+  const [transactions, setTransaction] = useState<any[]>([])
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("pending");
   const [isOpenMessage, setOpenMessage] = useState(false);
@@ -501,8 +513,9 @@ const StudentManagement: React.FC = () => {
     }
   };
 
-  const handleView = (student: Student) => {
+  const handleView = (student: Student,transactions:Transaction[]) => {
     setOpenView(true);
+    setTransaction(transactions)
     setSelectedStudent(student);
   };
   const handleDisableView = () => {
@@ -600,11 +613,11 @@ const StudentManagement: React.FC = () => {
     }
   };
 
-  const renderActionButtons = (student: Student) => {
+  const renderActionButtons = (student: Student,transactions) => {
     const commonButtons = (
       <>
         <button
-          onClick={() => handleView(student)}
+          onClick={() => handleView(student, transactions)}
           className="text-indigo-600 font-extrabold hover:text-indigo-900 mr-3"
         >
           VIEW
@@ -880,7 +893,7 @@ const StudentManagement: React.FC = () => {
           <>
             
         <button
-          onClick={() => handleView(student)}
+          onClick={() => handleView(student,payment && payment.find((payment) => payment.studentId?._id === student._id)?.transactions)}
           className="text-indigo-600 font-extrabold hover:text-indigo-900 mr-3"
         >
           VIEW
@@ -1133,11 +1146,11 @@ const StudentManagement: React.FC = () => {
                                 </div>
                               ) : (
                                 payment &&
-                                  payment.find((payment) => payment.studentId === student._id) ? (
+                                  payment.find((payment) => payment.studentId?._id === student._id) ? (
                                   payment &&
                                   payment
                                     .filter(
-                                      (payment) => payment.studentId === student._id
+                                      (payment) => payment.studentId?._id === student._id
                                     )
                                     .map((filteredPayment) => (
                                       <div key={filteredPayment._id}>
@@ -1163,7 +1176,9 @@ const StudentManagement: React.FC = () => {
                         )}
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex  gap-2">
-                            {renderActionButtons(student)}
+                          
+                            {renderActionButtons(student,payment &&
+                                  payment.find((payment) => payment.studentId?._id === student?._id)?.transactions)}
                           </div>
                         </td>
                       </tr>
@@ -1380,14 +1395,14 @@ const StudentManagement: React.FC = () => {
                     </p>
                     {payment &&
                       payment.filter(
-                        (payment) => payment.studentId === selectedStudent._id
+                        (payment) => payment.studentId?._id === selectedStudent._id
                       ).length === 0 ? (
                       <div>No payment information found.</div>
                     ) : (
                       payment &&
                       payment
                         .filter(
-                          (payment) => payment.studentId === selectedStudent._id
+                          (payment) => payment.studentId?._id === selectedStudent._id
                         )
                         .map((filteredPayment) => (
                           <div key={filteredPayment._id}>
@@ -1440,7 +1455,67 @@ const StudentManagement: React.FC = () => {
                                 Frw
                               </span>
                             </p>
+                             {transactions &&
+                              transactions?.filter(
+                                (tx) => tx.studentId && tx.studentId._id === selectedStudent._id
+                              ).length === 0 ? (
+                              <div className="mt-4 text-sm text-gray-600 italic">
+                                No transactions found.
+                              </div>
+                            ) : (
+                              <div className="mt-8">
+                                <h4 className="text-lg font-bold mb-2">Transactions</h4>
+                                <div className="overflow-x-auto">
+                                  <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+                                    <thead className="bg-gray-100">
+                                      <tr>
+                                        <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">
+                                          Date
+                                        </th>
+                                        <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">
+                                          Amount
+                                        </th>
+                                        <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">
+                                          Reason
+                                        </th>
+                                        <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">
+                                          Method
+                                        </th>
+                                        <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">
+                                          Receiver
+                                        </th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {transactions?.filter(
+                                          (tx) => tx.studentId && tx.studentId._id === selectedStudent._id
+                                        )
+                                        .map((tx) => (
+                                          <tr key={tx._id} className="hover:bg-gray-50">
+                                            <td className="py-2 px-4 border-b text-sm text-gray-800">
+                                              {formatDate(tx.createdAt)}
+                                            </td>
+                                            <td className="py-2 px-4 border-b text-sm font-bold text-green-700">
+                                              {new Intl.NumberFormat().format(tx.amount)} Frw
+                                            </td>
+                                            <td className="py-2 px-4 border-b text-sm text-gray-700">
+                                              {tx.reason || "—"}
+                                            </td>
+                                            <td className="py-2 px-4 border-b text-sm capitalize text-gray-700">
+                                              {tx.method}
+                                            </td>
+                                            <td className="py-2 px-4 border-b text-sm text-gray-700">
+                                              {tx.receiver?.name || "N/A"}
+                                            </td>
+                                          </tr>
+                                        ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                            )}
                           </div>
+                          
                         ))
                     )}
                     <p className="flex flex-col mt-10 gap-10">

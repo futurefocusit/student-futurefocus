@@ -13,21 +13,46 @@ import Loader from "@/components/loader";
 import { useAuth } from "@/context/AuthContext";
 import { TeamMember } from "@/types/types";
 import ConfirmDeleteModal from "@/components/confirmPopupmodel";
+import { formatDate } from "@/libs/dateConverter";
+import { FaUser } from "react-icons/fa";
 const imageUrl = "/futurefocuslogo.png";
 interface Student {
   _id: string;
+  nid: string
   name: string;
+  image: string
   email: string;
   phone: string;
   intake: string;
-  selectedCourse: string;
+  secondPhone: string
+  location: string,
+  gender: string,
+  identity: string,
+  dob: string,
+  nationality: string
+  selectedCourse: { title: string; _id: string }
   message: string;
-  selectedShift: string;
+  selectedShift: { _id: string; name: string; start: string; end: string };
+  updatedAt: string;
   createdAt: string;
   status: string;
+  admitted: string
+  registered: string
+  comment: string;
+}
+interface Transaction {
+  _id: string;
+  method: string,
+  receiver: { name: string }
+  studentId: Student | null;
+  amount: number;
+  reason: string;
+  createdAt: string;
+  updatedAt: string;
 }
 interface Payment {
-  studentId: string;
+  studentId: Student
+  transactions:Transaction[]
   amountDue: number;
   amountPaid: number;
   status: string;
@@ -46,7 +71,9 @@ const StudentManagement: React.FC = () => {
   const [studentCounts, setStudentCounts] = useState<Record<string, number>>(
     {}
   );
+  const [openView, setOpenView] = useState(false);
   const [loading, setIsLoading] = useState(false)
+  const [transactions, setTransaction] = useState<any[]>([])
   const [confirmModelOpen, SetConfirmModel] = useState(false);
   const [action, setAction] = useState("");
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
@@ -156,6 +183,17 @@ const StudentManagement: React.FC = () => {
   const handleView = (student: Student, type: string) => {
     setSelectedStudent(student);
     setType(type);
+  };
+  const handleViewS = (payment: Payment) => {
+    
+    setOpenView(true);
+    setSelectedStudent(payment.studentId);
+    setTransaction(payment.transactions)
+  };
+  const handleDisableView = () => {
+    setOpenView(false);
+    setSelectedStudent(null);
+    setTransaction(null)
   };
 
   const handlePay = async (id: string) => {
@@ -281,7 +319,7 @@ const StudentManagement: React.FC = () => {
     let totalDue = 0;
 
     intakeStudents.forEach((student) => {
-      const paymentInfo = payment.find((p) => p.studentId === student._id);
+      const paymentInfo = payment.find((p) => p.studentId?._id === student._id);
       if (paymentInfo) {
         totalPaid += paymentInfo.amountPaid;
         totalDiscounted += paymentInfo.amountDiscounted;
@@ -363,16 +401,16 @@ const StudentManagement: React.FC = () => {
                     <p>{status.toUpperCase()} </p>
                     <p
                       className={`items-start   bg-white rounded-full  w-12  text-center font-extrabold ${status === "completed"
-                          ? "text-yellow-600"
-                          : status === "accepted"
-                            ? "text-blue-600"
-                            : status === "dropout"
-                              ? "text-red-600"
-                              : status === "registered"
-                                ? "text-green-400"
-                                : status === "active"
-                                  ? "text-green-500"
-                                  : "text-green-900"
+                        ? "text-yellow-600"
+                        : status === "accepted"
+                          ? "text-blue-600"
+                          : status === "dropout"
+                            ? "text-red-600"
+                            : status === "registered"
+                              ? "text-green-400"
+                              : status === "active"
+                                ? "text-green-500"
+                                : "text-green-900"
                         }`}
                     >
                       {studentCounts[
@@ -467,7 +505,7 @@ const StudentManagement: React.FC = () => {
                             <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                               <div className="text-sm text-gray-900">
                                 {payment
-                                  .filter((p) => p.studentId === student._id)
+                                  .filter((p) => p.studentId?._id === student._id)
                                   .map((p) => (
                                     <div key={p._id}>
                                       {new Intl.NumberFormat().format(
@@ -481,7 +519,7 @@ const StudentManagement: React.FC = () => {
                             <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                               <div className="text-sm text-gray-900">
                                 {payment
-                                  .filter((p) => p.studentId === student._id)
+                                  .filter((p) => p.studentId?._id === student._id)
                                   .map((p) => (
                                     <div key={p._id}>
                                       {new Intl.NumberFormat().format(
@@ -495,7 +533,7 @@ const StudentManagement: React.FC = () => {
                             <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                               <div className="text-sm text-gray-900">
                                 {payment
-                                  .filter((p) => p.studentId === student._id)
+                                  .filter((p) => p.studentId?._id === student._id)
                                   .map((p) => (
                                     <div key={p._id}>
                                       {new Intl.NumberFormat().format(
@@ -509,7 +547,7 @@ const StudentManagement: React.FC = () => {
                             <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                               <div className="text-sm text-gray-900">
                                 {payment
-                                  .filter((p) => p.studentId === student._id)
+                                  .filter((p) => p.studentId?._id === student._id)
                                   .map((p) => (
                                     <div key={p._id}>
                                       {new Intl.NumberFormat().format(
@@ -522,7 +560,7 @@ const StudentManagement: React.FC = () => {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
                               {payment
-                                .filter((p) => p.studentId === student._id)
+                                .filter((p) => p.studentId?._id === student._id)
                                 .map((p) => (
                                   <div key={p._id}>
                                     {new Intl.NumberFormat().format(
@@ -603,7 +641,7 @@ const StudentManagement: React.FC = () => {
                                     placeholder="type comment..."
                                     defaultValue={payment
                                       .filter(
-                                        (p) => p.studentId === student._id
+                                        (p) => p.studentId?._id === student._id
                                       )
                                       .map((p) => p.comment)}
                                     onChange={(event) =>
@@ -618,6 +656,20 @@ const StudentManagement: React.FC = () => {
                                   >
                                     SAVE
                                   </button>
+                                  {hasPermission(
+                                    loggedUser as TeamMember,
+                                    "payment",
+                                    "view"
+                                  ) ? (
+                                    <button
+                                    className="text-green-600 hover:tex-green-800 p-2 font-extrabold rounded-sm "
+                                      onClick={() => handleViewS(payment.find((p) => p.studentId?._id === student._id))}
+                                    >
+                                      View
+                                    </button>
+                                  ) : (
+                                    ""
+                                  )}
                                 </div>
                               ) : (
                                 ""
@@ -721,6 +773,171 @@ const StudentManagement: React.FC = () => {
                   <button
                     onClick={() => setSelectedStudent(null)}
                     className="px-4 py-2 text-sm text-black font-extrabold hover:text-white bg-red-300 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          {selectedStudent && openView && (
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+              <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg ">
+                <div className="bg-gray-50 p-6 h-96 overflow-scroll">
+                  <div className="flex gap-10 items-center">
+                    {selectedStudent.image ? <img src={selectedStudent.image} alt="passport" className="w-24 rounded-full" /> : <FaUser className="w-24" />}
+                    <h3 className="text-lg font-extrabold text-center text-gray-900">
+                      STUDENT DETAILS
+                    </h3>
+
+                  </div>
+                  <div className="mt-4 space-y-4">
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28">Name</span>{" "}
+                      <span> {selectedStudent.name} </span>
+                    </p>
+                    <p className="flex gap-10">
+                      <span className="font-extrabold  w-28 ">Email</span>{" "}
+                      <span> {selectedStudent.email}</span>
+                    </p>
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Phone 1</span>{" "}
+                      <span> {selectedStudent.phone} </span>
+                    </p>
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Phone 2</span>{" "}
+                      <span> {selectedStudent.secondPhone} </span>
+                    </p>
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Intake</span>{" "}
+                      <span>{selectedStudent.intake}</span>
+                    </p>
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Course</span>{" "}
+                      <span>{selectedStudent?.selectedCourse.title}</span>
+                    </p>
+
+                    <p className="flex  gap-10">
+                      <span className="font-extrabold w-28 ">Shift</span>{" "}
+                      <span> {selectedStudent.selectedShift?.name}</span>
+                    </p>
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Nationality</span>{" "}
+                      <span> {selectedStudent?.nationality}</span>
+                    </p>
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Address</span>{" "}
+                      <span> {selectedStudent?.location}</span>
+                    </p>
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Gender</span>{" "}
+                      <span> {selectedStudent?.gender}</span>
+                    </p>
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">D.O.B</span>{" "}
+                      <span>{selectedStudent?.dob}</span>
+                    </p>
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28  ">NID/ Passport</span>{" "}
+                      <p className=""> {selectedStudent.nid}</p>
+                    </p>
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Applied</span>{" "}
+                      <span>{formatDate(new Date(selectedStudent.createdAt))}</span>
+                    </p>
+
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Status</span>{" "}
+                      <span>
+                        {" "}
+                        <span> {selectedStudent.status}</span>
+                      </span>
+                    </p>
+                    <p className="flex gap-10">
+                      <span className="font-extrabold w-28 ">Admitted </span>{" "}
+                      <span>
+
+                        <span> {selectedStudent?.admitted ? formatDate(new Date(selectedStudent?.admitted)) : 'no record found'}</span>
+                      </span>
+                    </p>
+                    <p className="flex gap-10 ">
+                      <span className="font-extrabold w-28 ">Registered </span>{" "}
+                      <span>
+
+                        <span> {selectedStudent?.registered ? formatDate(new Date(selectedStudent?.registered)) : 'no record found'}</span>
+                      </span>
+                    </p>
+
+                    {transactions &&
+                      transactions?.filter(
+                        (tx) => tx.studentId && tx.studentId._id === selectedStudent._id
+                      ).length === 0 ? (
+                      <div className="mt-4 text-sm text-gray-600 italic">
+                        No transactions found.
+                      </div>
+                    ) : (
+                      <div className="mt-8">
+                        <h4 className="text-lg font-bold mb-2">Transactions</h4>
+                        <div className="overflow-x-auto">
+                          <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+                            <thead className="bg-gray-100">
+                              <tr>
+                                <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">
+                                  Date
+                                </th>
+                                <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">
+                                  Amount
+                                </th>
+                                <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">
+                                  Reason
+                                </th>
+                                <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">
+                                  Method
+                                </th>
+                                <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">
+                                  Receiver
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {transactions?.filter(
+                                  (tx) => tx.studentId && tx.studentId._id === selectedStudent._id
+                                )
+                                .map((tx) => (
+                                  <tr key={tx._id} className="hover:bg-gray-50">
+                                    <td className="py-2 px-4 border-b text-sm text-gray-800">
+                                      {formatDate(new Date(tx.createdAt))}
+                                    </td>
+                                    <td className="py-2 px-4 border-b text-sm font-bold text-green-700">
+                                      {new Intl.NumberFormat().format(tx.amount)} Frw
+                                    </td>
+                                    <td className="py-2 px-4 border-b text-sm text-gray-700">
+                                      {tx.reason || "—"}
+                                    </td>
+                                    <td className="py-2 px-4 border-b text-sm capitalize text-gray-700">
+                                      {tx.method}
+                                    </td>
+                                    <td className="py-2 px-4 border-b text-sm text-gray-700">
+                                      {tx.receiver?.name || "N/A"}
+                                    </td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+
+                    <p className="flex flex-col mt-10 gap-10">
+                      <span className="font-extrabold w-28">Message</span>{" "}
+                      <p> {selectedStudent.message}</p>
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-gray-50 p-4 flex justify-end">
+                  <button
+                    onClick={() => handleDisableView()}
+                    className="inline-flex justify-center px-4 py-2 text-sm  text-black font-extrabold hover:text-white  bg-red-300 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
                   >
                     Close
                   </button>

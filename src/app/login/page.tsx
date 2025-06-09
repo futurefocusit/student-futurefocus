@@ -7,14 +7,13 @@ import { FaArrowAltCircleLeft, FaEye, FaEyeSlash } from "react-icons/fa";
 import Link from "next/link";
 
 const LoginForm = () => {
-  const { login, loading } = useAuth();
+  const { login, loading,error,success } = useAuth();
   const [formData, setFormData] = useState<TeamMemberLogin>({
     email: "",
     password: ""
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  
 
   const handleChangeFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -26,12 +25,9 @@ const LoginForm = () => {
 
   const handleSubmit = async () => {
     try {
-      setError("");
-      setSuccess("");
+     
       await login(formData);
-      setSuccess("Login successful!");
     } catch (error) {
-      setError("Invalid email or password");
     }
   };
 

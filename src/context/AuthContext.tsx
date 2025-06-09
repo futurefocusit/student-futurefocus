@@ -12,6 +12,8 @@ import "react-toastify/dist/ReactToastify.css";
 import API_BASE_URL from "@/config/baseURL";
 import { TeamMember, TeamMemberLogin } from "@/types/types";
 interface AuthContextData {
+  error:string
+  success:string
   signed: boolean;
   loading: boolean;
   loggedUser: TeamMember | null;
@@ -35,7 +37,8 @@ export const AuthContext = createContext<AuthContextData>(
 const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
   const [loggedUser, setLoggedUser] = useState<TeamMember | null>(null);
   const [loading, setIsLoading] = useState(false);
-
+ const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const fetchLoggedUser = useCallback(async () => {
     const token = localStorage.getItem("ffa-admin");
@@ -81,13 +84,17 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
   const login = useCallback(async (memberData: TeamMemberLogin) => {
     setIsLoading(true);
     try {
+       setError("");
+      setSuccess("");
       const response = await axios.post(
         `${API_BASE_URL}/member/login`,
         memberData,
         { withCredentials: true }
-      );
+      ); 
+      setSuccess("Login successful!");
       setLoggedUser(response.data);
       toast.success("Login successful!");
+      
       if (!response.data.token) {
         window.location.href = `/two-factor-auth/${response.data.id}`;
         return
@@ -95,6 +102,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem("ffa-admin", response.data.token);
       window.location.href = "/staff";
     } catch (error) {
+      setError("Invalid email or password");
       handleAxiosError(error);
     } finally {
       setIsLoading(false);
@@ -211,6 +219,8 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     signed: Boolean(loggedUser),
     loading,
     loggedUser,
+    error,
+    success,
     login,
     logout,
     fetchLoggedUser,
