@@ -21,7 +21,7 @@ interface BaseDeletedItem {
     createdAt: string;
     updatedAt: Date;
     deleted: boolean;
-    deletedBy:{name:string}
+    deletedBy:string
 
 }
 
@@ -319,7 +319,7 @@ const RecycleBinPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.intake}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.status}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(student?.updatedAt))}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student?.deletedBy?.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student?.deletedBy}</td>
                     </>
                 );
             case 'Payment':
@@ -332,7 +332,7 @@ const RecycleBinPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">RWF {payment.amountPaid.toLocaleString()}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">RWF {payment.amountDiscounted.toLocaleString()}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(payment?.updatedAt))}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{payment.deletedBy?.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{payment.deletedBy}</td>
                     </>
                 );
             case 'Course':
@@ -345,7 +345,7 @@ const RecycleBinPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">RWF {course.nonScholarship.toLocaleString()}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{course.active ? 'Active' : 'Inactive'}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(course?.updatedAt))}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{course?.deletedBy?.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{course?.deletedBy}</td>
                     </>
                 );
             case 'Shift':
@@ -360,7 +360,7 @@ const RecycleBinPage: React.FC = () => {
                             {new Date(shift.createdAt).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(shift?.updatedAt))}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{shift?.deletedBy?.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{shift?.deletedBy}</td>
                     </>
                 );
             case 'Attendance':
@@ -373,7 +373,7 @@ const RecycleBinPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{attendance.type}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{attendance.reason || '-'}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(attendance?.updatedAt))}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{attendance?.deletedBy?.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{attendance?.deletedBy}</td>
                     </>
                 );
             case 'Material':
@@ -383,7 +383,7 @@ const RecycleBinPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{inventory.materialName}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inventory.amount}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(inventory?.updatedAt))}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inventory?.deletedBy?.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inventory?.deletedBy}</td>
 
                     </>
                 );
@@ -399,7 +399,7 @@ const RecycleBinPage: React.FC = () => {
                             {new Date(cashflow.date).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(cashflow?.updatedAt))}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cashflow?.deletedBy?.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cashflow?.deletedBy}</td>
                     </>
                 );
             case 'Team':
@@ -412,7 +412,7 @@ const RecycleBinPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.role}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.status}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(team?.updatedAt))}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team?.deletedBy?.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team?.deletedBy}</td>
                     </>
                 );
             case 'Task':
@@ -427,7 +427,7 @@ const RecycleBinPage: React.FC = () => {
                             {new Date(task.dueDate).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(task?.updatedAt))}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{task?.deletedBy?.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{task?.deletedBy}</td>
                     </>
                 );
             case 'Transaction':
@@ -440,7 +440,7 @@ const RecycleBinPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.paymentMethod}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.status}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(new Date(student?.updatedAt))}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction?.deletedBy?.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction?.deletedBy}</td>
                     </>
                 );
         }

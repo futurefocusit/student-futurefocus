@@ -41,7 +41,7 @@ interface Student {
 interface Payment {
   _id: string;
   method: string,
-  receiver: { name: string }
+  receiver: string
   studentId: Student | null;
   amount: number;
   reason: string;
@@ -230,7 +230,7 @@ const PaymentsPage: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
-                          {payment?.receiver?.name || "N/A"}
+                          {payment?.receiver|| "N/A"}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

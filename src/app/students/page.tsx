@@ -24,7 +24,7 @@ const imageUrl = "/futurefocuslogo.png";
 interface Transaction {
   _id: string;
   method: string,
-  receiver: { name: string }
+  receiver: string
   studentId: Student | null;
   amount: number;
   reason: string;
@@ -33,32 +33,32 @@ interface Transaction {
 }
 export interface Student {
   _id: string;
-  nid:string
+  nid: string
   name: string;
-  image:string
+  image: string
   email: string;
   phone: string;
   intake: string;
-  secondPhone:string
-  location:  string ,
-    gender:  string ,
-    identity:  string ,
-    dob:  string ,
-    nationality:  string 
+  secondPhone: string
+  location: string,
+  gender: string,
+  identity: string,
+  dob: string,
+  nationality: string
   selectedCourse: { title: string; _id: string }
   message: string;
   selectedShift: { _id: string; name: string; start: string; end: string };
   updatedAt: string;
   createdAt: string;
   status: string;
-  admitted:string
-  registered:string
+  admitted: string
+  registered: string
   comment: string;
 }
 
 interface Payment {
-  transactions:Transaction[]
-  studentId: {_id:string};
+  transactions: Transaction[]
+  studentId: { _id: string };
   amountDue: number;
   amountPaid: number;
   status: string;
@@ -110,7 +110,7 @@ const StudentManagement: React.FC = () => {
   const [openPay, setOpenPay] = useState(false);
   const [commentText, setComment] = useState({ comment: "", student: "" });
   const [courses, setCourses] = useState<Course[]>([]);
-  const [student, setStudent] = useState<string|null>("");
+  const [student, setStudent] = useState<string | null>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [isPaying, setIsPaying] = useState<boolean>(false);
   const [isRecovering, setIsRecovering] = useState<boolean>(false);
@@ -281,6 +281,7 @@ const StudentManagement: React.FC = () => {
         generateRegisterStatementPdf(data, ourlogo);
       }
       await fetchStudents();
+      await fetchPayment()
       setPaymentMethod("");
       setStudentToRegister(null);
     } catch (error) {
@@ -431,12 +432,7 @@ const StudentManagement: React.FC = () => {
       setIsLoading(true);
       await axios.put(
         `${API_BASE_URL}/students/update/${selectedStudent._id}`,
-        {
-          selectedCourse: selectedStudent.selectedCourse,
-          selectedShift: selectedStudent.selectedShift,
-          intake: selectedStudent.intake,
-          name: selectedStudent.name,
-        }, {
+        selectedStudent, {
         headers: {
           "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
         }
@@ -513,7 +509,7 @@ const StudentManagement: React.FC = () => {
     }
   };
 
-  const handleView = (student: Student,transactions:Transaction[]) => {
+  const handleView = (student: Student, transactions: Transaction[]) => {
     setOpenView(true);
     setTransaction(transactions)
     setSelectedStudent(student);
@@ -613,7 +609,7 @@ const StudentManagement: React.FC = () => {
     }
   };
 
-  const renderActionButtons = (student: Student,transactions) => {
+  const renderActionButtons = (student: Student, transactions) => {
     const commonButtons = (
       <>
         <button
@@ -635,7 +631,7 @@ const StudentManagement: React.FC = () => {
         ) : (
           ""
         )}
-        
+
         {hasPermission(loggedUser as TeamMember, "students", "comment") ? (
           <div className="">
             <input
@@ -787,31 +783,31 @@ const StudentManagement: React.FC = () => {
           <>
             {commonButtons}
             {hasPermission(loggedUser as TeamMember, "students", "complete") ? (
-          <button
-            onClick={() => {
-              handleStatusClick(student._id, student.name, "completed");
-              setAction("complete student");
-            }}
-            className="text-green-600 font-extrabold hover:text-green-900 ml-3"
-          >
-            COMPLETE
-          </button>
-        ) : (
-          ""
-        )}
-        {hasPermission(loggedUser as TeamMember, "students", "dropout") ? (
-          <button
-            onClick={() => {
-              handleStatusClick(student._id, student.name, "droppedout");
-              setAction("drop student out");
-            }}
-            className="text-red-600 font-extrabold hover:text-green-900 ml-3"
-          >
-            DROPOUT
-          </button>
-        ) : (
-          ""
-        )}
+              <button
+                onClick={() => {
+                  handleStatusClick(student._id, student.name, "completed");
+                  setAction("complete student");
+                }}
+                className="text-green-600 font-extrabold hover:text-green-900 ml-3"
+              >
+                COMPLETE
+              </button>
+            ) : (
+              ""
+            )}
+            {hasPermission(loggedUser as TeamMember, "students", "dropout") ? (
+              <button
+                onClick={() => {
+                  handleStatusClick(student._id, student.name, "droppedout");
+                  setAction("drop student out");
+                }}
+                className="text-red-600 font-extrabold hover:text-green-900 ml-3"
+              >
+                DROPOUT
+              </button>
+            ) : (
+              ""
+            )}
             {hasPermission(loggedUser as TeamMember, "students", "update") ? (
               <button
                 onClick={() => handleUpdateStudent(student)}
@@ -891,13 +887,9 @@ const StudentManagement: React.FC = () => {
       case "completed":
         return (
           <>
-            
-        <button
-          onClick={() => handleView(student,payment && payment.find((payment) => payment.studentId?._id === student._id)?.transactions)}
-          className="text-indigo-600 font-extrabold hover:text-indigo-900 mr-3"
-        >
-          VIEW
-        </button>
+
+            {commonButtons}
+
           </>
 
         )
@@ -942,7 +934,7 @@ const StudentManagement: React.FC = () => {
               href="/past-student"
               className="px-4 mx-10 py-2 bg-blue-400 hover:bg-blue-700 rounded-lg text-white font-bold"
             >
-             ADD ALUMNI
+              ADD ALUMNI
             </a>
           )}
         </div>
@@ -1176,9 +1168,9 @@ const StudentManagement: React.FC = () => {
                         )}
                         <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex  gap-2">
-                          
-                            {renderActionButtons(student,payment &&
-                                  payment.find((payment) => payment.studentId?._id === student?._id)?.transactions)}
+
+                            {renderActionButtons(student, payment &&
+                              payment.find((payment) => payment.studentId?._id === student?._id)?.transactions)}
                           </div>
                         </td>
                       </tr>
@@ -1190,8 +1182,8 @@ const StudentManagement: React.FC = () => {
           ))}
 
           {selectedStudent && updateMode && (
-            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-              <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg">
+            <div className="fixed inset-0 flex items-center  justify-center bg-gray-800 bg-opacity-75">
+              <div className="bg-white rounded-lg    overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg">
                 <div className="bg-gray-50 p-6 h-96 overflow-scroll">
                   <h3 className="text-lg font-medium text-gray-900">
                     UPDATE STUDENT INFO
@@ -1227,12 +1219,81 @@ const StudentManagement: React.FC = () => {
                         NAME
                       </label>
                       <input
+                        name="name"
                         type="text"
                         value={selectedStudent.name}
                         onChange={(e) =>
                           setSelectedStudent({
                             ...selectedStudent,
                             name: e.target.value,
+                          })
+                        }
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        PHONE 1
+                      </label>
+                      <input
+                        type="text"
+                        name="phone"
+                        value={selectedStudent.phone}
+                        onChange={(e) =>
+                          setSelectedStudent({
+                            ...selectedStudent,
+                            phone: e.target.value,
+                          })
+                        }
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        PHONE 2
+                      </label>
+                      <input
+                        type="text"
+                        name="secondPhone"
+                        value={selectedStudent.secondPhone}
+                        onChange={(e) =>
+                          setSelectedStudent({
+                            ...selectedStudent,
+                            secondPhone: e.target.value,
+                          })
+                        }
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Address
+                      </label>
+                      <input
+                        type="text"
+                        name="location"
+                        value={selectedStudent.location}
+                        onChange={(e) =>
+                          setSelectedStudent({
+                            ...selectedStudent,
+                            location: e.target.value,
+                          })
+                        }
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        NID/Passport
+                      </label>
+                      <input
+                        type="text"
+                        name="nid"
+                        value={selectedStudent.nid}
+                        onChange={(e) =>
+                          setSelectedStudent({
+                            ...selectedStudent,
+                            nid: e.target.value,
                           })
                         }
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -1311,10 +1372,10 @@ const StudentManagement: React.FC = () => {
               <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg ">
                 <div className="bg-gray-50 p-6 h-96 overflow-scroll">
                   <div className="flex gap-10 items-center">
-                   {selectedStudent.image?<img src={selectedStudent.image} alt="passport" className="w-24 rounded-full" />:<FaUser className="w-24"/>}
+                    {selectedStudent.image ? <img src={selectedStudent.image} alt="passport" className="w-24 rounded-full" /> : <FaUser className="w-24" />}
                     <h3 className="text-lg font-extrabold text-center text-gray-900">
-                    STUDENT DETAILS
-                  </h3>
+                      STUDENT DETAILS
+                    </h3>
 
                   </div>
                   <div className="mt-4 space-y-4">
@@ -1359,7 +1420,7 @@ const StudentManagement: React.FC = () => {
                       <span className="font-extrabold w-28 ">Gender</span>{" "}
                       <span> {selectedStudent?.gender}</span>
                     </p>
-                     <p className="flex gap-10">
+                    <p className="flex gap-10">
                       <span className="font-extrabold w-28 ">D.O.B</span>{" "}
                       <span>{selectedStudent?.dob}</span>
                     </p>
@@ -1371,7 +1432,7 @@ const StudentManagement: React.FC = () => {
                       <span className="font-extrabold w-28 ">Applied</span>{" "}
                       <span>{formatDate(selectedStudent.createdAt)}</span>
                     </p>
-                   
+
                     <p className="flex gap-10">
                       <span className="font-extrabold w-28 ">Status</span>{" "}
                       <span>
@@ -1382,15 +1443,15 @@ const StudentManagement: React.FC = () => {
                     <p className="flex gap-10">
                       <span className="font-extrabold w-28 ">Admitted </span>{" "}
                       <span>
-                        
-                        <span> {selectedStudent?.admitted? formatDate(selectedStudent?.admitted):'no record found'}</span>
+
+                        <span> {selectedStudent?.admitted ? formatDate(selectedStudent?.admitted) : 'no record found'}</span>
                       </span>
                     </p>
                     <p className="flex gap-10 ">
                       <span className="font-extrabold w-28 ">Registered </span>{" "}
                       <span>
-                        
-                        <span> { selectedStudent?.registered? formatDate(selectedStudent?.registered):'no record found'}</span>
+
+                        <span> {selectedStudent?.registered ? formatDate(selectedStudent?.registered) : 'no record found'}</span>
                       </span>
                     </p>
                     {payment &&
@@ -1455,7 +1516,7 @@ const StudentManagement: React.FC = () => {
                                 Frw
                               </span>
                             </p>
-                             {transactions &&
+                            {transactions &&
                               transactions?.filter(
                                 (tx) => tx.studentId && tx.studentId._id === selectedStudent._id
                               ).length === 0 ? (
@@ -1488,8 +1549,8 @@ const StudentManagement: React.FC = () => {
                                     </thead>
                                     <tbody>
                                       {transactions?.filter(
-                                          (tx) => tx.studentId && tx.studentId._id === selectedStudent._id
-                                        )
+                                        (tx) => tx.studentId && tx.studentId._id === selectedStudent._id
+                                      )
                                         .map((tx) => (
                                           <tr key={tx._id} className="hover:bg-gray-50">
                                             <td className="py-2 px-4 border-b text-sm text-gray-800">
@@ -1505,7 +1566,7 @@ const StudentManagement: React.FC = () => {
                                               {tx.method}
                                             </td>
                                             <td className="py-2 px-4 border-b text-sm text-gray-700">
-                                              {tx.receiver?.name || "N/A"}
+                                              {tx.receiver || "N/A"}
                                             </td>
                                           </tr>
                                         ))}
@@ -1515,7 +1576,7 @@ const StudentManagement: React.FC = () => {
                               </div>
                             )}
                           </div>
-                          
+
                         ))
                     )}
                     <p className="flex flex-col mt-10 gap-10">
@@ -1523,6 +1584,37 @@ const StudentManagement: React.FC = () => {
                       <p> {selectedStudent.message}</p>
                     </p>
                   </div>
+                </div>
+                <div className="flex  justify-center gap-10">
+                  {hasPermission(loggedUser as TeamMember, "students", "update") ? (
+                    <button
+                      onClick={() => {
+                        handleUpdateStudent(selectedStudent)
+                        setOpenView(false)
+                      }}
+                      className="text-green-600 font-extrabold hover:text-green-900 ml-3"
+                    >
+                      UPDATE
+                    </button>
+                  ) : (
+                    ""
+                  )}
+                  {hasPermission(loggedUser as TeamMember, "students", "delete") ? (
+                    <button
+                      onClick={() => {
+                        handleDeleteClick(selectedStudent._id);
+                        setAction("delete student");
+
+                        setOpenView(false)
+
+                      }}
+                      className="text-red-600 ml-3 font-extrabold hover:text-red-900"
+                    >
+                      DELETE
+                    </button>
+                  ) : (
+                    ""
+                  )}
                 </div>
                 <div className="bg-gray-50 p-4 flex justify-end">
                   <button

@@ -274,13 +274,13 @@ const PaymentsPage: React.FC = () => {
     <div className="min-h-screen bg-gray-100  p-4">
       <SideBar />
       <div className="max-w-5xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="flex gap-72">
-          <h1 className="lg:text-left ml-16">TODAY SUMMARY</h1>
+        <div className="flex flex-col  mb-5 gap-10">
           <h2 className="text-2xl font-bold text-gray-900 text-center">CASHFLOW</h2>
+          <h1 className="text-center">TODAY SUMMARY</h1>
         </div>
 
         {hasPermission(loggedUser as TeamMember, "cashflow", "view") && (
-          <div className="flex flex-col lg:flex-row justify-center w-1/4 gap-5">
+          <div className="flex flex-col mx-auto lg:flex-row justify-center w-1/4 gap-5">
             <div className="flex flex-col gap-2 items-center lg:justify-start">
               <FaRightToBracket size={40} className="text-green-500" />
               <p className="text-lg font-extrabold text-green-500">{todaySummary.income.toLocaleString()} Frw</p>

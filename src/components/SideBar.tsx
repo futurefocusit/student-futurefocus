@@ -25,13 +25,12 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { FaHouseCrack, FaLockOpen, FaMessage, FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
 import { MdEventAvailable } from "react-icons/md";
-import { toast } from "react-toastify";
 
 const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const { fetchLoggedUser, logout, loggedUser, loading } = useAuth();
+  const {logout, loggedUser } = useAuth();
 
 
   const menuItems = {
@@ -138,12 +137,7 @@ const SideBar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  useEffect(() => {
-    const fetchUserData = async () => {
-      await fetchLoggedUser();
-    };
-    fetchUserData();
-  }, []);
+
 
 
 

@@ -49,18 +49,53 @@ export interface IInvoice {
   remaining: number
   status: string
 }
+export interface Transaction {
+  _id: string
+  method: string
+  receiver: { name: string }
+  studentId: Student | null
+  amount: number
+  reason: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Course {
+  title: string
+  _id: string
+  shifts: { name: string; _id: string; start: string; end: string }[]
+}
+export interface Payment {
+  transactions: Transaction[]
+  studentId: { _id: string }
+  amountDue: number
+  amountPaid: number
+  status: string
+  _id: string
+}
 export interface Student {
-  _id: string;
-  name: string;
-  email: string;
-  phone: string;
-  selectedCourse: string;
-  selectedShift: { name: string };
-  intake: string;
-  message: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
+    _id: string
+    nid: string
+    name: string
+    image: string
+    email: string
+    phone: string
+    intake: string
+    secondPhone: string
+    location: string
+    gender: string
+    identity: string
+    dob: string
+    nationality: string
+    selectedCourse: { title: string; _id: string }
+    message: string
+    selectedShift: { _id: string; name: string; start: string; end: string }
+    updatedAt: string
+    createdAt: string
+    status: string
+    admitted: string
+    registered: string
+    comment: string
 }
 
 export interface AttendanceRecord {
