@@ -23,7 +23,7 @@ import {
   FaRecycle,
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
-import { FaHouseCrack, FaLockOpen, FaMessage, FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
+import { FaHouseCrack, FaLockOpen, FaMessage, FaPerson, FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
 import { MdEventAvailable } from "react-icons/md";
 
 const SideBar = () => {
@@ -36,6 +36,7 @@ const SideBar = () => {
   const menuItems = {
     general:[
        { label: "DASHBOARD", icon: FaTachometerAlt, href: "/dashboard", admin: true },
+       { label: "PROFILE", icon: FaPerson, href: "/profile", admin: true },
        {
       label: "TEAM",
       icon: FaTeamspeak,
@@ -184,7 +185,7 @@ const SideBar = () => {
               )}
             </button>
           </div>
-          <Link className="flex items-center justify-left ml-4 text-[20px] gap-2 " href="/dashboard">
+          <Link className="flex items-center justify-left ml-4 text-[20px] gap-2 " href="/profile">
             <img src={loggedUser?.institution?.logo} alt={`${loggedUser?.institution?.logo}'s logo`} className="rounded-full  bg-gray-600 w-10 h-10 " />
             {isExpanded && <h2 className="text-white text-sm font-semibold">{loggedUser?.institution?.name}</h2>}
           </Link>
