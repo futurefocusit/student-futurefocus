@@ -11,9 +11,11 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import API_BASE_URL from "@/config/baseURL";
 import { TeamMember, TeamMemberLogin } from "@/types/types";
+import axiosInstance, { fetchWithCache, fetchWithRetry } from '@/libs/axios';
+
 interface AuthContextData {
-  error:string
-  success:string
+  error: string
+  success: string
   signed: boolean;
   loading: boolean;
   loggedUser: TeamMember | null;
@@ -37,7 +39,7 @@ export const AuthContext = createContext<AuthContextData>(
 const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
   const [loggedUser, setLoggedUser] = useState<TeamMember | null>(null);
   const [loading, setIsLoading] = useState(false);
- const [error, setError] = useState("");
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   const fetchLoggedUser = useCallback(async () => {
@@ -48,33 +50,31 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
 
     try {
       setIsLoading(true)
-      const response = await axios.get(`${API_BASE_URL}/member/logged-user`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetchWithRetry(() =>
+        axiosInstance.get(`${API_BASE_URL}/member/logged-user`)
+      );
       setLoggedUser(response.data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response) {
           const errorMessage = error.response.data.message || "An error occurred";
           toast.error(errorMessage);
-          if(error.response.status===401){
+          if (error.response.status === 401) {
             localStorage.removeItem("ffa-admin");
-             setLoggedUser(null);
+            setLoggedUser(null);
           }
         } else if (error.request) {
-          toast.error("network error! try again");
+          toast.error("Network error! Please check your connection.");
         } else {
           toast.error("Error sending request. Please try again.");
         }
       } else {
         localStorage.removeItem("ffa-admin");
-      setLoggedUser(null);
+        setLoggedUser(null);
         toast.error("An unexpected error occurred");
       }
 
-      
+
     } finally {
       setIsLoading(false)
     }
@@ -84,17 +84,15 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
   const login = useCallback(async (memberData: TeamMemberLogin) => {
     setIsLoading(true);
     try {
-       setError("");
+      setError("");
       setSuccess("");
-      const response = await axios.post(
-        `${API_BASE_URL}/member/login`,
-        memberData,
-        { withCredentials: true }
-      ); 
+      const response = await fetchWithRetry(() =>
+        axiosInstance.post(`${API_BASE_URL}/member/login`, memberData, { withCredentials: true })
+      );
       setSuccess("Login successful!");
       setLoggedUser(response.data);
       toast.success("Login successful!");
-      
+
       if (!response.data.token) {
         window.location.href = `/two-factor-auth/${response.data.id}`;
         return
@@ -111,13 +109,8 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
   const fetchTeam = async (): Promise<TeamMember[]> => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`${API_BASE_URL}/member`, {
-        withCredentials: true, headers: {
-          Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`,
-
-        }
-      });
-      return response.data;
+      const response = await fetchWithCache<TeamMember[]>(`${API_BASE_URL}/member`);
+      return response;
     } catch (error) {
       handleAxiosError(error);
       throw error;
@@ -129,16 +122,8 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
   const addTeamMember = async (newMember: Omit<TeamMember, "_id">) => {
     setIsLoading(true);
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/member/new`,
-        newMember,
-
-        {
-          withCredentials: true, headers: {
-            Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`,
-
-          }
-        }
+      const response = await fetchWithRetry(() =>
+        axiosInstance.post(`${API_BASE_URL}/member/new`, newMember, { withCredentials: true })
       );
       toast.success("Member added successfully");
       return response.data;
@@ -152,12 +137,9 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
   const updateTeamMember = async (id: string, updatedMember: TeamMember) => {
     setIsLoading(true);
     try {
-      await axios.put(`${API_BASE_URL}/member/update/${id}`, updatedMember, {
-        withCredentials: true, headers: {
-          Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`,
-
-        }
-      });
+      await fetchWithRetry(() =>
+        axiosInstance.put(`${API_BASE_URL}/member/update/${id}`, updatedMember, { withCredentials: true })
+      );
       toast.success("Member updated successfully");
     } catch (error) {
       handleAxiosError(error);
@@ -169,12 +151,9 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
   const deleteTeamMember = async (id: string) => {
     setIsLoading(true);
     try {
-      await axios.delete(`${API_BASE_URL}/member/delete/${id}`, {
-        withCredentials: true, headers: {
-          Authorization: `Bearer ${localStorage.getItem('ffa-admin')}`,
-
-        }
-      });
+      await fetchWithRetry(() =>
+        axiosInstance.delete(`${API_BASE_URL}/member/delete/${id}`, { withCredentials: true })
+      );
       toast.success("Member deleted successfully");
     } catch (error) {
       handleAxiosError(error);
@@ -194,7 +173,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
-   const handleAxiosError = (error: unknown) => {
+  const handleAxiosError = (error: unknown) => {
     if (axios.isAxiosError(error)) {
       if (error.response) {
         const errorMessage = error.response.data.message || "An error occurred";

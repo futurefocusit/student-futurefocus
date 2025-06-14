@@ -30,7 +30,7 @@ const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const {logout, loggedUser } = useAuth();
+  const {logout, loggedUser, loading } = useAuth();
 
 
   const menuItems = {
@@ -148,7 +148,9 @@ const SideBar = () => {
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
-
+if(!loading&&!loggedUser){
+return null
+}
   return (
     <>
       <button
@@ -214,7 +216,7 @@ const SideBar = () => {
           <div className="flex flex-col items-start border-b-2  mb-2 border-b-gray-500">
             {menuItems.students
               .filter(
-                (item) => !item.admin || (item.admin && loggedUser?.isAdmin)
+                (item) => !item.admin || ( item.admin && loggedUser?.isAdmin)
               )
               .map((item, index) => (
                 <Link

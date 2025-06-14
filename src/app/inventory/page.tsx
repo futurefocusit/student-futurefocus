@@ -15,28 +15,30 @@ import Loader from "@/components/loader";
 import { ShoppingCart } from "lucide-react";
 import { CartItem, useCart } from "@/context/cartContext";
 import Cart from "@/components/cart";
+import axiosInstance, { fetchWithCache, fetchWithRetry } from '@/libs/axios';
+
 interface IMaterial {
-  _id:string
+  _id: string
   materialName: string;
-  category: {name:string,_id:string};
+  category: { name: string, _id: string };
   amount: number;
-  SN:string,
-  type:string
+  SN: string,
+  type: string
   rent: number;
 }
 export interface IMaterialRent {
-  _id:string
+  _id: string
   materialId: IMaterial;
-  render: {name:string,_id:string};
-  receiver: {name:string,_id:string};
-  rendeeName: string; 
+  render: { name: string, _id: string };
+  receiver: { name: string, _id: string };
+  rendeeName: string;
   returnDate: Date;
   returnedDate: Date;
-  returned:boolean
+  returned: boolean
   amount: number;
   cost: number;
-  createdAt:Date
-  
+  createdAt: Date
+
 }
 const MaterialManagement: React.FC = () => {
   const { fetchLoggedUser, loggedUser } = useAuth();
@@ -51,17 +53,13 @@ const MaterialManagement: React.FC = () => {
   const [showCart, setShowCart] = useState(false);
   const [message, setMessage] = useState<{ type: string; text: string } | null>(null);
   const [activeTab, setActiveTab] = useState<"materials" | "rented" | "category">("materials");
-  const [updateMaterial,setUpdateMaterial]=useState<IMaterial>(null)
+  const [updateMaterial, setUpdateMaterial] = useState<IMaterial>(null)
 
   const fetchMaterials = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_BASE_URL}/inventory`,{
-        headers:{
-          "Authorization":`Beare ${localStorage.getItem('ffa-admin')}`
-        }
-      });
-      setMaterials(response.data);
+      const response = await fetchWithCache<IMaterial[]>(`${API_BASE_URL}/inventory`);
+      setMaterials(response);
       await fetchLoggedUser();
     } catch (error) {
       setMessage({ type: "error", text: "Failed to load materials" });
@@ -72,12 +70,9 @@ const MaterialManagement: React.FC = () => {
 
   const fetchCategory = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/inventory/category`,{
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
-        },
-      });
-      setCategory(response.data);
+      const response = await fetchWithCache(`${API_BASE_URL}/inventory/category`);
+      //@ts-expect-error error
+      setCategory(response);
     } catch (error) {
       setMessage({ type: "error", text: "Failed to load category" });
     }
@@ -85,7 +80,7 @@ const MaterialManagement: React.FC = () => {
 
   const fetchRented = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/inventory/rent`,{
+      const response = await axios.get(`${API_BASE_URL}/inventory/rent`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
         },
@@ -100,7 +95,7 @@ const MaterialManagement: React.FC = () => {
     try {
       await axios.put(`${API_BASE_URL}/inventory/${id}`, {
         receiver: loggedUser?._id,
-      },{
+      }, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
         },
@@ -120,7 +115,7 @@ const MaterialManagement: React.FC = () => {
 
 
 
-  const handleAddToCart = (material:CartItem) => {
+  const handleAddToCart = (material: CartItem) => {
     const amount = 1; // Default amount
     if (material.amount - material.rent < amount) {
       toast.error("This item hit maximum");
@@ -130,17 +125,17 @@ const MaterialManagement: React.FC = () => {
     toast.success("Added to cart");
   };
 
-  
 
-  const handleDelete = async (material:IMaterial) => {
+
+  const handleDelete = async (material: IMaterial) => {
     try {
-      await axios.delete(`${API_BASE_URL}/inventory/${material._id}`,{
+      await axios.delete(`${API_BASE_URL}/inventory/${material._id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
         },
       });
       toast.success("Material deleted successfully!");
-      fetchMaterials(); 
+      fetchMaterials();
     } catch (error) {
       toast.error("Failed to delete material.");
     }
@@ -155,9 +150,9 @@ const MaterialManagement: React.FC = () => {
     );
   }
 
-const  handleUpdate=(material: IMaterial)=> {
-   setShowPopupUM(true)
-   setUpdateMaterial(material)
+  const handleUpdate = (material: IMaterial) => {
+    setShowPopupUM(true)
+    setUpdateMaterial(material)
   }
 
   return (
@@ -192,25 +187,22 @@ const  handleUpdate=(material: IMaterial)=> {
           </button>
           <button
             onClick={() => setActiveTab("materials")}
-            className={`mr-2 px-4 py-2 rounded ${
-              activeTab === "materials" ? "bg-blue-500 text-white" : "bg-gray-200"
-            }`}
+            className={`mr-2 px-4 py-2 rounded ${activeTab === "materials" ? "bg-blue-500 text-white" : "bg-gray-200"
+              }`}
           >
             MATERIALS
           </button>
           <button
             onClick={() => setActiveTab("rented")}
-            className={`px-4 py-2 rounded ${
-              activeTab === "rented" ? "bg-blue-500 text-white" : "bg-gray-200"
-            }`}
+            className={`px-4 py-2 rounded ${activeTab === "rented" ? "bg-blue-500 text-white" : "bg-gray-200"
+              }`}
           >
             RENT MATERIALS
           </button>
           <button
             onClick={() => setActiveTab("category")}
-            className={`px-4 py-2 rounded ${
-              activeTab === "category" ? "bg-blue-500 text-white" : "bg-gray-200"
-            }`}
+            className={`px-4 py-2 rounded ${activeTab === "category" ? "bg-blue-500 text-white" : "bg-gray-200"
+              }`}
           >
             CATEGORY
           </button>
@@ -244,13 +236,13 @@ const  handleUpdate=(material: IMaterial)=> {
                         Add to Cart
                       </button>
                       <button
-                        onClick={() => handleDelete(material)} 
+                        onClick={() => handleDelete(material)}
                         className="bg-red-500 text-white px-2 py-1 rounded"
                       >
                         Delete
                       </button>
                       <button
-                        onClick={() => handleUpdate(material)} 
+                        onClick={() => handleUpdate(material)}
                         className="bg-blue-500 text-white px-2 py-1 rounded"
                       >
                         Update
@@ -316,7 +308,7 @@ const  handleUpdate=(material: IMaterial)=> {
                 </tr>
               </thead>
               <tbody>
-                {category.map((category:{name:string,_id:string}) => (
+                {category.map((category: { name: string, _id: string }) => (
                   <tr key={category._id} className="hover:bg-gray-100">
                     <td className="border border-gray-300 p-2">{category?.name}</td>
                   </tr>
@@ -330,29 +322,29 @@ const  handleUpdate=(material: IMaterial)=> {
           <PopupForm
             categories={category as never}
             onClose={() => setShowPopupNM(false)}
-            onSuccess={async() => {
-             await fetchMaterials();
+            onSuccess={async () => {
+              await fetchMaterials();
               setShowPopupNM(false);
             }}
           />
         )}
         {showPopupUM && (
           <PopupUpdateForm
-          onClose={() => setShowPopupNM(false)}
-          onSuccess={async() => {
-           await fetchMaterials();
-            setShowPopupUM(false);
-          }}
-          Material={updateMaterial}
-          categories={category as never}
+            onClose={() => setShowPopupNM(false)}
+            onSuccess={async () => {
+              await fetchMaterials();
+              setShowPopupUM(false);
+            }}
+            Material={updateMaterial}
+            categories={category as never}
           />
         )}
         {showPopupNC && (
           <PopupFormCategory
             categories={[]}
             onClose={() => setShowPopupNC(false)}
-            onSuccess={async() => {
-             await fetchCategory();
+            onSuccess={async () => {
+              await fetchCategory();
               setShowPopupNC(false);
             }}
           />
