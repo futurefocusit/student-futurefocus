@@ -1,61 +1,81 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Building2, Save, Eye, Plus, X, Target, TrendingUp, MessageCircle } from "lucide-react"
+import { Building2, Save, Eye, Plus, X, Target, TrendingUp, MessageCircle, Clock, Globe, Image as ImageIcon } from "lucide-react"
 import withAdminAuth from "@/components/withAdminAuth"
-import axios from "axios"
+import axiosInstance, { fetchWithCache, fetchWithRetry } from "@/libs/axios"
 import API_BASE_URL from "@/config/baseURL"
 import SideBar from "@/components/SideBar"
+import BlogEditor from "@/components/Editor"
+import Image from "next/image"
 
 interface CompanyData {
   name: string
   location: string
-  aboutUs: string
+  coreValues: string[]
+  heroImage: string
+  address: string
+  languages: string[]
+  gallery: string[]
   mission: string
   vision: string
+  slug: string
+  opening: string
+  closing: string
   whyChooseUs: string[]
-  email: string
-  phone: string
-  website: string
   linkedin: string
   instagram: string
-  twitter: string
+  tiktok: string
   facebook: string
+  description: string
+  aboutUs: string
+  email: string
+  phone: string[]
+  logo: string
+  website: string
+  isSuperInst: boolean
 }
 
 const AdminPage = () => {
   const [companyData, setCompanyData] = useState<CompanyData>({
     name: "",
     location: "",
-    aboutUs: "",
+    coreValues: [""],
+    heroImage: "",
+    address: "",
+    languages: [""],
+    gallery: [],
     mission: "",
     vision: "",
-    whyChooseUs: ["", "", ""],
-    email: "",
-    phone: "",
-    website: "",
+    slug: "",
+    opening: "",
+    closing: "",
+    whyChooseUs: [""],
     linkedin: "",
     instagram: "",
-    twitter: "",
+    tiktok: "",
     facebook: "",
+    description: "",
+    aboutUs: "",
+    email: "",
+    phone: [""],
+    logo: "",
+    website: "",
+    isSuperInst: false
   })
 
   const [showPreview, setShowPreview] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [saveMessage, setSaveMessage] = useState({ type: "", message: "" })
+  const [uploadingImages, setUploadingImages] = useState(false)
 
   const loadSavedData = async () => {
     try {
       setIsLoading(true)
-      const response = await axios.get(`${API_BASE_URL}/institution/profile`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
-        },
-      })
-
-      if (response.data) {
-        setCompanyData(response.data)
+      const response = await fetchWithCache<CompanyData>(`${API_BASE_URL}/institution/profile`)
+      if (response) {
+        setCompanyData(response)
       }
     } catch (error) {
       console.error("Error loading data:", error)
@@ -77,41 +97,89 @@ const AdminPage = () => {
       ...prev,
       [field]: value,
     }))
-    // Clear any previous save messages when user makes changes
     if (saveMessage.message) {
       setSaveMessage({ type: "", message: "" })
     }
   }
 
-  const handleArrayChange = (field: "whyChooseUs", index: number, value: string) => {
+  const handleArrayChange = (field: "coreValues" | "languages" | "whyChooseUs" | "phone", index: number, value: string) => {
     setCompanyData((prev) => ({
       ...prev,
       [field]: prev[field].map((item, i) => (i === index ? value : item)),
     }))
   }
 
-  const addArrayItem = (field: "whyChooseUs") => {
+  const addArrayItem = (field: "coreValues" | "languages" | "whyChooseUs" | "phone") => {
     setCompanyData((prev) => ({
       ...prev,
       [field]: [...prev[field], ""],
     }))
   }
 
-  const removeArrayItem = (field: "whyChooseUs", index: number) => {
+  const removeArrayItem = (field: "coreValues" | "languages" | "whyChooseUs" | "phone", index: number) => {
     setCompanyData((prev) => ({
       ...prev,
       [field]: prev[field].filter((_, i) => i !== index),
     }))
   }
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'logo' | 'heroImage' | 'gallery') => {
+    const files = e.target.files
+    if (!files) return
+
+    try {
+      setUploadingImages(true)
+      const formData = new FormData()
+
+      // if (type === 'gallery') {
+        Array.from(files).forEach(file => formData.append('files', file))
+      // } else {
+      //   formData.append('files', files)
+      // }
+
+      const response = await fetchWithRetry(() =>
+        axiosInstance.post(`${API_BASE_URL}/upload/files`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
+      )
+
+      if (type === 'gallery') {
+        setCompanyData(prev => ({
+          ...prev,
+          gallery: [...prev.gallery, ...response.data.urls]
+        }))
+      } else {
+        setCompanyData(prev => ({
+          ...prev,
+          [type]: response.data.urls[0]
+        }))
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      setSaveMessage({
+        type: "error",
+        message: "Failed to upload image. Please try again.",
+      })
+    } finally {
+      setUploadingImages(false)
+    }
+  }
+
+  const removeGalleryImage = (index: number) => {
+    setCompanyData(prev => ({
+      ...prev,
+      gallery: prev.gallery.filter((_, i) => i !== index)
+    }))
+  }
+
   const handleSave = async () => {
     try {
       setIsSaving(true)
-      await axios.put(`${API_BASE_URL}/institution/profile`, companyData, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
-        },
-      })
+      await fetchWithRetry(() =>
+        axiosInstance.put(`${API_BASE_URL}/institution/profile`, companyData)
+      )
       setSaveMessage({
         type: "success",
         message: "Company profile saved successfully!",
@@ -169,9 +237,8 @@ const AdminPage = () => {
 
           {saveMessage.message && (
             <div
-              className={`p-3 rounded-md mb-4 ${
-                saveMessage.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"
-              }`}
+              className={`p-3 rounded-md mb-4 ${saveMessage.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"
+                }`}
             >
               {saveMessage.message}
             </div>
@@ -193,17 +260,33 @@ const AdminPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                    Company Name
+                    Company Name *
                   </label>
                   <input
                     type="text"
                     id="name"
                     value={companyData.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
-                    placeholder="Enter company name"
+                    required
                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   />
                 </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={companyData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    required
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
                     Location
@@ -213,160 +296,315 @@ const AdminPage = () => {
                     id="location"
                     value={companyData.location}
                     onChange={(e) => handleInputChange("location", e.target.value)}
-                    placeholder="City, Country"
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+                    Address
+                  </label>
+                  <input
+                    type="text"
+                    id="address"
+                    value={companyData.address}
+                    onChange={(e) => handleInputChange("address", e.target.value)}
                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   />
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* About Us */}
-          <div className="bg-white shadow rounded-lg overflow-hidden">
-            <div className="px-4 py-5 sm:px-6 border-b">
-              <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-green-600" />
-                About Us
-              </h3>
-            </div>
-            <div className="px-4 py-5 sm:p-6">
-              <label htmlFor="aboutUs" className="block text-sm font-medium text-gray-700 mb-1">
-                Company Description
-              </label>
-              <textarea
-                id="aboutUs"
-                value={companyData.aboutUs}
-                onChange={(e) => handleInputChange("aboutUs", e.target.value)}
-                placeholder="Write 2-3 sentences about your company..."
-                rows={4}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              ></textarea>
-            </div>
-          </div>
-
-          {/* Mission & Vision */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white shadow rounded-lg overflow-hidden">
-              <div className="px-4 py-5 sm:px-6 border-b">
-                <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
-                  <Target className="w-5 h-5 text-blue-600" />
-                  Mission
-                </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="opening" className="block text-sm font-medium text-gray-700 mb-1">
+                    Opening Hours *
+                  </label>
+                  <input
+                    type="time"
+                    id="opening"
+                    value={companyData.opening}
+                    onChange={(e) => handleInputChange("opening", e.target.value)}
+                    required
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="closing" className="block text-sm font-medium text-gray-700 mb-1">
+                    Closing Hours *
+                  </label>
+                  <input
+                    type="time"
+                    id="closing"
+                    value={companyData.closing}
+                    onChange={(e) => handleInputChange("closing", e.target.value)}
+                    required
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
               </div>
-              <div className="px-4 py-5 sm:p-6">
-                <label htmlFor="mission" className="block text-sm font-medium text-gray-700 mb-1">
-                  Mission Statement
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone Numbers *
                 </label>
-                <textarea
-                  id="mission"
-                  value={companyData.mission}
-                  onChange={(e) => handleInputChange("mission", e.target.value)}
-                  placeholder="Your company's mission statement..."
-                  rows={3}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                ></textarea>
-              </div>
-            </div>
-
-            <div className="bg-white shadow rounded-lg overflow-hidden">
-              <div className="px-4 py-5 sm:px-6 border-b">
-                <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
-                  <Eye className="w-5 h-5 text-purple-600" />
-                  Vision
-                </h3>
-              </div>
-              <div className="px-4 py-5 sm:p-6">
-                <label htmlFor="vision" className="block text-sm font-medium text-gray-700 mb-1">
-                  Vision Statement
-                </label>
-                <textarea
-                  id="vision"
-                  value={companyData.vision}
-                  onChange={(e) => handleInputChange("vision", e.target.value)}
-                  placeholder="Your long-term vision..."
-                  rows={3}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                ></textarea>
-              </div>
-            </div>
-          </div>
-
-          {/* Why Choose Us */}
-          <div className="bg-white shadow rounded-lg overflow-hidden">
-            <div className="px-4 py-5 sm:px-6 border-b">
-              <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-green-600" />
-                Why Choose Us
-              </h3>
-            </div>
-            <div className="px-4 py-5 sm:p-6">
-              <div className="space-y-2">
-                {companyData.whyChooseUs.map((reason, index) => (
-                  <div key={index} className="flex gap-2">
+                {companyData.phone.map((phone, index) => (
+                  <div key={index} className="flex gap-2 mb-2">
                     <input
-                      type="text"
-                      value={reason}
-                      onChange={(e) => handleArrayChange("whyChooseUs", index, e.target.value)}
-                      placeholder="Enter reason to choose your company"
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => handleArrayChange("phone", index, e.target.value)}
+                      required
                       className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
                     <button
-                      onClick={() => removeArrayItem("whyChooseUs", index)}
-                      className="p-2 border border-gray-300 rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      aria-label="Remove item"
+                      type="button"
+                      onClick={() => removeArrayItem("phone", index)}
+                      className="px-3 py-2 text-red-600 hover:text-red-800"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-5 h-5" />
                     </button>
                   </div>
                 ))}
                 <button
-                  onClick={() => addArrayItem("whyChooseUs")}
-                  className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  type="button"
+                  onClick={() => addArrayItem("phone")}
+                  className="mt-2 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
-                  <Plus className="w-4 h-4 inline mr-2" />
-                  Add Reason
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add Phone Number
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Contact Information */}
+          {/* Images Section */}
+          <div className="bg-white shadow rounded-lg overflow-hidden">
+            <div className="px-4 py-5 sm:px-6 border-b">
+              <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-blue-600" />
+                Images
+              </h3>
+            </div>
+            <div className="px-4 py-5 sm:p-6 space-y-6">
+              {/* Logo Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Company Logo
+                </label>
+                <div className="flex items-center gap-4">
+                  {companyData.logo && (
+                    <div className="relative w-24 h-24">
+                      <Image
+                        src={companyData.logo}
+                        alt="Company Logo"
+                        fill
+                        className="object-contain rounded-lg"
+                      />
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, 'logo')}
+                    disabled={uploadingImages}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                </div>
+              </div>
+
+              {/* Hero Image Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Hero Image
+                </label>
+                <div className="flex items-center gap-4">
+                  {companyData.heroImage && (
+                    <div className="relative w-48 h-32">
+                      <Image
+                        src={companyData.heroImage}
+                        alt="Hero Image"
+                        fill
+                        className="object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, 'heroImage')}
+                    disabled={uploadingImages}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                </div>
+              </div>
+
+              {/* Gallery Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Gallery Images
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                  {companyData.gallery.map((image, index) => (
+                    <div key={index} className="relative group">
+                      <div className="relative w-full h-32">
+                        <Image
+                          src={image}
+                          alt={`Gallery image ${index + 1}`}
+                          fill
+                          className="object-cover rounded-lg"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeGalleryImage(index)}
+                        className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={(e) => handleImageUpload(e, 'gallery')}
+                  disabled={uploadingImages}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+              </div>
+            </div>
+          </div>
+
+          
+          <div className="bg-white shadow rounded-lg overflow-hidden">
+            
+            <div className="px-4 py-5 sm:p-6 space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  About Us
+                </label>
+                <BlogEditor
+                  initialContent={companyData.aboutUs}
+                  onChange={(content) => handleInputChange("aboutUs", content)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description
+                </label>
+                <BlogEditor
+                  initialContent={companyData.description}
+                  onChange={(content) => handleInputChange("description", content)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Mission
+                </label>
+                <BlogEditor
+                  initialContent={companyData.mission}
+                  onChange={(content) => handleInputChange("mission", content)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Vision
+                </label>
+                <BlogEditor
+                  initialContent={companyData.vision}
+                  onChange={(content) => handleInputChange("vision", content)}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Core Values & Languages */}
+          <div className="bg-white shadow rounded-lg overflow-hidden">
+            <div className="px-4 py-5 sm:px-6 border-b">
+              <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+                <Target className="w-5 h-5 text-blue-600" />
+                Core Values & Languages
+              </h3>
+            </div>
+            <div className="px-4 py-5 sm:p-6 space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Core Values
+                </label>
+                {companyData.coreValues.map((value, index) => (
+                  <div key={index} className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={value}
+                      onChange={(e) => handleArrayChange("coreValues", index, e.target.value)}
+                      className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeArrayItem("coreValues", index)}
+                      className="px-3 py-2 text-red-600 hover:text-red-800"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => addArrayItem("coreValues")}
+                  className="mt-2 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add Core Value
+                </button>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Languages
+                </label>
+                {companyData.languages.map((language, index) => (
+                  <div key={index} className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={language}
+                      onChange={(e) => handleArrayChange("languages", index, e.target.value)}
+                      className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeArrayItem("languages", index)}
+                      className="px-3 py-2 text-red-600 hover:text-red-800"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => addArrayItem("languages")}
+                  className="mt-2 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add Language
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Social Media & Contact */}
           <div className="bg-white shadow rounded-lg overflow-hidden">
             <div className="px-4 py-5 sm:px-6 border-b">
               <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
                 <MessageCircle className="w-5 h-5 text-blue-600" />
-                Contact Information
+                Social Media & Contact
               </h3>
             </div>
             <div className="px-4 py-5 sm:p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    value={companyData.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
-                    placeholder="company@example.com"
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone
-                  </label>
-                  <input
-                    type="text"
-                    id="phone"
-                    value={companyData.phone}
-                    onChange={(e) => handleInputChange("phone", e.target.value)}
-                    placeholder="+1 (555) 123-4567"
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
-                </div>
-                <div className="col-span-1 md:col-span-2">
                   <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-1">
                     Website
                   </label>
@@ -375,74 +613,63 @@ const AdminPage = () => {
                     id="website"
                     value={companyData.website}
                     onChange={(e) => handleInputChange("website", e.target.value)}
-                    placeholder="https://www.yourcompany.com"
                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   />
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-base font-medium text-gray-700 mb-3">Social Media Links</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="linkedin" className="block text-sm text-gray-600 mb-1">
-                      LinkedIn
-                    </label>
-                    <input
-                      type="url"
-                      id="linkedin"
-                      value={companyData.linkedin}
-                      onChange={(e) => handleInputChange("linkedin", e.target.value)}
-                      placeholder="https://linkedin.com/company/yourcompany"
-                      className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="instagram" className="block text-sm text-gray-600 mb-1">
-                      Instagram
-                    </label>
-                    <input
-                      type="url"
-                      id="instagram"
-                      value={companyData.instagram}
-                      onChange={(e) => handleInputChange("instagram", e.target.value)}
-                      placeholder="https://instagram.com/yourcompany"
-                      className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="twitter" className="block text-sm text-gray-600 mb-1">
-                      X (Twitter)
-                    </label>
-                    <input
-                      type="url"
-                      id="twitter"
-                      value={companyData.twitter}
-                      onChange={(e) => handleInputChange("twitter", e.target.value)}
-                      placeholder="https://x.com/yourcompany"
-                      className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="facebook" className="block text-sm text-gray-600 mb-1">
-                      Facebook
-                    </label>
-                    <input
-                      type="url"
-                      id="facebook"
-                      value={companyData.facebook}
-                      onChange={(e) => handleInputChange("facebook", e.target.value)}
-                      placeholder="https://facebook.com/yourcompany"
-                      className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    />
-                  </div>
+                <div>
+                  <label htmlFor="linkedin" className="block text-sm font-medium text-gray-700 mb-1">
+                    LinkedIn
+                  </label>
+                  <input
+                    type="url"
+                    id="linkedin"
+                    value={companyData.linkedin}
+                    onChange={(e) => handleInputChange("linkedin", e.target.value)}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="instagram" className="block text-sm font-medium text-gray-700 mb-1">
+                    Instagram
+                  </label>
+                  <input
+                    type="url"
+                    id="instagram"
+                    value={companyData.instagram}
+                    onChange={(e) => handleInputChange("instagram", e.target.value)}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="tiktok" className="block text-sm font-medium text-gray-700 mb-1">
+                    TikTok
+                  </label>
+                  <input
+                    type="url"
+                    id="tiktok"
+                    value={companyData.tiktok}
+                    onChange={(e) => handleInputChange("tiktok", e.target.value)}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="facebook" className="block text-sm font-medium text-gray-700 mb-1">
+                    Facebook
+                  </label>
+                  <input
+                    type="url"
+                    id="facebook"
+                    value={companyData.facebook}
+                    onChange={(e) => handleInputChange("facebook", e.target.value)}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Save Button */}
-          <div className="flex justify-center pt-6 pb-10">
+          <div className="flex justify-end">
             <button
               onClick={handleSave}
               disabled={isSaving}
@@ -611,14 +838,14 @@ function CompanyProfilePreview({ data, onBack }: { data: CompanyData; onBack: ()
                     Instagram
                   </a>
                 )}
-                {data.twitter && (
+                {data.tiktok && (
                   <a
-                    href={data.twitter}
+                    href={data.tiktok}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200"
                   >
-                    X (Twitter)
+                    TikTok
                   </a>
                 )}
                 {data.facebook && (
@@ -631,7 +858,7 @@ function CompanyProfilePreview({ data, onBack }: { data: CompanyData; onBack: ()
                     Facebook
                   </a>
                 )}
-                {!data.linkedin && !data.instagram && !data.twitter && !data.facebook && (
+                {!data.linkedin && !data.instagram && !data.tiktok && !data.facebook && (
                   <span className="text-gray-500">[Social Media Links]</span>
                 )}
               </div>
