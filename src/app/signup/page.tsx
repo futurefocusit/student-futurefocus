@@ -1,7 +1,7 @@
 'use client'
 import API_BASE_URL from '@/config/baseURL'
 import axios from 'axios'
-import { useState, ChangeEvent, FormEvent } from 'react'
+import { useState, ChangeEvent, FormEvent, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -43,6 +43,11 @@ const RegisterPage = () => {
   const [logoPreview, setLogoPreview] = useState<string>('')
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
+
+  useEffect(()=>{
+      document.title = "XCOOLL | Register";
+  })
+
   const handleAxiosError = (error: unknown) => {
     if (axios.isAxiosError(error)) {
       if (error.response) {

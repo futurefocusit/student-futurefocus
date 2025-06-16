@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Building2, Save, Eye, Plus, X, Target, TrendingUp, MessageCircle, Clock, Globe, Image as ImageIcon } from "lucide-react"
+import { Building2, Save, Eye, Plus, X, Target, TrendingUp, MessageCircle, Clock, Globe, Image as ImageIcon, Loader2 } from "lucide-react"
 import withAdminAuth from "@/components/withAdminAuth"
 import axiosInstance, { fetchWithCache, fetchWithRetry } from "@/libs/axios"
 import API_BASE_URL from "@/config/baseURL"
@@ -16,12 +16,11 @@ interface CompanyData {
   heroImage: string
   address: string
   languages: string[]
-  gallery: string[]
+  gallery: Array<{ url: string, caption?: string, isEditingCaption: boolean }>
   mission: string
   vision: string
   slug: string
-  opening: string
-  closing: string
+  days: Array<{ day: string, opening: string, closing: string }>
   whyChooseUs: string[]
   linkedin: string
   instagram: string
@@ -30,11 +29,95 @@ interface CompanyData {
   description: string
   aboutUs: string
   email: string
-  phone: string[]
+  phone: Array<{ type: string, number: string }>
   logo: string
   website: string
   isSuperInst: boolean
 }
+
+const DAYS_OF_WEEK = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday"
+]
+
+// Move these components outside of AdminPage
+const CaptionEditor = ({
+  image,
+  index,
+  onSave,
+  onCancel,
+  onCaptionChange
+}: {
+  image: { url: string; caption?: string; isEditingCaption: boolean };
+  index: number;
+  onSave: (index: number) => void;
+  onCancel: (index: number) => void;
+  onCaptionChange: (index: number, value: string) => void;
+}) => {
+  const [tempCaption, setTempCaption] = useState(image.caption);
+
+  const handleSave = () => {
+    onCaptionChange(index, tempCaption);
+    onSave(index);
+  };
+
+  return (
+    <div className="space-y-2">
+      <textarea
+        value={tempCaption}
+        onChange={(e) => setTempCaption(e.target.value)}
+        placeholder="Add a caption..."
+        className="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 resize-none"
+        rows={2}
+        autoFocus
+      />
+      <div className="flex justify-end space-x-2">
+        <button
+          type="button"
+          onClick={() => onCancel(index)}
+          className="px-2 py-1 text-sm text-gray-600 hover:text-gray-800"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          onClick={handleSave}
+          className="px-2 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const CaptionDisplay = ({
+  caption,
+  onEdit
+}: {
+  caption: string;
+  onEdit: () => void;
+}) => (
+  <div
+    className="min-h-[2.5rem] cursor-pointer group/caption"
+    onClick={onEdit}
+  >
+    {caption ? (
+      <p className="text-sm text-gray-700 line-clamp-2 group-hover/caption:text-blue-600">
+        {caption}
+      </p>
+    ) : (
+      <p className="text-sm text-gray-400 italic group-hover/caption:text-blue-600">
+        Click to add caption
+      </p>
+    )}
+  </div>
+);
 
 const AdminPage = () => {
   const [companyData, setCompanyData] = useState<CompanyData>({
@@ -48,8 +131,7 @@ const AdminPage = () => {
     mission: "",
     vision: "",
     slug: "",
-    opening: "",
-    closing: "",
+    days: [{ day: "", opening: "", closing: "" }],
     whyChooseUs: [""],
     linkedin: "",
     instagram: "",
@@ -58,7 +140,7 @@ const AdminPage = () => {
     description: "",
     aboutUs: "",
     email: "",
-    phone: [""],
+    phone: [{ type: "", number: "" }],
     logo: "",
     website: "",
     isSuperInst: false
@@ -77,6 +159,8 @@ const AdminPage = () => {
       if (response) {
         setCompanyData(response)
       }
+
+
     } catch (error) {
       console.error("Error loading data:", error)
       setSaveMessage({
@@ -102,21 +186,34 @@ const AdminPage = () => {
     }
   }
 
-  const handleArrayChange = (field: "coreValues" | "languages" | "whyChooseUs" | "phone", index: number, value: string) => {
+  const handleArrayChange = (field: "coreValues" | "languages" | "whyChooseUs" | "phone" | "gallery" | "days", index: number, value, subField?: string) => {
     setCompanyData((prev) => ({
       ...prev,
-      [field]: prev[field].map((item, i) => (i === index ? value : item)),
+      [field]: prev[field].map((item, i) => {
+        if (i === index) {
+          if (subField) {
+            return { ...item, [subField]: value };
+          }
+          return value;
+        }
+        return item;
+      }),
     }))
   }
 
-  const addArrayItem = (field: "coreValues" | "languages" | "whyChooseUs" | "phone") => {
-    setCompanyData((prev) => ({
-      ...prev,
-      [field]: [...prev[field], ""],
-    }))
+  const addArrayItem = (field: "coreValues" | "languages" | "whyChooseUs" | "phone" | "gallery" | "days") => {
+    setCompanyData((prev) => {
+      const newItem = field === "phone" ? { type: "", number: "" } :
+        field === "gallery" ? { url: "", caption: "", isEditingCaption: false } :
+          field === "days" ? { day: "", opening: "", closing: "" } : "";
+      return {
+        ...prev,
+        [field]: [...prev[field], newItem],
+      }
+    })
   }
 
-  const removeArrayItem = (field: "coreValues" | "languages" | "whyChooseUs" | "phone", index: number) => {
+  const removeArrayItem = (field: "coreValues" | "languages" | "whyChooseUs" | "phone" | "gallery" | "days", index: number) => {
     setCompanyData((prev) => ({
       ...prev,
       [field]: prev[field].filter((_, i) => i !== index),
@@ -131,11 +228,7 @@ const AdminPage = () => {
       setUploadingImages(true)
       const formData = new FormData()
 
-      // if (type === 'gallery') {
-        Array.from(files).forEach(file => formData.append('files', file))
-      // } else {
-      //   formData.append('files', files)
-      // }
+      Array.from(files).forEach(file => formData.append('files', file))
 
       const response = await fetchWithRetry(() =>
         axiosInstance.post(`${API_BASE_URL}/upload/files`, formData, {
@@ -146,9 +239,14 @@ const AdminPage = () => {
       )
 
       if (type === 'gallery') {
+        const newImages = response.data.urls.map((url: string) => ({
+          url: url,
+          caption: "",
+          isEditingCaption: false
+        }))
         setCompanyData(prev => ({
           ...prev,
-          gallery: [...prev.gallery, ...response.data.urls]
+          gallery: [...prev.gallery, ...newImages]
         }))
       } else {
         setCompanyData(prev => ({
@@ -167,12 +265,44 @@ const AdminPage = () => {
     }
   }
 
-  const removeGalleryImage = (index: number) => {
+  const handleCaptionChange = (index: number, value: string) => {
     setCompanyData(prev => ({
       ...prev,
-      gallery: prev.gallery.filter((_, i) => i !== index)
-    }))
-  }
+      gallery: prev.gallery.map((img, i) =>
+        i === index ? { ...img, caption: value } : img
+      )
+    }));
+  };
+
+  const handleCaptionEdit = (index: number, isEditing: boolean) => {
+    setCompanyData(prev => ({
+      ...prev,
+      gallery: prev.gallery.map((img, i) => ({
+        ...img,
+        isEditingCaption: i === index ? isEditing : false
+      }))
+    }));
+  };
+
+  const handleCaptionSave = (index: number) => {
+    setCompanyData(prev => ({
+      ...prev,
+      gallery: prev.gallery.map((img, i) => ({
+        ...img,
+        isEditingCaption: false
+      }))
+    }));
+  };
+
+  const handleCaptionCancel = (index: number) => {
+    setCompanyData(prev => ({
+      ...prev,
+      gallery: prev.gallery.map((img, i) => ({
+        ...img,
+        isEditingCaption: false
+      }))
+    }));
+  };
 
   const handleSave = async () => {
     try {
@@ -194,6 +324,22 @@ const AdminPage = () => {
       setIsSaving(false)
     }
   }
+
+  // Add a specific function for handling phone changes
+  const handlePhoneChange = (index: number, field: 'type' | 'number', value: string) => {
+    setCompanyData((prev) => ({
+      ...prev,
+      phone: prev.phone.map((phone, i) => {
+        if (i === index) {
+          return {
+            ...phone,
+            [field]: value
+          };
+        }
+        return phone;
+      })
+    }));
+  };
 
   if (showPreview) {
     return <CompanyProfilePreview data={companyData} onBack={() => setShowPreview(false)} />
@@ -313,65 +459,146 @@ const AdminPage = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="opening" className="block text-sm font-medium text-gray-700 mb-1">
-                    Opening Hours *
-                  </label>
-                  <input
-                    type="time"
-                    id="opening"
-                    value={companyData.opening}
-                    onChange={(e) => handleInputChange("opening", e.target.value)}
-                    required
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
+              {/* Opening Hours Section */}
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Opening Hours</h2>
+                  <button
+                    type="button"
+                    onClick={() => addArrayItem("days")}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Day
+                  </button>
                 </div>
-                <div>
-                  <label htmlFor="closing" className="block text-sm font-medium text-gray-700 mb-1">
-                    Closing Hours *
-                  </label>
-                  <input
-                    type="time"
-                    id="closing"
-                    value={companyData.closing}
-                    onChange={(e) => handleInputChange("closing", e.target.value)}
-                    required
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
+                <div className="space-y-4">
+                  {companyData.days.map((day, index) => (
+                    <div key={index} className="flex flex-col sm:flex-row gap-4 p-4 border rounded-lg">
+                      <div className="flex-1">
+                        <label htmlFor={`day-${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                          Day
+                        </label>
+                        <select
+                          id={`day-${index}`}
+                          value={day.day || ""}
+                          onChange={(e) => handleArrayChange("days", index, { ...day, day: e.target.value }, "day")}
+                          className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          required
+                        >
+                          <option value="">Select a day</option>
+                          {DAYS_OF_WEEK.map((d) => (
+                            <option key={d} value={d}>{d}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex-1">
+                        <label htmlFor={`opening-${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                          Opening Time
+                        </label>
+                        <input
+                          type="time"
+                          id={`opening-${index}`}
+                          value={day.opening || ""}
+                          onChange={(e) => handleArrayChange("days", index, { ...day, opening: e.target.value }, "opening")}
+                          className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          required
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label htmlFor={`closing-${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                          Closing Time
+                        </label>
+                        <input
+                          type="time"
+                          id={`closing-${index}`}
+                          value={day.closing || ""}
+                          onChange={(e) => handleArrayChange("days", index, { ...day, closing: e.target.value }, "closing")}
+                          className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          required
+                        />
+                      </div>
+                      <div className="flex items-end">
+                        <button
+                          type="button"
+                          onClick={() => removeArrayItem("days", index)}
+                          className="p-2 text-red-600 hover:text-red-800"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone Numbers *
-                </label>
-                {companyData.phone.map((phone, index) => (
-                  <div key={index} className="flex gap-2 mb-2">
-                    <input
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => handleArrayChange("phone", index, e.target.value)}
-                      required
-                      className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeArrayItem("phone", index)}
-                      className="px-3 py-2 text-red-600 hover:text-red-800"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => addArrayItem("phone")}
-                  className="mt-2 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Add Phone Number
-                </button>
+              {/* Phone Numbers Section */}
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Phone Numbers</h2>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCompanyData(prev => ({
+                        ...prev,
+                        phone: [...prev.phone, { type: "", number: "" }]
+                      }));
+                    }}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Phone
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  {companyData.phone.map((phone, index) => (
+                    <div key={index} className="flex flex-col sm:flex-row gap-4 p-4 border rounded-lg">
+                      <div className="flex-1">
+                        <label htmlFor={`phone-type-${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                          Type (e.g., Main, Mobile, WhatsApp)
+                        </label>
+                        <input
+                          type="text"
+                          id={`phone-type-${index}`}
+                          value={phone.type}
+                          onChange={(e) => handlePhoneChange(index, 'type', e.target.value)}
+                          placeholder="Enter phone type"
+                          className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          required
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label htmlFor={`phone-number-${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                          Phone Number
+                        </label>
+                        <input
+                          type="tel"
+                          id={`phone-number-${index}`}
+                          value={phone.number}
+                          onChange={(e) => handlePhoneChange(index, 'number', e.target.value)}
+                          placeholder="Enter phone number"
+                          className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          required
+                        />
+                      </div>
+                      <div className="flex items-end">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCompanyData(prev => ({
+                              ...prev,
+                              phone: prev.phone.filter((_, i) => i !== index)
+                            }));
+                          }}
+                          className="p-2 text-red-600 hover:text-red-800"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -411,7 +638,7 @@ const AdminPage = () => {
                 </div>
               </div>
 
-              {/* Hero Image Upload */}
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Hero Image
@@ -438,46 +665,103 @@ const AdminPage = () => {
               </div>
 
               {/* Gallery Upload */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Gallery Images
-                </label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                  {companyData.gallery.map((image, index) => (
-                    <div key={index} className="relative group">
-                      <div className="relative w-full h-32">
-                        <Image
-                          src={image}
-                          alt={`Gallery image ${index + 1}`}
-                          fill
-                          className="object-cover rounded-lg"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeGalleryImage(index)}
-                        className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div className="flex justify-between items-center mb-6">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">Gallery</h2>
+                    <p className="text-sm text-gray-500 mt-1">Add images with captions to showcase your institution</p>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      id="gallery-upload"
+                      multiple
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, "gallery")}
+                      className="hidden"
+                      disabled={uploadingImages}
+                    />
+                    <label
+                      htmlFor="gallery-upload"
+                      className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white ${uploadingImages ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'
+                        } transition-colors duration-200`}
+                    >
+                      {uploadingImages ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-4 h-4 mr-2" />
+                          Upload Images
+                        </>
+                      )}
+                    </label>
+                  </div>
                 </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) => handleImageUpload(e, 'gallery')}
-                  disabled={uploadingImages}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {companyData.gallery.map((image, index) => {
+                    // Type guard to ensure we have valid image data
+                    if (!image || typeof image !== 'object' || !('url' in image)) {
+                      return null;
+                    }
+
+                    const imageUrl = String(image.url || '');
+                    const imageCaption = String(image.caption || '');
+                    const isEditing = Boolean(image.isEditingCaption);
+
+                    return (
+                      <div key={index} className="group relative bg-gray-50 rounded-lg overflow-hidden">
+                        <div className="relative aspect-square">
+                          <Image
+                            src={imageUrl}
+                            alt={imageCaption || `Gallery image ${index + 1}`}
+                            fill
+                            className="object-cover transition-transform group-hover:scale-105"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeArrayItem("gallery", index)}
+                            className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+                            title="Remove image"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        <div className="p-3">
+                          {isEditing ? (
+                            <CaptionEditor
+                              image={image}
+                              index={index}
+                              onSave={handleCaptionSave}
+                              onCancel={handleCaptionCancel}
+                              onCaptionChange={handleCaptionChange}
+                            />
+                          ) : (
+                            <CaptionDisplay
+                              caption={imageCaption}
+                              onEdit={() => handleCaptionEdit(index, true)}
+                            />
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                {companyData.gallery.length === 0 && (
+                  <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                    <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500">No images uploaded yet</p>
+                    <p className="text-sm text-gray-400 mt-1">Upload images to showcase your institution</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
-          
           <div className="bg-white shadow rounded-lg overflow-hidden">
-            
             <div className="px-4 py-5 sm:p-6 space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -808,7 +1092,7 @@ function CompanyProfilePreview({ data, onBack }: { data: CompanyData; onBack: ()
                 <strong>Email:</strong> {data.email || "[Your Email]"}
               </div>
               <div>
-                <strong>Phone:</strong> {data.phone || "[Your Phone Number]"}
+                <strong>Phone:</strong> {data.phone.map(p => p.number).join(", ") || "[Your Phone Number]"}
               </div>
               <div className="col-span-1 md:col-span-2">
                 <strong>Website:</strong> {data.website || "[Your Website]"}

@@ -11,7 +11,6 @@ interface BlogEditorProps {
 export default function BlogEditor({ initialContent, onChange }: BlogEditorProps) {
   const editorRef = useRef(null)
   const [content, setContent] = useState(initialContent)
-
   const handleEditorChange = (newContent: string) => {
     setContent(newContent)
     onChange(newContent)
@@ -23,7 +22,7 @@ export default function BlogEditor({ initialContent, onChange }: BlogEditorProps
       onInit={(evt, editor) => {
         editorRef.current = editor
       }}
-      value={content}
+      value={content||initialContent}
       init={{
         height: 500,
         menubar: true,

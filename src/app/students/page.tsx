@@ -1371,8 +1371,11 @@ const StudentManagement: React.FC = () => {
             <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
               <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-lg ">
                 <div className="bg-gray-50 p-6 h-96 overflow-scroll">
-                  <div className="flex gap-10 items-center">
-                    {selectedStudent.image ? <img src={selectedStudent.image} alt="passport" className="w-24 rounded-full" /> : <FaUser className="w-24" />}
+                  <div className="flex  gap-10 items-center">
+                    <div className="w-24 items-center  h-24 overflow-hidden rounded-full">
+                    {selectedStudent.image ? <img src={selectedStudent.image} alt="passport" className=" w-full h-auto rounded-full" /> : <FaUser className="w-24" />}
+                          
+                    </div>
                     <h3 className="text-lg font-extrabold text-center text-gray-900">
                       STUDENT DETAILS
                     </h3>

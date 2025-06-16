@@ -100,7 +100,6 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem("ffa-admin", response.data.token);
       window.location.href = "/staff";
     } catch (error) {
-      setError("Invalid email or password");
       handleAxiosError(error);
     } finally {
       setIsLoading(false);
@@ -177,7 +176,8 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     if (axios.isAxiosError(error)) {
       if (error.response) {
         const errorMessage = error.response.data.message || "An error occurred";
-        toast.error(errorMessage);
+             setError(errorMessage);
+
 
         if (error.response.status === 401) {
           logout();
@@ -185,9 +185,11 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       } else if (error.request) {
         toast.error("network error ");
       } else {
+
         toast.error("Error sending request. Please try again.");
       }
     } else {
+      setError("An unexpected error occurred")
       toast.error("An unexpected error occurred");
     }
   };

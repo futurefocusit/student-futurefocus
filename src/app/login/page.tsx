@@ -1,12 +1,15 @@
 "use client";
 import { useAuth } from "@/context/AuthContext";
 import { TeamMemberLogin } from "@/types/types";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import Message from "@/components/message";
 import { FaArrowAltCircleLeft, FaEye, FaEyeSlash } from "react-icons/fa";
 import Link from "next/link";
 
 const LoginForm = () => {
+  useEffect(()=>{
+      document.title = "XCOOLL | Login";
+  })
   const { login, loading,error,success } = useAuth();
   const [formData, setFormData] = useState<TeamMemberLogin>({
     email: "",
@@ -25,7 +28,6 @@ const LoginForm = () => {
 
   const handleSubmit = async () => {
     try {
-     
       await login(formData);
     } catch (error) {
     }

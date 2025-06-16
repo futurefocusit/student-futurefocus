@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { Building2, Target, Eye, TrendingUp, MessageCircle, Loader2, ExternalLink, MapPin, Star, Clock, Globe, ImageIcon, Home, User, BookOpen, Calendar, MessageSquare } from "lucide-react"
+import { Building2, Target, Eye, TrendingUp, MessageCircle, Loader2, ExternalLink, MapPin, Star, Clock, Globe, ImageIcon, Home, User, BookOpen, Calendar, MessageSquare, X } from "lucide-react"
 import axiosInstance, { fetchWithCache } from "@/libs/axios"
 import API_BASE_URL from "@/config/baseURL"
-import Header from "@/components/header"
 import Image from "next/image"
-import Link from "next/link"
 
 interface CompanyData {
   name: string
@@ -16,12 +14,11 @@ interface CompanyData {
   heroImage: string
   address: string
   languages: string[]
-  gallery: string[]
+  gallery: Array<{ url: string, caption?: string }>
   mission: string
   vision: string
   slug: string
-  opening: string
-  closing: string
+  days: Array<{ opening: string, closing: string }>
   whyChooseUs: string[]
   linkedin: string
   instagram: string
@@ -30,17 +27,75 @@ interface CompanyData {
   description: string
   aboutUs: string
   email: string
-  phone: string[]
+  phone: Array<{ type: string, number: string }>
   logo: string
   website: string
   isSuperInst: boolean
 }
+
+// Add HTMLContent component for safe HTML rendering
+const HTMLContent = ({ content, className = "" }: { content: string; className?: string }) => (
+  <div
+    className={`prose prose-blue max-w-none ${className}`}
+    dangerouslySetInnerHTML={{ __html: content || "" }}
+  />
+);
+
+// Add TextWithReadMore component
+const TextWithReadMore = ({
+  content,
+  title,
+  maxLength = 200,
+  className = ""
+}: {
+  content: string;
+  title: string;
+  maxLength?: number;
+  className?: string;
+}) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const shouldTruncate = content?.length > maxLength;
+  const displayContent = isExpanded ? content : content?.slice(0, maxLength) + "...";
+
+  return (
+    <div className={`space-y-2 ${className}`}>
+      <h3 className="text-xl font-semibold text-gray-900 bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">{title}</h3>
+      <div className="relative">
+        <HTMLContent
+          content={displayContent}
+          className="text-gray-700 leading-relaxed"
+        />
+        {shouldTruncate && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="mt-2 text-blue-600 hover:text-blue-800 font-medium inline-flex items-center"
+          >
+            {isExpanded ? "Show Less" : "Read More"}
+            <svg
+              className={`w-4 h-4 ml-1 transform ${isExpanded ? "rotate-180" : ""}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default function CompanyProfilePage() {
   const params = useParams()
   const router = useRouter()
   const slug = params?.slug as string
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [showTextPopup, setShowTextPopup] = useState(false)
+  const [showGalleryPopup, setShowGalleryPopup] = useState(false)
+  const [showFullImage, setShowFullImage] = useState<string | null>(null)
+  const [popupContent, setPopupContent] = useState({ title: "", content: "" })
+  const [selectedGallery, setSelectedGallery] = useState<Array<{ url: string, caption?: string }>>([])
 
   const [companyData, setCompanyData] = useState<CompanyData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -72,13 +127,7 @@ export default function CompanyProfilePage() {
     }
   }, [slug])
 
-  const navItems = [
-    { name: "Home", href: "/", icon: Home },
-    { name: "Profile", href: `/profile/${slug}`, icon: User },
-    { name: "Courses", href: `/profile/${slug}/courses`, icon: BookOpen },
-    { name: "Events", href: `/profile/${slug}/events`, icon: Calendar },
-    { name: "Contact", href: `#contact`, icon: MessageSquare },
-  ]
+
 
   const sectionItems = [
     { name: "About Us", href: "#about", icon: Building2 },
@@ -87,6 +136,131 @@ export default function CompanyProfilePage() {
     { name: "Gallery", href: "#gallery", icon: ImageIcon },
     { name: "Contact Info", href: "#contact-info", icon: MessageCircle },
   ]
+
+  const GallerySection = ({ images }: { images: Array<{ url: string, caption?: string }> }) => {
+    const displayImages = images.slice(0, 4)
+    const hasMore = images.length > 4
+
+    const handleViewMore = () => {
+      setSelectedGallery(images)
+      setShowGalleryPopup(true)
+    }
+
+    const handleImageClick = (image: { url: string, caption?: string }) => {
+      setShowFullImage(image.url)
+    }
+
+    return (
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {displayImages.map((image, index) => (
+            <div
+              key={index}
+              className="relative aspect-square cursor-pointer group"
+              onClick={() => handleImageClick(image)}
+            >
+              <Image
+                src={image.url}
+                alt={image.caption || `Gallery image ${index + 1}`}
+                fill
+                className="object-cover rounded-lg transition-transform group-hover:scale-105"
+              />
+              {image.caption && (
+                <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-2 text-sm rounded-b-lg">
+                  {image.caption}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        {hasMore && (
+          <button
+            onClick={handleViewMore}
+            className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            View All Images ({images.length})
+          </button>
+        )}
+      </div>
+    )
+  }
+
+  const TextPopup = () => (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+        <div className="p-6">
+          <h3 className="text-xl font-bold mb-4">{popupContent.title}</h3>
+          <p className="text-gray-700 whitespace-pre-wrap">{popupContent.content}</p>
+        </div>
+        <div className="p-4 border-t">
+          <button
+            onClick={() => setShowTextPopup(false)}
+            className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+
+  const GalleryPopup = () => (
+    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+      <div className="max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {selectedGallery.map((image, index) => (
+            <div
+              key={index}
+              className="relative aspect-square cursor-pointer group"
+              onClick={() => setShowFullImage(image.url)}
+            >
+              <Image
+                src={image.url}
+                alt={image.caption || `Gallery image ${index + 1}`}
+                fill
+                className="object-cover rounded-lg transition-transform group-hover:scale-105"
+              />
+              {image.caption && (
+                <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-2 text-sm rounded-b-lg">
+                  {image.caption}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 text-center">
+          <button
+            onClick={() => setShowGalleryPopup(false)}
+            className="px-6 py-2 bg-white text-black rounded-lg hover:bg-gray-100"
+          >
+            Close Gallery
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+
+  const FullImagePopup = () => (
+    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4" onClick={() => setShowFullImage(null)}>
+      {showFullImage && (
+        <div className="relative max-w-6xl w-full max-h-[90vh]">
+          <Image
+            src={showFullImage}
+            alt="Full size image"
+            width={1200}
+            height={800}
+            className="object-contain max-h-[90vh] w-auto mx-auto"
+          />
+          <button
+            onClick={() => setShowFullImage(null)}
+            className="absolute top-4 right-4 p-2 bg-white/20 rounded-full hover:bg-white/30"
+          >
+            <X className="w-6 h-6 text-white" />
+          </button>
+        </div>
+      )}
+    </div>
+  )
 
   if (isLoading) {
     return (
@@ -151,7 +325,7 @@ export default function CompanyProfilePage() {
                 })}
               </div>
               <button
-                onClick={() => router.push(`/profile/${slug}/contact`)}
+                onClick={() => router.push(`/profile/${slug}/##contact`)}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-yellow-800 bg-white hover:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
               >
                 <MessageSquare className="h-5 w-5 mr-2" />
@@ -257,70 +431,62 @@ export default function CompanyProfilePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="space-y-12">
             {/* About Us */}
-            <div id="about" className="bg-white rounded-2xl shadow-xl overflow-hidden border border-blue-100">
-              <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">
-                <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                  <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
-                    <Building2 className="w-6 h-6 text-blue-800" />
-                  </div>
-                  About Us
-                </h3>
+            <div id="about" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <TextWithReadMore
+                  content={companyData.aboutUs}
+                  title="About Us"
+                  maxLength={300}
+                />
               </div>
-              <div className="px-6 py-8">
-                <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: companyData.aboutUs }} />
+            </div>
+
+            {/* Mission & Vision */}
+            <div id="mission-vision" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-white rounded-2xl shadow-xl p-8">
+                  <TextWithReadMore
+                    content={companyData.mission}
+                    title="Mission"
+                    maxLength={200}
+                  />
+                </div>
+                <div className="bg-white rounded-2xl shadow-xl p-8">
+                  <TextWithReadMore
+                    content={companyData.vision}
+                    title="Vision"
+                    maxLength={200}
+                  />
+                </div>
               </div>
             </div>
 
             {/* Description */}
-            {companyData.description && (
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-blue-100 max-h-96">
-                <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">
-                  <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                    <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
-                      <TrendingUp className="w-6 h-6 text-blue-800" />
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <TextWithReadMore
+                  content={companyData.description}
+                  title="Description"
+                  maxLength={400}
+                />
+              </div>
+            </div>
+
+            {/* Why Choose Us */}
+            <div id="why-choose-us" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+              <div className="bg-white rounded-2xl shadow-xl p-8 ">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">Why Choose Us</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {companyData.whyChooseUs.map((reason, index) => (
+                    <div key={index} className="p-4 bg-gray-50 rounded-lg">
+                      <HTMLContent
+                        content={reason}
+                        className="text-gray-700"
+                      />
                     </div>
-                    Description
-                  </h3>
-                </div>
-                <div className="px-6 py-8">
-                  <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: companyData.description }} />
+                  ))}
                 </div>
               </div>
-            )}
-
-            {/* Mission & Vision */}
-            <div id="mission-vision" className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-96 overflow-y-scroll">
-              {companyData.mission && (
-                <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-blue-100">
-                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">
-                    <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                      <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
-                        <Target className="w-6 h-6 text-blue-800" />
-                      </div>
-                      Mission
-                    </h3>
-                  </div>
-                  <div className="px-6 py-8">
-                    <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: companyData.mission }} />
-                  </div>
-                </div>
-              )}
-
-              {companyData.vision && (
-                <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-blue-100">
-                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">
-                    <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                      <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
-                        <Eye className="w-6 h-6 text-blue-800" />
-                      </div>
-                      Vision
-                    </h3>
-                  </div>
-                  <div className="px-6 py-8">
-                    <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: companyData.vision }} />
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Core Values & Languages */}
@@ -385,18 +551,7 @@ export default function CompanyProfilePage() {
                 </h3>
               </div>
               <div className="px-6 py-8">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {companyData.gallery.map((image, index) => (
-                    <div key={index} className="relative aspect-square">
-                      <Image
-                        src={image}
-                        alt={`Gallery image ${index + 1}`}
-                        fill
-                        className="object-cover rounded-lg"
-                      />
-                    </div>
-                  ))}
-                </div>
+                <GallerySection images={companyData.gallery} />
               </div>
             </div>
 
@@ -407,7 +562,7 @@ export default function CompanyProfilePage() {
                   <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
                     <MessageCircle className="w-6 h-6 text-blue-800" />
                   </div>
-                  Contact Information
+                  Contacts
                 </h3>
               </div>
               <div className="px-6 py-8">
@@ -424,11 +579,11 @@ export default function CompanyProfilePage() {
                             </a>
                           </p>
                         )}
-                        {companyData.phone.map((phone, index) => (
+                        {companyData.phone.map((p, index) => (
                           <p key={index} className="flex items-center gap-2 text-gray-700">
-                            <span className="font-medium">Phone {index + 1}:</span>
-                            <a href={`tel:${phone}`} className="text-blue-600 hover:text-blue-800">
-                              {phone}
+                            <span className="font-medium">{p.type}:</span>
+                            <a href={`tel:${p.number}`} className="text-blue-600 hover:text-blue-800">
+                              {p.number}
                             </a>
                           </p>
                         ))}
@@ -436,6 +591,12 @@ export default function CompanyProfilePage() {
                           <p className="flex items-center gap-2 text-gray-700">
                             <span className="font-medium">Address:</span>
                             {companyData.address}
+                          </p>
+                        )}
+                        {companyData.location && (
+                          <p className="flex items-center gap-2 text-gray-700">
+                            <span className="font-medium">Address:</span>
+                            {companyData.location}
                           </p>
                         )}
                         {companyData.website && (
@@ -455,19 +616,21 @@ export default function CompanyProfilePage() {
                       </div>
                     </div>
 
-                    {(companyData.opening || companyData.closing) && (
+                    {(companyData.days.length > 0 && companyData.days[0].opening && companyData.days[0].closing) && (
                       <div>
                         <h4 className="text-lg font-semibold text-gray-900 mb-2">Business Hours</h4>
                         <p className="flex items-center gap-2 text-gray-700">
                           <Clock className="w-5 h-5 text-blue-600" />
-                          {companyData.opening} - {companyData.closing}
+                          {companyData.days.map((day, index) => (
+                            <span key={index}>{day.opening} - {day.closing}</span>
+                          ))}
                         </p>
                       </div>
                     )}
                   </div>
 
                   <div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2">Social Media</h4>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2">Social Medias</h4>
                     <div className="flex flex-wrap gap-3">
                       {companyData.linkedin && (
                         <a
@@ -516,7 +679,84 @@ export default function CompanyProfilePage() {
             </div>
           </div>
         </div>
+        <div className="bg-gradient-to-r from-blue-800 to-blue-900 py-12">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              {/* <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-400 rounded-2xl mb-6">
+                <Building2 className="w-8 h-8 text-blue-800" />
+              </div> */}
+              <p className="text-blue-100 text-lg">
+                © {new Date().getFullYear()} {companyData.name}. All rights reserved.
+              </p>
+              <div className="mt-4 w-24 h-1 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full mx-auto"></div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Popups */}
+      {showTextPopup && <TextPopup />}
+      {showGalleryPopup && <GalleryPopup />}
+      {showFullImage && <FullImagePopup />}
+
+      {/* Add styles for prose content */}
+      <style jsx global>{`
+        .prose {
+          max-width: 65ch;
+          color: #374151;
+        }
+        .prose h1, .prose h2, .prose h3, .prose h4 {
+          color: #1f2937;
+          font-weight: 600;
+          margin-top: 1.5em;
+          margin-bottom: 0.5em;
+        }
+        .prose p {
+          margin-top: 1.25em;
+          margin-bottom: 1.25em;
+        }
+        .prose a {
+          color: #2563eb;
+          text-decoration: underline;
+        }
+        .prose ul, .prose ol {
+          margin-top: 1.25em;
+          margin-bottom: 1.25em;
+          padding-left: 1.625em;
+        }
+        .prose li {
+          margin-top: 0.5em;
+          margin-bottom: 0.5em;
+        }
+        .prose blockquote {
+          font-style: italic;
+          color: #4b5563;
+          border-left-width: 0.25rem;
+          border-left-color: #e5e7eb;
+          padding-left: 1em;
+          margin-top: 1.6em;
+          margin-bottom: 1.6em;
+        }
+        .prose img {
+          margin-top: 2em;
+          margin-bottom: 2em;
+          border-radius: 0.375rem;
+        }
+        .prose code {
+          color: #1f2937;
+          background-color: #f3f4f6;
+          padding: 0.2em 0.4em;
+          border-radius: 0.25rem;
+          font-size: 0.875em;
+        }
+        .prose pre {
+          background-color: #1f2937;
+          color: #f3f4f6;
+          padding: 1em;
+          border-radius: 0.375rem;
+          overflow-x: auto;
+        }
+      `}</style>
     </>
   )
 }

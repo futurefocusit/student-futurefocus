@@ -7,9 +7,11 @@ import { toast } from "react-toastify";
 import { IFeature, IRole, IPermission, TeamMember } from "@/types/types";
 import { useAuth } from "@/context/AuthContext";
 import { hasPermission } from "@/libs/hasPermission";
-import Layout from "../layout";
 import SideBar from "@/components/SideBar";
 import Loader from "@/components/loader";
+import Head from "next/head";
+
+
 
 const ManageRolesPermissions: React.FC = () => {
   const [error, setError] = useState<string>("");
@@ -30,6 +32,10 @@ const ManageRolesPermissions: React.FC = () => {
   const [rolePermissions, setRolePermissions] = useState<string[]>([]);
   const [userData, setUserData] = useState<TeamMember|null>()
   const { fetchLoggedUser, loggedUser } = useAuth();
+
+useEffect(()=>{
+    document.title = "XCOOLL | Role Managenent";
+})
 
   useEffect(() => {
     fetchFeatures();
@@ -160,7 +166,15 @@ const ManageRolesPermissions: React.FC = () => {
 if (isLoading) return <Loader />;
 if (error) return <div>{error}</div>;
   return (
-     <><SideBar /><div className="max-w-6xl  mx-auto p-5">
+
+     <>
+      <>
+      <Head>
+        <title>Manage Role</title>
+        <meta name="description" content="Xcool management system" />
+      </Head>
+    </>
+     <SideBar /><div className="max-w-4xl  mx-auto p-5">
 
       <h1 className="text-3xl font-bold ml-10 mb-6">MANAGE ROLES AND PERMISSIONS</h1>
       <div className="mb-10">
