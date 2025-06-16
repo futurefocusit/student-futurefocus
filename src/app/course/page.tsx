@@ -42,10 +42,10 @@ const CoursesComponent: React.FC = () => {
     const fetchCourses = async () => {
       try {
         const response = await getCourses();
-        if (Array.isArray(response.data)) {
-          setCourses(response.data);
+        if (Array.isArray(response)) {
+          setCourses(response);
         } else {
-          console.error("Unexpected data format:", response.data);
+          console.error("Unexpected data format:", response);
           setCourses([]);
         }
         await fetchLoggedUser();
@@ -130,7 +130,7 @@ const CoursesComponent: React.FC = () => {
         active: formData.active,
       };
       const response = await addCourse(newCourse);
-      setCourses([...courses, response.data]);
+      setCourses([...courses, response]);
       toast.success("Course added successfully!");
     } catch (error) {
       toast.error("Failed to add course.");

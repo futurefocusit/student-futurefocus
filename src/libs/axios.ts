@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 
 // Cache configuration
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
-const cache = new Map<string, { data: any; timestamp: number }>();
+const cache = new Map<string, { data; timestamp: number }>();
 
 // Retry configuration
 const MAX_RETRIES = {

@@ -9,7 +9,7 @@ interface BlogEditorProps {
 }
 
 export default function BlogEditor({ initialContent, onChange }: BlogEditorProps) {
-  const editorRef = useRef<any>(null)
+  const editorRef = useRef(null)
   const [content, setContent] = useState(initialContent)
 
   const handleEditorChange = (newContent: string) => {
