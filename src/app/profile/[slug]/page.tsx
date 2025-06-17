@@ -6,6 +6,7 @@ import { Building2, Target, Eye, TrendingUp, MessageCircle, Loader2, ExternalLin
 import axiosInstance, { fetchWithCache } from "@/libs/axios"
 import API_BASE_URL from "@/config/baseURL"
 import Image from "next/image"
+import BlogList from "./BlogList"
 
 interface CompanyData {
   name: string
@@ -18,7 +19,7 @@ interface CompanyData {
   mission: string
   vision: string
   slug: string
-  days: Array<{ opening: string, closing: string }>
+  days: Array<{ day: string, opening: string, closing: string }>
   whyChooseUs: string[]
   linkedin: string
   instagram: string
@@ -59,7 +60,7 @@ const TextWithReadMore = ({
 
   return (
     <div className={`space-y-2 ${className}`}>
-      <h3 className="text-xl font-semibold text-gray-900 bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">{title}</h3>
+      <h3 className=" rounded-t-2xl text-xl font-semibold text-gray-900 bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">{title}</h3>
       <div className="relative">
         <HTMLContent
           content={displayContent}
@@ -619,12 +620,15 @@ export default function CompanyProfilePage() {
                     {(companyData.days.length > 0 && companyData.days[0].opening && companyData.days[0].closing) && (
                       <div>
                         <h4 className="text-lg font-semibold text-gray-900 mb-2">Business Hours</h4>
-                        <p className="flex items-center gap-2 text-gray-700">
-                          <Clock className="w-5 h-5 text-blue-600" />
+                        <div className="space-y-1">
                           {companyData.days.map((day, index) => (
-                            <span key={index}>{day.opening} - {day.closing}</span>
+                            <p key={index} className="flex items-center gap-2 text-gray-700">
+                              <Clock className="w-5 h-5 text-blue-600" />
+                              <span className="font-medium">{day.day}:</span>
+                              <span>{day.opening} - {day.closing}</span>
+                            </p>
                           ))}
-                        </p>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -757,6 +761,11 @@ export default function CompanyProfilePage() {
           overflow-x: auto;
         }
       `}</style>
+
+      {/* Add BlogList at the end of the main content section */}
+      {/* <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <BlogList slug={slug} />
+      </div> */}
     </>
   )
 }
