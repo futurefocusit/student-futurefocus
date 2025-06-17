@@ -556,7 +556,7 @@ const AdminPage = () => {
                   <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
                     <Clock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-500">No working days added yet</p>
-                    <p className="text-sm text-gray-400 mt-1">Add your business hours to help customers know when you're open</p>
+                    <p className="text-sm text-gray-400 mt-1">Add your business hours to help customers know when you&apos;re open</p>
 
                     <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
                       <button
