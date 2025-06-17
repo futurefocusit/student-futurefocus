@@ -26,10 +26,23 @@ export interface TeamMember {
   isSuperAdmin: boolean;
   role: Role;
   image: string
-  position: string
+  position: string;
+  phone: string
   attend: boolean;
   active: boolean;
   institution: { logo: string, name: string }
+  contractType: string,
+  linkedIn: string,
+  nationalId: string,
+  leaveDetails:{
+    isOnLeave: boolean,
+    leaveType?: string ,
+    startDate?: string,
+    endDate?: string,
+    approvedBy?: string,
+  },
+  bio: string,
+  skills: string[],
 
 }
 export interface TeamMemberLogin {
