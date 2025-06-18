@@ -107,7 +107,7 @@ export default function BlogList({ slug }: { slug: string }) {
             Recent Blog Posts
           </h3>
           <Button variant="ghost" size="sm" asChild className="text-white  hover:text-yellow-200 hover:bg-white/10">
-            <Link href={`/blogs/${slug}`} className="flex items-center gap-1">
+            <Link href={`/blogs/slug/${slug}`} className="flex items-center gap-1">
               View All <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
