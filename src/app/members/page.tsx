@@ -602,7 +602,7 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
                                   )}
                           
                                   {/* Certificates */}
-                                  {member.certificate && member.certificate.length > 0 && (
+                                  {(member.certificate || []).length > 0 && (
                                     <div className="border border-gray-300 p-3 rounded">
                                       <p className="font-medium mb-2">Certificates:</p>
                                       <ul className="list-disc pl-5 space-y-1 text-sm text-blue-700">
