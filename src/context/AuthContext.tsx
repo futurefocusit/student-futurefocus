@@ -6,6 +6,7 @@ import {
   useContext,
   useState,
   useCallback,
+  useEffect,
 } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -38,7 +39,7 @@ export const AuthContext = createContext<AuthContextData>(
 
 const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
   const [loggedUser, setLoggedUser] = useState<TeamMember | null>(null);
-  const [loading, setIsLoading] = useState(false);
+  const [loading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -80,6 +81,9 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
+  useEffect(() => {
+    fetchLoggedUser();
+  }, [fetchLoggedUser]);
 
   const login = useCallback(async (memberData: TeamMemberLogin) => {
     setIsLoading(true);
@@ -176,7 +180,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     if (axios.isAxiosError(error)) {
       if (error.response) {
         const errorMessage = error.response.data.message || "An error occurred";
-             setError(errorMessage);
+        setError(errorMessage);
 
 
         if (error.response.status === 401) {
@@ -193,8 +197,6 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       toast.error("An unexpected error occurred");
     }
   };
-
-
 
   const contextValue = {
     signed: Boolean(loggedUser),
