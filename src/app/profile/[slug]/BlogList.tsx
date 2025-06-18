@@ -150,7 +150,7 @@ export default function BlogList({ slug }: { slug: string }) {
                     className="w-fit text-blue-600 hover:text-blue-800 hover:bg-blue-50"
                     asChild
                   >
-                    <Link href={`/blog/${post._id}`}>Read More</Link>
+                    <Link href={`/blogs/${post._id}`}>Read More</Link>
                   </Button>
                   {post.tags && post.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
