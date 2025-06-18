@@ -10,22 +10,56 @@ import { TeamMember } from "@/types/types";
 import Layout from "../layout";
 import { hasPermission } from "@/libs/hasPermission";
 import SideBar from "@/components/SideBar";
-import { CloudUpload, Person, Email, Phone, Work, AccessTime, CalendarToday } from "@mui/icons-material";
-import { TextField, Select, MenuItem, FormControl, InputLabel, Grid, Chip, OutlinedInput } from "@mui/material";
+import { X, ArrowUpRightFromSquareIcon, PhoneIcon, LucideLinkedin } from "lucide-react";
+import {
+  CloudUpload,
+  Person,
+  Email,
+  Phone,
+  Work,
+  AccessTime,
+  CalendarToday,
+} from "@mui/icons-material";
+import Grid2 from "@mui/material/Unstable_Grid2";
+import {
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Chip,
+  OutlinedInput,
+  FormControlLabel,
+  Checkbox,
+  Box,
+} from "@mui/material";
 
 const MembersPage: React.FC = () => {
-  const { fetchTeam, addTeamMember, updateTeamMember, deleteTeamMember, loggedUser, fetchLoggedUser } =
-    useAuth();
+  const {
+    fetchTeam,
+    addTeamMember,
+    updateTeamMember,
+    deleteTeamMember,
+    loggedUser,
+    fetchLoggedUser,
+  } = useAuth();
 
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
-
-  const [togglesAdmin, setTogglesAdmin] = useState<{ [key: string]: boolean }>({});
-  const [togglesAttedance, setTogglesAttendance] = useState<{ [key: string]: boolean }>({});
-  const [togglesActive, setTogglesActive] = useState<{ [key: string]: boolean }>({});
+  const [skillInput, setSkillInput] = useState('');
+  const [togglesAdmin, setTogglesAdmin] = useState<{ [key: string]: boolean }>(
+    {}
+  );
+  const [togglesAttedance, setTogglesAttendance] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [togglesActive, setTogglesActive] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [moreInfo, setMoreInfo] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     _id: "",
@@ -41,7 +75,18 @@ const MembersPage: React.FC = () => {
     isSuperAdmin: false,
     attend: false,
     active: true,
-    institution: { logo: "", name: "" }
+    institution: { logo: "", name: "" },
+    contractType: "",
+    linkedIn: "",
+    nationalId: "",
+    bio: "",
+    skills: [],
+    leaveDetails: {
+      isOnLeave: false,
+      leaveType: "",
+      startDate: "",
+      endDate: "",
+    },
   });
 
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -61,7 +106,7 @@ const MembersPage: React.FC = () => {
     const loadTeamMembers = async () => {
       setIsLoading(true);
       try {
-        await fetchLoggedUser()
+        await fetchLoggedUser();
         const teamMembers = await fetchTeam();
         setMembers(teamMembers);
 
@@ -141,9 +186,8 @@ const MembersPage: React.FC = () => {
         [id]: !prev[id],
       }));
       toast.success("switched succsfully");
-
     } catch (error) {
-      toast.error('failed to switch')
+      toast.error("failed to switch");
     }
   };
   const handleToggleActive = async (id: string) => {
@@ -154,9 +198,8 @@ const MembersPage: React.FC = () => {
         [id]: !prev[id],
       }));
       toast.success("switched succsfully");
-
     } catch (error) {
-      toast.error('failed to switch')
+      toast.error("failed to switch");
     }
   };
   const handleToggleAdmin = async (id: string) => {
@@ -167,9 +210,8 @@ const MembersPage: React.FC = () => {
         [id]: !prev[id],
       }));
       toast.success("switched succsfully");
-
     } catch (error) {
-      toast.error('failed to switch')
+      toast.error("failed to switch");
     }
   };
 
@@ -191,7 +233,18 @@ const MembersPage: React.FC = () => {
       isSuperAdmin: false,
       attend: false,
       active: true,
-      institution: { logo: "", name: "" }
+      institution: { logo: "", name: "" },
+      contractType: "",
+      linkedIn: "",
+      nationalId: "",
+      bio: "",
+      skills: [],
+      leaveDetails: {
+        isOnLeave: false,
+        leaveType: "",
+        startDate: "",
+        endDate: "",
+      },
     });
   };
 
@@ -201,10 +254,9 @@ const MembersPage: React.FC = () => {
 
     // Check if file is WebP format
     if (!file.type.startsWith("image/")) {
-  toast.error("Please upload only image format images");
-  return;
-}
-
+      toast.error("Please upload only image format images");
+      return;
+    }
 
     if (file.size > 2 * 1024 * 1024) {
       toast.error("Image size should be less than 2MB");
@@ -243,311 +295,650 @@ const MembersPage: React.FC = () => {
 
   const handleDaysChange = (event) => {
     const selectedDays = event.target.value;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      days: selectedDays.join(", ")
+      days: selectedDays.join(", "),
     }));
   };
 
+  const handleMoreInfo = (id: string) => {
+    setMoreInfo((prev) => (prev === id ? null : id));
+  };
+
+  const handleSkillKeyDown = (e) => {
+    if (e.key === 'Enter' && skillInput.trim()) {
+      e.preventDefault();
+      if (!formData.skills.includes(skillInput.trim())) {
+        setFormData({
+          ...formData,
+          skills: [...formData.skills, skillInput.trim()],
+        });
+      }
+      setSkillInput('');
+    }
+  };
+
+  const handleSkillDelete = (skillToDelete) => {
+    setFormData({
+      ...formData,
+      skills: formData.skills.filter((skill) => skill !== skillToDelete),
+    });
+  };
+
   return (
-    <><SideBar /><div className="p-2 md:px-20 md:ml-20 md:p-4">
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-        <h1 className="text-xl md:text-2xl font-semibold">TEAM MEMBERS</h1>
-        <button
-          disabled={!hasPermission(loggedUser, "team", "create")}
-          onClick={() => setIsAddModalOpen(true)}
-          className={`w-full sm:w-auto px-4 py-2 ${!hasPermission(loggedUser, "team", "create")
-            ? "bg-gray-400 cursor-not-allowed"
-            : "bg-blue-600"} text-white rounded-md`}
-        >
-          Add Member
-        </button>
-      </div>
-
-      {isLoading ? (
-        <div className="text-center py-10">
-          <div className="loader">Loading...</div>
+    <>
+      <SideBar />
+      <div className="p-2 md:px-20 md:ml-20 md:p-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+          <h1 className="text-xl md:text-2xl font-semibold">TEAM MEMBERS</h1>
+          <button
+            disabled={!hasPermission(loggedUser, "team", "create")}
+            onClick={() => setIsAddModalOpen(true)}
+            className={`w-full sm:w-auto px-4 py-2 ${
+              !hasPermission(loggedUser, "team", "create")
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600"
+            } text-white rounded-md`}
+          >
+            Add Member
+          </button>
         </div>
-      ) : (
-        <div className="space-y-4">
-          {members.map((member) => (
-            <div
-              key={member._id}
-              className="flex flex-col  md:flex-row md:justify-between   items-center p-3 md:p-4 border  rounded-lg shadow-md bg-white "
-            >
-              <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-                <img
-                  src={member.image}
-                  alt={member.name}
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover" />
-                <div className="text-center sm:text-left">
-                  <h3 className="text-lg md:text-xl font-bold mb-1">{member.name}</h3>
-                  <p className="text-gray-700 mb-1">{member.position}</p>
-                </div>
-              </div>
 
-              <div className="flex flex-col md:flex-row gap-4  sm:ml-auto">
-                <div className="flex flex-col gap-4 w-full md:w-auto">
-                  <div className="flex items-center justify-between gap-4">
-                    <p className="font-bold text-sm md:text-base">ATTENDANCE:</p>
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`attendance-${member._id}`}
-                        className="toggle-checkbox hidden"
-                        checked={togglesAttedance[member._id] || false}
-                        onChange={() => handleToggleAttend(member._id)} />
-                      <div
-                        onClick={() => handleToggleAttend(member._id)}
-                        className={`toggle-container w-12 md:w-16 h-6 md:h-8 rounded-full flex items-center p-1 cursor-pointer ${togglesAttedance[member._id] ? "bg-blue-500" : "bg-gray-300"}`}
-                      >
-                        <div
-                          className={`toggle-circle w-5 h-5 md:w-6 md:h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${togglesAttedance[member._id] ? "translate-x-6 md:translate-x-8" : ""}`} />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between gap-4">
-                    <p className="font-bold text-sm md:text-base">ACTIVE:</p>
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`active-${member._id}`}
-                        className="toggle-checkbox hidden"
-                        checked={togglesActive[member._id] || false}
-                        onChange={() => handleToggleActive(member._id)} />
-                      <div
-                        onClick={() => handleToggleActive(member._id)}
-                        className={`toggle-container w-12 md:w-16 h-6 md:h-8 rounded-full flex items-center p-1 cursor-pointer ${togglesActive[member._id] ? "bg-blue-500" : "bg-gray-300"}`}
-                      >
-                        <div
-                          className={`toggle-circle w-5 h-5 md:w-6 md:h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${togglesActive[member._id] ? "translate-x-6 md:translate-x-8" : ""}`} />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between md:gap-4">
-                    <p className="font-bold text-sm md:text-base">ADMIN:</p>
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`admin-${member._id}`}
-                        className="toggle-checkbox hidden"
-                        checked={togglesAdmin[member._id] || false}
-                        onChange={() => handleToggleAdmin(member._id)} />
-                      <div
-                        onClick={() => handleToggleAdmin(member._id)}
-                        className={`toggle-container w-12 md:w-16 h-6 md:h-8 rounded-full flex items-center p-1 cursor-pointer ${togglesAdmin[member._id] ? "bg-blue-500" : "bg-gray-300"}`}
-                      >
-                        <div
-                          className={`toggle-circle w-5 h-5 md:w-6 md:h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${togglesAdmin[member._id] ? "translate-x-6 md:translate-x-8" : ""}`} />
-                      </div>
+        {isLoading ? (
+          <div className="text-center py-10">
+            <div className="loader">Loading...</div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {members.map((member) => (
+              <div
+                key={member._id}
+                className="flex flex-col  md:flex-row md:justify-between   items-center p-3 md:p-4 border  rounded-lg shadow-md bg-white "
+              >
+                <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover"
+                  />
+                  <div className="text-center sm:text-left">
+                    <h3 className="text-lg md:text-xl font-bold mb-1">
+                      {member.name}
+                    </h3>
+                    <p className="text-gray-700 mb-1">{member.position}</p>
+                    <div
+                      onClick={() => handleMoreInfo(member._id)}
+                      className="flex items-center gap-2 text-blue-700 cursor-pointer hover:text-green-700 hover:underline"
+                    >
+                      <p className="font-bold text-sm ">More Info...</p>
+                      <ArrowUpRightFromSquareIcon size={13} />
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-row md:flex-col justify-center gap-2 w-full md:w-auto">
-                  <button
-                    disabled={!hasPermission(loggedUser, "team", "update")}
-                    onClick={() => handleEdit(member)}
-                    className={`flex-1 md:flex-none px-4 py-2 text-sm md:text-base ${!hasPermission(loggedUser, "team", "update")
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-green-600"} text-white rounded-md`}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    disabled={!hasPermission(loggedUser, "team", "delete")}
-                    onClick={() => handleDelete(member._id)}
-                    className={`flex-1 md:flex-none px-4 py-2 text-sm md:text-base ${!hasPermission(loggedUser, "team", "delete")
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-red-600"} text-white rounded-md`}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+                {moreInfo === member._id && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                    <div className="bg-white p-5 w-1/2">
+                      <div className="flex flex-col gap-10">
+                        <div className="flex justify-between items-center">
+                          <h1 className="font-bold text-2xl text-blue-700">
+                            Member Profile
+                          </h1>
+                          <X
+                            onClick={() => setMoreInfo(null)}
+                            size={25}
+                            className="cursor-pointer hover:bg-red-700 rounded-full p-1 hover:text-white"
+                          />
+                        </div>
 
-      <Modal isOpen={isAddModalOpen || isUpdateModalOpen} onClose={closeModal}>
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-lg md:text-xl font-bold mb-6 text-center">
-            {editingMember ? "Edit Member" : "Add New Member"}
-          </h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Grid container spacing={3}>
-              {/* Profile Image Upload */}
-              <Grid item xs={12}>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Profile Image (image format only)
-                  </label>
-                  <div className="flex items-center space-x-4">
-                    <div className="relative">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                        id="image-upload"
-                        disabled={isUploading}
-                      />
-                      <label
-                        htmlFor="image-upload"
-                        className={`flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer ${isUploading ? "opacity-50 cursor-not-allowed" : ""
-                          }`}
-                      >
-                        <CloudUpload className="mr-2" />
-                        {isUploading ? "Uploading..." : "Upload Image"}
-                      </label>
+                        <div className="flex items-center gap-3">
+                          <div className="w-36 h-36 rounded-full bg-black overflow-hidden">
+                            <img
+                              src={member.image}
+                              alt={member.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex flex-col">
+                            <h1 className="font-bold text-lg">{member.name}</h1>
+                            <p className="font-medium text-gray-500">
+                              {member.email}
+                            </p>
+                            <p className="font-medium text-gray-500">{member.phone}</p>
+                            <p className="font-medium italic text-blue-700">
+                              {member.position}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-4">
+                          <div className="flex flex-col border border-gray-400 p-3 rounded gap-2">
+                            <h1 className="font-bold text-2xl">About Me</h1>
+                            <p>{member.bio}</p>
+                          </div>
+
+                          <div className="flex flex-col border border-gray-400 p-3 rounded gap-2">
+                            <h1 className="font-bold text-2xl">Skills</h1>
+                            <div className="grid grid-cols-3 gap-2">
+                              {member.skills.map((skill, index) => (
+                                <div key={index} className="">
+                                  <p className="font-medium">📍 {skill}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2 min-w-full">
+                            <div className="flex flex-col border border-gray-400 p-3 rounded gap-2">
+                              <h1 className="font-bold text-2xl">Phone Number</h1>
+                              <p className="flex gap-2 items-center"><span><PhoneIcon size={15}/></span>{member.phone}</p>
+                             </div>
+
+                             <div className="flex flex-col border border-gray-400 p-3 rounded gap-2">
+                                <h1 className="font-bold text-2xl">Social Profile</h1>
+                                <a href={member.linkedIn} className="hover:text-blue-700"><span><LucideLinkedin/></span></a>
+                             </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    {(imagePreview || formData.image) && (
-                      <div className="relative w-20 h-20">
-                        <img
-                          src={imagePreview || formData.image}
-                          alt="Preview"
-                          className="w-full h-full object-cover rounded-full"
+                  </div>
+                )}
+
+                <div className="flex flex-col md:flex-row gap-4  sm:ml-auto">
+                  <div className="flex flex-col gap-4 w-full md:w-auto">
+                    <div className="flex items-center justify-between gap-4">
+                      <p className="font-bold text-sm md:text-base">
+                        ATTENDANCE:
+                      </p>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={`attendance-${member._id}`}
+                          className="toggle-checkbox hidden"
+                          checked={togglesAttedance[member._id] || false}
+                          onChange={() => handleToggleAttend(member._id)}
                         />
+                        <div
+                          onClick={() => handleToggleAttend(member._id)}
+                          className={`toggle-container w-12 md:w-16 h-6 md:h-8 rounded-full flex items-center p-1 cursor-pointer ${
+                            togglesAttedance[member._id]
+                              ? "bg-blue-500"
+                              : "bg-gray-300"
+                          }`}
+                        >
+                          <div
+                            className={`toggle-circle w-5 h-5 md:w-6 md:h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                              togglesAttedance[member._id]
+                                ? "translate-x-6 md:translate-x-8"
+                                : ""
+                            }`}
+                          />
+                        </div>
                       </div>
-                    )}
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <p className="font-bold text-sm md:text-base">ACTIVE:</p>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={`active-${member._id}`}
+                          className="toggle-checkbox hidden"
+                          checked={togglesActive[member._id] || false}
+                          onChange={() => handleToggleActive(member._id)}
+                        />
+                        <div
+                          onClick={() => handleToggleActive(member._id)}
+                          className={`toggle-container w-12 md:w-16 h-6 md:h-8 rounded-full flex items-center p-1 cursor-pointer ${
+                            togglesActive[member._id]
+                              ? "bg-blue-500"
+                              : "bg-gray-300"
+                          }`}
+                        >
+                          <div
+                            className={`toggle-circle w-5 h-5 md:w-6 md:h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                              togglesActive[member._id]
+                                ? "translate-x-6 md:translate-x-8"
+                                : ""
+                            }`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between md:gap-4">
+                      <p className="font-bold text-sm md:text-base">ADMIN:</p>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={`admin-${member._id}`}
+                          className="toggle-checkbox hidden"
+                          checked={togglesAdmin[member._id] || false}
+                          onChange={() => handleToggleAdmin(member._id)}
+                        />
+                        <div
+                          onClick={() => handleToggleAdmin(member._id)}
+                          className={`toggle-container w-12 md:w-16 h-6 md:h-8 rounded-full flex items-center p-1 cursor-pointer ${
+                            togglesAdmin[member._id]
+                              ? "bg-blue-500"
+                              : "bg-gray-300"
+                          }`}
+                        >
+                          <div
+                            className={`toggle-circle w-5 h-5 md:w-6 md:h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                              togglesAdmin[member._id]
+                                ? "translate-x-6 md:translate-x-8"
+                                : ""
+                            }`}
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-500">
-                    Maximum file size: 2MB. Only image format is supported.
-                  </p>
+
+                  <div className="flex flex-row md:flex-col justify-center gap-2 w-full md:w-auto">
+                    <button
+                      disabled={!hasPermission(loggedUser, "team", "update")}
+                      onClick={() => handleEdit(member)}
+                      className={`flex-1 md:flex-none px-4 py-2 text-sm md:text-base ${
+                        !hasPermission(loggedUser, "team", "update")
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-green-600"
+                      } text-white rounded-md`}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      disabled={!hasPermission(loggedUser, "team", "delete")}
+                      onClick={() => handleDelete(member._id)}
+                      className={`flex-1 md:flex-none px-4 py-2 text-sm md:text-base ${
+                        !hasPermission(loggedUser, "team", "delete")
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-red-600"
+                      } text-white rounded-md`}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
-              </Grid>
+              </div>
+            ))}
+          </div>
+        )}
 
-              {/* Basic Information */}
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Full Name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  InputProps={{
-                    startAdornment: <Person className="text-gray-400 mr-2" />,
-                  }}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  InputProps={{
-                    startAdornment: <Email className="text-gray-400 mr-2" />,
-                  }}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Phone Number"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                  InputProps={{
-                    startAdornment: <Phone className="text-gray-400 mr-2" />,
-                  }}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Position"
-                  name="position"
-                  value={formData.position}
-                  onChange={handleChange}
-                  required
-                  InputProps={{
-                    startAdornment: <Work className="text-gray-400 mr-2" />,
-                  }}
-                />
-              </Grid>
-
-              {/* Working Hours */}
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  label="Entry Time"
-                  name="entry"
-                  type="time"
-                  value={formData.entry}
-                  onChange={handleChange}
-                  required
-                  InputProps={{
-                    startAdornment: <AccessTime className="text-gray-400 mr-2" />,
-                  }}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  label="Exit Time"
-                  name="exit"
-                  type="time"
-                  value={formData.exit}
-                  onChange={handleChange}
-                  required
-                  InputProps={{
-                    startAdornment: <AccessTime className="text-gray-400 mr-2" />,
-                  }}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <FormControl fullWidth required>
-                  <InputLabel>Working Days</InputLabel>
-                  <Select
-                    multiple
-                    value={formData.days ? formData.days.split(", ") : []}
-                    onChange={handleDaysChange}
-                    input={<OutlinedInput label="Working Days" />}
-                    renderValue={(selected) => (
-                      <div className="flex flex-wrap gap-1">
-                        {selected.map((value) => (
-                          <Chip key={value} label={value} />
-                        ))}
+        <Modal
+          isOpen={isAddModalOpen || isUpdateModalOpen}
+          onClose={closeModal}
+        >
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-lg md:text-xl font-bold mb-6 text-center">
+              {editingMember ? "Edit Member" : "Add New Member"}
+            </h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Grid2 container spacing={3}>
+                {/* Profile Image Upload */}
+                <Grid2 xs={12}>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Profile Image (image format only)
+                    </label>
+                    <div className="flex items-center space-x-4">
+                      <div className="relative">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          id="image-upload"
+                          disabled={isUploading}
+                        />
+                        <label
+                          htmlFor="image-upload"
+                          className={`flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer ${
+                            isUploading ? "opacity-50 cursor-not-allowed" : ""
+                          }`}
+                        >
+                          <CloudUpload className="mr-2" />
+                          {isUploading ? "Uploading..." : "Upload Image"}
+                        </label>
                       </div>
-                    )}
-                    startAdornment={<CalendarToday className="text-gray-400 mr-2" />}
-                  >
-                    {weekDays.map((day) => (
-                      <MenuItem key={day.value} value={day.value}>
-                        {day.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+                      {(imagePreview || formData.image) && (
+                        <div className="relative w-20 h-20">
+                          <img
+                            src={imagePreview || formData.image}
+                            alt="Preview"
+                            className="w-full h-full object-cover rounded-full"
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      Maximum file size: 2MB. Only image format is supported.
+                    </p>
+                  </div>
+                </Grid2>
 
-              {/* Submit Button */}
-              <Grid item xs={12}>
-                <button
-                  type="submit"
-                  className="w-full py-3 bg-blue-600 text-white rounded-md text-sm md:text-base hover:bg-blue-700 transition-colors"
-                >
-                  {editingMember ? "Update Member" : "Add Member"}
-                </button>
-              </Grid>
-            </Grid>
-          </form>
-        </div>
-      </Modal>
-    </div></>
+                {/* Full Name */}
+                <Grid2 xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Full Name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    InputProps={{
+                      startAdornment: <Person className="text-gray-400 mr-2" />,
+                    }}
+                  />
+                </Grid2>
+
+                {/* Email */}
+                <Grid2 xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    InputProps={{
+                      startAdornment: <Email className="text-gray-400 mr-2" />,
+                    }}
+                  />
+                </Grid2>
+
+                {/* Phone */}
+                <Grid2 xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Phone Number"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    required
+                    InputProps={{
+                      startAdornment: <Phone className="text-gray-400 mr-2" />,
+                    }}
+                  />
+                </Grid2>
+
+                {/* Position */}
+                <Grid2 xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Position"
+                    name="position"
+                    value={formData.position}
+                    onChange={handleChange}
+                    required
+                    InputProps={{
+                      startAdornment: <Work className="text-gray-400 mr-2" />,
+                    }}
+                  />
+                </Grid2>
+
+                {/* Entry Time */}
+                <Grid2 xs={12} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Entry Time"
+                    name="entry"
+                    type="time"
+                    value={formData.entry}
+                    onChange={handleChange}
+                    required
+                    InputProps={{
+                      startAdornment: (
+                        <AccessTime className="text-gray-400 mr-2" />
+                      ),
+                    }}
+                  />
+                </Grid2>
+
+                {/* Exit Time */}
+                <Grid2 xs={12} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Exit Time"
+                    name="exit"
+                    type="time"
+                    value={formData.exit}
+                    onChange={handleChange}
+                    required
+                    InputProps={{
+                      startAdornment: (
+                        <AccessTime className="text-gray-400 mr-2" />
+                      ),
+                    }}
+                  />
+                </Grid2>
+
+                {/* Working Days */}
+                <Grid2 xs={12} md={4}>
+                  <FormControl fullWidth required>
+                    <InputLabel>Working Days</InputLabel>
+                    <Select
+                      multiple
+                      value={formData.days ? formData.days.split(", ") : []}
+                      onChange={handleDaysChange}
+                      input={<OutlinedInput label="Working Days" />}
+                      renderValue={(selected) => (
+                        <div className="flex flex-wrap gap-1">
+                          {selected.map((value) => (
+                            <Chip key={value} label={value} />
+                          ))}
+                        </div>
+                      )}
+                      startAdornment={
+                        <CalendarToday className="text-gray-400 mr-2" />
+                      }
+                    >
+                      {weekDays.map((day) => (
+                        <MenuItem key={day.value} value={day.value}>
+                          {day.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid2>
+
+                {/* Contract Type */}
+                <Grid2 xs={12} md={6}>
+                  <FormControl fullWidth required>
+                    <InputLabel>Contract Type</InputLabel>
+                    <Select
+                      value={formData.contractType || ""}
+                      onChange={handleChange}
+                      name="contractType"
+                      input={<OutlinedInput label="Contract Type" />}
+                    >
+                      <MenuItem value="Permanent">Permanent</MenuItem>
+                      <MenuItem value="Fixed-Term">Fixed-Term</MenuItem>
+                      <MenuItem value="Part-Time">Part-Time</MenuItem>
+                      <MenuItem value="Freelance">Freelance</MenuItem>
+                      <MenuItem value="Consultancy">Consultancy</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid2>
+
+                {/* LinkedIn */}
+                <Grid2 xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="LinkedIn Profile"
+                    name="linkedIn"
+                    value={formData.linkedIn || ""}
+                    onChange={handleChange}
+                  />
+                </Grid2>
+
+                {/* NationalId */}
+                <Grid2 xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="National ID"
+                    name="nationalId"
+                    value={formData.nationalId || ""}
+                    onChange={handleChange}
+                  />
+                </Grid2>
+
+                {/* Bio */}
+                <Grid2 xs={12}>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={4}
+                    label="Bio"
+                    name="bio"
+                    value={formData.bio || ""}
+                    onChange={handleChange}
+                  />
+                </Grid2>
+
+                {/* Skills */}
+                <Grid2 xs={12}>
+          <InputLabel>Skills</InputLabel>
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 1,
+              mb: 1,
+              border: '1px solid #c4c4c4',
+              borderRadius: 1,
+              p: 1,
+            }}
+          >
+            {formData.skills.map((skill, index) => (
+              <Chip
+                key={index}
+                label={skill}
+                onDelete={() => handleSkillDelete(skill)}
+                color="primary"
+              />
+            ))}
+          </Box>
+          <TextField
+            fullWidth
+            label="Type a skill and press Enter"
+            value={skillInput}
+            onChange={(e) => setSkillInput(e.target.value)}
+            onKeyDown={handleSkillKeyDown}
+          />
+        </Grid2>
+
+                {/* Leave Details */}
+                <Grid2 xs={12}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.leaveDetails?.isOnLeave || false}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            leaveDetails: {
+                              ...formData.leaveDetails,
+                              isOnLeave: e.target.checked,
+                            },
+                          })
+                        }
+                      />
+                    }
+                    label="Is On Leave"
+                  />
+                </Grid2>
+
+                {formData.leaveDetails?.isOnLeave && (
+                  <>
+                    <Grid2 xs={12} md={4}>
+                      <FormControl fullWidth>
+                        <InputLabel>Leave Type</InputLabel>
+                        <Select
+                          value={formData.leaveDetails?.leaveType || ""}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              leaveDetails: {
+                                ...formData.leaveDetails,
+                                leaveType: e.target.value,
+                              },
+                            })
+                          }
+                          name="leaveType"
+                          input={<OutlinedInput label="Leave Type" />}
+                        >
+                          <MenuItem value="Sick Leave">Sick Leave</MenuItem>
+                          <MenuItem value="Annual Leave">Annual Leave</MenuItem>
+                          <MenuItem value="Maternity Leave">
+                            Maternity Leave
+                          </MenuItem>
+                          <MenuItem value="Paternity Leave">
+                            Paternity Leave
+                          </MenuItem>
+                          <MenuItem value="Unpaid Leave">Unpaid Leave</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid2>
+
+                    <Grid2 xs={12} md={4}>
+                      <TextField
+                        fullWidth
+                        label="Start Date"
+                        type="date"
+                        name="leaveStartDate"
+                        InputLabelProps={{ shrink: true }}
+                        value={formData.leaveDetails?.startDate || ""}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            leaveDetails: {
+                              ...formData.leaveDetails,
+                              startDate: e.target.value,
+                            },
+                          })
+                        }
+                      />
+                    </Grid2>
+
+                    <Grid2 xs={12} md={4}>
+                      <TextField
+                        fullWidth
+                        label="End Date"
+                        type="date"
+                        name="leaveEndDate"
+                        InputLabelProps={{ shrink: true }}
+                        value={formData.leaveDetails?.endDate || ""}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            leaveDetails: {
+                              ...formData.leaveDetails,
+                              endDate: e.target.value,
+                            },
+                          })
+                        }
+                      />
+                    </Grid2>
+                  </>
+                )}
+                {/* Submit Button */}
+                <Grid2 xs={12}>
+                  <button
+                    type="submit"
+                    className="w-full py-3 bg-blue-600 text-white rounded-md text-sm md:text-base hover:bg-blue-700 transition-colors"
+                  >
+                    {editingMember ? "Update Member" : "Add Member"}
+                  </button>
+                </Grid2>
+              </Grid2>
+            </form>
+          </div>
+        </Modal>
+      </div>
+    </>
   );
 };
 

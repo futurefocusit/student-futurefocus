@@ -142,7 +142,7 @@ const Dashboard = () => {
     };
 
     fetchSummary();
-  }, []);
+  },[]);
 
   if (loading)
     return (
