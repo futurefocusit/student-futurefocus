@@ -47,7 +47,10 @@ export interface TeamMember {
   bio: string,
   skills: string[],
   cv:string,
-  certificate: string[],
+  certificate: {
+    name: string;
+    url: string;
+  }[];
   instagram: string,
   snapchat: string,
   facebook: string,

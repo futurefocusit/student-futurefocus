@@ -92,7 +92,12 @@ const MembersPage: React.FC = () => {
     },
     cv: "",
     contract: "",
-    certificate: [] ,
+    certificate: [
+      {
+        name:"",
+        url: ""
+      }
+    ] ,
     instagram: "",
     snapchat: "",
     facebook: "",
@@ -257,7 +262,12 @@ const MembersPage: React.FC = () => {
       },
       cv: "",
       contract: "",
-      certificate: [],
+      certificate: [
+        {
+          name:"",
+          url:""
+        }
+      ],
       instagram: "",
       snapchat: "",
       facebook: "",
@@ -602,19 +612,19 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
                                   )}
                           
                                   {/* Certificates */}
-                                  {(member.certificate || []).length > 0 && (
+                                  {Array.isArray(member.certificate) && member.certificate.length > 0 && (
                                     <div className="border border-gray-300 p-3 rounded">
                                       <p className="font-medium mb-2">Certificates:</p>
                                       <ul className="list-disc pl-5 space-y-1 text-sm text-blue-700">
                                         {member.certificate.map((cert, index) => (
                                           <li key={index}>
                                             <a
-                                              href={cert}
+                                              href={cert.url}
                                               target="_blank"
                                               rel="noopener noreferrer"
                                               className="italic hover:text-blue-500 underline"
                                             >
-                                              Certificate {index + 1}
+                                              {cert.name || `Certificate ${index + 1}`}
                                             </a>
                                           </li>
                                         ))}
@@ -1125,10 +1135,10 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
                     />
                     {formData.certificate.length > 0 && (
                       <ul className="list-disc ml-5 mt-1 text-sm text-blue-700">
-                        {formData.certificate.map((url, i) => (
+                        {formData.certificate.map((cert, i) => (
                           <li key={i}>
-                            <a href={url} target="_blank" rel="noopener noreferrer">
-                              Certificate {i + 1}
+                            <a href={cert.url} target="_blank" rel="noopener noreferrer">
+                               {cert.name || `Certificate ${i + 1}`}
                             </a>
                           </li>
                         ))}
