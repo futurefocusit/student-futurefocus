@@ -46,44 +46,40 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
   const fetchLoggedUser = useCallback(async () => {
     const token = localStorage.getItem("ffa-admin");
     if (!token) {
-      window.location.href = '/login'
-    };
+      setLoggedUser(null);
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const response = await fetchWithRetry(() =>
         axiosInstance.get(`${API_BASE_URL}/member/logged-user`)
       );
       setLoggedUser(response.data);
     } catch (error) {
+      // Let the axios interceptor handle 401 errors
       if (axios.isAxiosError(error)) {
-        if (error.response) {
+        if (error.response && error.response.status !== 401) {
           const errorMessage = error.response.data.message || "An error occurred";
           toast.error(errorMessage);
-          if (error.response.status === 401) {
-            localStorage.removeItem("ffa-admin");
-            setLoggedUser(null);
-          }
         } else if (error.request) {
           toast.error("Network error! Please check your connection.");
         } else {
           toast.error("Error sending request. Please try again.");
         }
       } else {
-        localStorage.removeItem("ffa-admin");
-        setLoggedUser(null);
         toast.error("An unexpected error occurred");
       }
-
-
+      setLoggedUser(null);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
     fetchLoggedUser();
-  }, [fetchLoggedUser]);
+  }, []); // Remove fetchLoggedUser from dependencies to prevent infinite loop
 
   const login = useCallback(async (memberData: TeamMemberLogin) => {
     setIsLoading(true);

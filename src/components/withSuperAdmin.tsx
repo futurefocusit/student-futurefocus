@@ -13,9 +13,7 @@ const withSuperAdminAuth = <P extends object>(WrappedComponent: React.FC<P>) => 
         setLoading(true);
         try {
           await fetchLoggedUser();
-          
         } catch (error) {
-          
           toast.error("You have been logged out.");
           window.location.href = "/login";
           return;
@@ -25,7 +23,7 @@ const withSuperAdminAuth = <P extends object>(WrappedComponent: React.FC<P>) => 
       };
 
       checkAuth();
-    }, [fetchLoggedUser]);
+    }, []);
 
     useEffect(() => {
       if (!loading && loggedUser && !loggedUser.isSuperAdmin) {
