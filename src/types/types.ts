@@ -17,6 +17,9 @@ export interface Role {
 }
 
 export interface TeamMember {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  entry: any;
+  exit: string;
 
   _id: string;
   email: string;
@@ -43,7 +46,13 @@ export interface TeamMember {
   },
   bio: string,
   skills: string[],
-
+  cv:string,
+  certificate: string[],
+  instagram: string,
+  snapchat: string,
+  facebook: string,
+  ranking: string,
+  contract: string,
 }
 export interface TeamMemberLogin {
 
