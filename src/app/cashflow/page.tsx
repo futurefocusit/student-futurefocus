@@ -38,7 +38,7 @@ const PaymentsPage: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false)
   const { fetchLoggedUser, loggedUser } = useAuth()
 
-  // Simplified search state
+
   const [searchQuery, setSearchQuery] = useState("")
   const [searchField, setSearchField] = useState<"user" | "payment" | "reason" | "all">("all")
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
@@ -96,12 +96,12 @@ const PaymentsPage: React.FC = () => {
       const data = await response.data
       setCashflows(data)
     } catch (error) {
-      
+
       setError(error.message)
     } finally {
       setIsFetching(false)
     }
-  }, [fetchLoggedUser])
+  }, [])
 
   useEffect(() => {
     fetchCashflows()
@@ -154,8 +154,8 @@ const PaymentsPage: React.FC = () => {
         const matchesSearch = searchMatches(cashflow, debouncedSearchQuery, searchField)
 
         return matchesDate &&
-        //  matchesType &&
-         matchesSearch
+          //  matchesType &&
+          matchesSearch
       })
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   }, [cashflows, selectedDates, filter, debouncedSearchQuery, searchField, searchMatches])
@@ -187,10 +187,10 @@ const PaymentsPage: React.FC = () => {
         groups[dateString] = {
           total: 0,
           transactions: [],
-        
+
         }
       }
- 
+
 
       groups[dateString].total += cashflow.amount
       groups[dateString].transactions.push(cashflow)
@@ -341,17 +341,15 @@ const PaymentsPage: React.FC = () => {
           <div>
             <button
               onClick={() => setFilter("income")}
-              className={`px-4 py-2 font-semibold ${
-                filter === "income" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"
-              } rounded-l`}
+              className={`px-4 py-2 font-semibold ${filter === "income" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"
+                } rounded-l`}
             >
               CASH IN
             </button>
             <button
               onClick={() => setFilter("expenses")}
-              className={`px-4 py-2 font-semibold ${
-                filter === "expenses" ? "bg-red-500 text-white" : "bg-gray-200 text-gray-800"
-              } rounded-r`}
+              className={`px-4 py-2 font-semibold ${filter === "expenses" ? "bg-red-500 text-white" : "bg-gray-200 text-gray-800"
+                } rounded-r`}
             >
               CASH OUT
             </button>
@@ -392,12 +390,12 @@ const PaymentsPage: React.FC = () => {
                 <div key={date} className="mb-4">
                   <h3 className="text-lg font-bold text-gray-800">{date.toUpperCase()}</h3>
                   <div className="text-sm text-gray-600 flex flex-wrap gap-4">
-                  <p>Total: {new Intl.NumberFormat().format(total)} Frw</p>
-                        <p>Income: {new Intl.NumberFormat().format(transactions.filter(t=>t.type==='income').reduce((total,t)=>{ return total+t.amount},0))} Frw</p>
-                      <p>Expenses: {new Intl.NumberFormat().format(transactions.filter(t=>t.type==='expenses').reduce((total,t)=>{ return total+t.amount},0))} Frw</p>
-                      <p className="font-semibold">
-                        Remaining Balance: {new Intl.NumberFormat().format(transactions.reduce((total,t)=>{ return t.type==='income'?total+t.amount:total-t.amount},0))}   Frw
-                      </p>
+                    <p>Total: {new Intl.NumberFormat().format(total)} Frw</p>
+                    <p>Income: {new Intl.NumberFormat().format(transactions.filter(t => t.type === 'income').reduce((total, t) => { return total + t.amount }, 0))} Frw</p>
+                    <p>Expenses: {new Intl.NumberFormat().format(transactions.filter(t => t.type === 'expenses').reduce((total, t) => { return total + t.amount }, 0))} Frw</p>
+                    <p className="font-semibold">
+                      Remaining Balance: {new Intl.NumberFormat().format(transactions.reduce((total, t) => { return t.type === 'income' ? total + t.amount : total - t.amount }, 0))}   Frw
+                    </p>
                   </div>
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
@@ -412,7 +410,7 @@ const PaymentsPage: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {transactions.filter(t=>t.type==filter).map((cashflow, index) => (
+                      {transactions.filter(t => t.type == filter).map((cashflow, index) => (
                         <tr key={cashflow._id}>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">{index + 1}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">

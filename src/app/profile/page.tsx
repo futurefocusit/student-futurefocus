@@ -385,13 +385,13 @@ const AdminPage = () => {
       )
       setSaveMessage({
         type: "success",
-        message: "Company profile saved successfully!",
+        message: "Institution profile saved successfully!",
       })
     } catch (error) {
       console.error("Error saving data:", error)
       setSaveMessage({
         type: "error",
-        message: "Failed to save company profile. Please try again.",
+        message: "Failed to save Institution profile. Please try again.",
       })
     } finally {
       setIsSaving(false)
@@ -427,7 +427,7 @@ const AdminPage = () => {
       <div className="flex-1 p-4 sm:p-6 md:p-8 max-w-full md:max-w-4xl mx-auto">
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Company Profile Admin</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Institution Profile </h1>
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={loadSavedData}
@@ -443,14 +443,7 @@ const AdminPage = () => {
                 <Eye className="w-4 h-4 inline mr-1" />
                 Preview
               </button>
-              <button
-                onClick={handleSave}
-                disabled={isSaving}
-                className="px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-              >
-                <Save className="w-4 h-4 inline mr-1" />
-                {isSaving ? "Saving..." : "Save Profile"}
-              </button>
+              
             </div>
           </div>
 
@@ -463,7 +456,7 @@ const AdminPage = () => {
             </div>
           )}
 
-          <p className="text-gray-600">Update your company information below.</p>
+          <p className="text-gray-600">Update your Institution information below.</p>
         </div>
 
         <div className="space-y-6">
@@ -748,7 +741,7 @@ const AdminPage = () => {
               {/* Logo Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Company Logo
+                  Profile Image
                 </label>
                 <div className="flex items-center gap-4">
                   {companyData.logo && (
@@ -774,7 +767,7 @@ const AdminPage = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Hero Image
+                  Background Image
                 </label>
                 <div className="flex items-center gap-4">
                   {companyData.heroImage && (
@@ -1093,7 +1086,7 @@ const AdminPage = () => {
               className="px-8 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
               <Save className="w-5 h-5 inline mr-2" />
-              {isSaving ? "Saving..." : "Save Company Profile"}
+              {isSaving ? "Saving..." : "Save Institution Profile"}
             </button>
           </div>
         </div>

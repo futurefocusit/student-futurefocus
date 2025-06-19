@@ -11,30 +11,21 @@ const withMemberAuth = <P extends object>(
     const { fetchLoggedUser } = useAuth();
 
     useEffect(() => {
-      let isMounted = true;
-
       const checkAuth = async () => {
+        setLoading(true);
         try {
           await fetchLoggedUser();
-          if (isMounted) {
-            setLoading(false);
-          }
         } catch (error) {
-          if (isMounted) {
-            toast.error("Session expired. Please log in again.");
-            window.location.href = "/login";
-          }
-  
+          toast.error("You have been logged out.");
+          window.location.href = "/login";
+          return;
+        } finally {
+          setLoading(false);
         }
       };
 
       checkAuth();
-
-   
-      return () => {
-        isMounted = false;
-      };
-    }, [fetchLoggedUser]); 
+    }, []); // Remove fetchLoggedUser from dependencies to prevent infinite loop
 
     if (loading) {
       return (

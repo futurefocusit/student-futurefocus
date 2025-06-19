@@ -12,7 +12,7 @@ const MAX_RETRIES = {
     default: 2, // For other requests
 };
 
-const RETRY_DELAY = 1000; // 1 second delay between retries
+const RETRY_DELAY = 1000; 
 
 // Create axios instance with default config
 const axiosInstance: AxiosInstance = axios.create({
@@ -91,6 +91,7 @@ axiosInstance.interceptors.response.use(
             localStorage.removeItem('ffa-admin');
             window.location.href = '/login';
             toast.error('Session expired. Please login again.');
+
         } else if (error.response?.status === 403) {
             toast.error('You do not have permission to perform this action.');
         } else if (!error.response) {

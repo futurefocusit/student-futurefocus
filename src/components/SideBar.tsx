@@ -30,90 +30,98 @@ const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const {logout, loggedUser, loading } = useAuth();
+  const { logout, loggedUser, loading } = useAuth();
 
 
   const menuItems = {
-    general:[
-       { label: "DASHBOARD", icon: FaTachometerAlt, href: "/dashboard", admin: true },
-       { label: "PROFILE", icon: FaPerson, href: "/profile", admin: true },
-       {
-      label: "TEAM",
-      icon: FaTeamspeak,
-      href: "/members",
-      admin: true,
-    },
-    {
-      label: "MANAGE ROLE",
-      icon: FaLockOpen,
-      href: "/manage-role",
-      admin: true,
-    },
-    {
-      label: "RECYCLE BIN",
-      icon: FaRecycle,
-      href: "/recycle-bin",
-      admin: true,
-    },
+    general: [
+      { label: "DASHBOARD", icon: FaTachometerAlt, href: "/dashboard", admin: true },
+      { label: "PROFILE", icon: FaPerson, href: "/profile", admin: true },
+      {
+        label: "TEAM",
+        icon: FaTeamspeak,
+        href: "/members",
+        admin: true,
+      },
+      {
+        label: "MANAGE ROLE",
+        icon: FaLockOpen,
+        href: "/manage-role",
+        admin: true,
+      },
+      {
+        label: "BLOG",
+        icon: FaBookOpen,
+        href: "/blogs",
+        admin: true,
+      },
+      {
+        label: "RECYCLE BIN",
+        icon: FaRecycle,
+        href: "/recycle-bin",
+        admin: true,
+      },
     ],
-   students:[
-    
-    { label: "STUDENTS", icon: FaUser, href: "/students", admin: true },
-    {
-      label: "STUDENT ATTENDANCE",
-      icon: FaCalendarCheck,
-      href: "/attendance",
-      admin: true,
-    },
-    {
-      label: "COURSES",
-      icon: FaBookOpen,
-      href: "/course",
-      admin: true,
-    },
-    {
-      label: "INTAKES",
-      icon: FaCalendar,
-      href: "/intake",
-      admin: true,
-    },
-    {
-      label: "SHIFTS",
-      icon: FaHouseCrack,
-      href: "/shift",
-      admin: true,
-    },
-    { label: "PAYMENTS", 
-      icon: FaMoneyBill, 
-      href: "/payment", admin: true },
-    {
-      label: "TRANSACTIONS",
-      icon: FaExchangeAlt,
-      href: "/transactions",
-      admin: true,
-    },
-   ],
+    students: [
 
-    hr:[
-    {
-      label: "STAFF ATTENDANCE",
-      icon: FaClock,
-      href: "/attendance/staff",
-      admin: true,
-    },
-    { label: "MY ATTENDANCE", icon: MdEventAvailable, href: "/staff" },
+      { label: "STUDENTS", icon: FaUser, href: "/students", admin: true },
+      {
+        label: "STUDENT ATTENDANCE",
+        icon: FaCalendarCheck,
+        href: "/attendance",
+        admin: true,
+      },
+      {
+        label: "COURSES",
+        icon: FaBookOpen,
+        href: "/course",
+        admin: true,
+      },
+      {
+        label: "INTAKES",
+        icon: FaCalendar,
+        href: "/intake",
+        admin: true,
+      },
+      {
+        label: "SHIFTS",
+        icon: FaHouseCrack,
+        href: "/shift",
+        admin: true,
+      },
+      {
+        label: "PAYMENTS",
+        icon: FaMoneyBill,
+        href: "/payment", admin: true
+      },
+      {
+        label: "TRANSACTIONS",
+        icon: FaExchangeAlt,
+        href: "/transactions",
+        admin: true,
+      },
+    ],
 
-    { label: "TASKS", icon: FaTasks, href: "/tasks", admin: true },
-    { label: "MY TASKS", icon: FaClipboardList, href: "/staff/task" },
-     ],
+    hr: [
+      {
+        label: "STAFF ATTENDANCE",
+        icon: FaClock,
+        href: "/attendance/staff",
+        admin: true,
+      },
+      { label: "MY ATTENDANCE", icon: MdEventAvailable, href: "/staff" },
 
-  cashFlow:[
-    { label: "CASHFLOW", icon: FaMoneyBillAlt, href: "/cashflow", admin: true },
+      { label: "TASKS", icon: FaTasks, href: "/tasks", admin: true },
+      { label: "MY TASKS", icon: FaClipboardList, href: "/staff/task" },
+    ],
 
-    { label: "INVENTORY", icon: FaToolbox, href: "/inventory", admin: true },
-   
-   
-  ]
+    cashFlow: [
+      { label: "CASHFLOW", icon: FaMoneyBillAlt, href: "/cashflow", admin: true },
+
+      { label: "INVENTORY", icon: FaToolbox, href: "/inventory", admin: true },
+
+
+    ]
 
     // {
     //   label: "TECHUP PROGRAM",
@@ -148,9 +156,23 @@ const SideBar = () => {
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
-if(!loading&&!loggedUser){
-return null
-}
+
+  // Show loading state while fetching user data
+  if (loading) {
+    return (
+      <div className="flex flex-col fixed top-0 left-0 w-20 md:w-20 bg-gray-800 z-30 justify-between h-full">
+        <div className="flex items-center justify-center h-full">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Only return null if not loading and no user (not authenticated)
+  if (!loggedUser) {
+    return null;
+  }
+
   return (
     <>
       <button
@@ -216,7 +238,7 @@ return null
           <div className="flex flex-col items-start border-b-2  mb-2 border-b-gray-500">
             {menuItems.students
               .filter(
-                (item) => !item.admin || ( item.admin && loggedUser?.isAdmin)
+                (item) => !item.admin || (item.admin && loggedUser?.isAdmin)
               )
               .map((item, index) => (
                 <Link
@@ -282,15 +304,15 @@ return null
 
 
           <div className="px-4">
-            <a
-              href="https://www.futurefocus.co.rw/admin"
+            {/* <a
+              href="https://www.futurefocus.co.rw/"
               className={`flex items-center px-4 py-2 mb-10 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white ${loggedUser && loggedUser.isAdmin ? '' : 'hidden'} `}
             >
               <FaWebAwesome className="w-5 h-5" />
               <p className={`mx-4 font-medium md:${isExpanded ? "" : "hidden"}`}>
                 Go to web
               </p>
-            </a>
+            </a> */}
             <button
               className={`flex items-center px-4 py-2 mb-10 text-gray-300 transition-colors duration-300 transform rounded-md hover:bg-gray-700 hover:text-white `}
               onClick={handleLogout}

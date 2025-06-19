@@ -6,6 +6,7 @@ import {
   useContext,
   useState,
   useCallback,
+  useEffect,
 } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -38,48 +39,47 @@ export const AuthContext = createContext<AuthContextData>(
 
 const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
   const [loggedUser, setLoggedUser] = useState<TeamMember | null>(null);
-  const [loading, setIsLoading] = useState(false);
+  const [loading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   const fetchLoggedUser = useCallback(async () => {
     const token = localStorage.getItem("ffa-admin");
     if (!token) {
-      window.location.href = '/login'
-    };
+      setLoggedUser(null);
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const response = await fetchWithRetry(() =>
         axiosInstance.get(`${API_BASE_URL}/member/logged-user`)
       );
       setLoggedUser(response.data);
     } catch (error) {
+      // Let the axios interceptor handle 401 errors
       if (axios.isAxiosError(error)) {
-        if (error.response) {
+        if (error.response && error.response.status !== 401) {
           const errorMessage = error.response.data.message || "An error occurred";
           toast.error(errorMessage);
-          if (error.response.status === 401) {
-            localStorage.removeItem("ffa-admin");
-            setLoggedUser(null);
-          }
         } else if (error.request) {
           toast.error("Network error! Please check your connection.");
         } else {
           toast.error("Error sending request. Please try again.");
         }
       } else {
-        localStorage.removeItem("ffa-admin");
-        setLoggedUser(null);
         toast.error("An unexpected error occurred");
       }
-
-
+      setLoggedUser(null);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }, []);
 
+  useEffect(() => {
+    fetchLoggedUser();
+  }, []); // Remove fetchLoggedUser from dependencies to prevent infinite loop
 
   const login = useCallback(async (memberData: TeamMemberLogin) => {
     setIsLoading(true);
@@ -176,7 +176,7 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
     if (axios.isAxiosError(error)) {
       if (error.response) {
         const errorMessage = error.response.data.message || "An error occurred";
-             setError(errorMessage);
+        setError(errorMessage);
 
 
         if (error.response.status === 401) {
@@ -193,8 +193,6 @@ const AuthContextAPI: React.FC<AuthProviderProps> = ({ children }) => {
       toast.error("An unexpected error occurred");
     }
   };
-
-
 
   const contextValue = {
     signed: Boolean(loggedUser),

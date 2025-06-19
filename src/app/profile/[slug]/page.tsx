@@ -683,6 +683,10 @@ export default function CompanyProfilePage() {
             </div>
           </div>
         </div>
+         {/* Add BlogList at the end of the main content section */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <BlogList slug={slug} />
+      </div>
         <div className="bg-gradient-to-r from-blue-800 to-blue-900 py-12">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
@@ -762,10 +766,7 @@ export default function CompanyProfilePage() {
         }
       `}</style>
 
-      {/* Add BlogList at the end of the main content section */}
-      {/* <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <BlogList slug={slug} />
-      </div> */}
+     
     </>
   )
 }
