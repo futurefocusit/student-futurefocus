@@ -38,7 +38,7 @@ const PaymentsPage: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false)
   const { fetchLoggedUser, loggedUser } = useAuth()
 
-  // Simplified search state
+
   const [searchQuery, setSearchQuery] = useState("")
   const [searchField, setSearchField] = useState<"user" | "payment" | "reason" | "all">("all")
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")

@@ -158,7 +158,7 @@ const MaterialManagement: React.FC = () => {
   return (
     <>
       <SideBar />
-      <div className="p-4 mx-auto container">
+      <div className="p-4 mx-auto max-w-5xl container">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold text-center ml-20">INVENTORY MANAGEMENT</h1>
           <button
@@ -224,10 +224,10 @@ const MaterialManagement: React.FC = () => {
               <tbody>
                 {materials.map((material) => (
                   <tr key={material._id} className="hover:bg-gray-100">
-                    <td className="border border-gray-300 p-2">{material.materialName}</td>
-                    <td className="border border-gray-300 p-2">{material.amount}</td>
+                    <td className="border border-gray-300 p-2">{material?.materialName}</td>
+                    <td className="border border-gray-300 p-2">{material?.amount}</td>
                     <td className="border border-gray-300 p-2">{material?.category?.name}</td>
-                    <td className="border border-gray-300 p-2">{material.rent}</td>
+                    <td className="border border-gray-300 p-2">{material?.rent}</td>
                     <td className="border border-gray-300 p-2 flex gap-3">
                       <button
                         onClick={() => handleAddToCart(material)}
@@ -274,7 +274,7 @@ const MaterialManagement: React.FC = () => {
               <tbody>
                 {rentedMaterials.map((rented) => (
                   <tr key={rented._id} className="hover:bg-gray-100">
-                    <td className="border border-gray-300 p-2">{rented.materialId.materialName}</td>
+                    <td className="border border-gray-300 p-2">{rented.materialId?.materialName}</td>
                     <td className="border border-gray-300 p-2">{rented.amount}</td>
                     <td className="border border-gray-300 p-2">{rented.render?.name}</td>
                     <td className="border border-gray-300 p-2">{rented.rendeeName}</td>

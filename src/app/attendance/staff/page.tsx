@@ -153,7 +153,7 @@ const AttendancePage: React.FC = () => {
     <div>
       <SideBar />
       {hasPermission(loggedUser as TeamMember, "staff-attendance", "view") ? (
-        <div className="container mx-auto p-4">
+        <div className="container max-w-5xl mx-auto p-4">
           <h1 className="text-2xl font-bold mb-4 text-center">STAFF ATTENDANCE RECORDS</h1>
 
           <div className="flex flex-wrap gap-4 mb-4">

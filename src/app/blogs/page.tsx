@@ -114,7 +114,7 @@ export default function BlogsPage() {
     if (!blogToPublish) return
 
     try {
-      const res = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/blogs/${blogToPublish._id}`, {
+      const res = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/blogs/${blogToPublish._id}`,{published:!blogToPublish.published}, {
 
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("ffa-admin")}`
@@ -244,21 +244,21 @@ export default function BlogsPage() {
                     <TableCell>
                       {blog.publishedAt
                         ? format(new Date(blog.publishedAt), "MMM d, yyyy")
-                        : format(new Date(blog.createdAt), "MMM d, yyyy") + " (Draft)"}
+                        : format(new Date(blog.createdAt), "MMM d, yyyy")}
                     </TableCell>
                     <TableCell>
-                      <DropdownMenu>
+                      <DropdownMenu >
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
                             <span className="sr-only">Open menu</span>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="end" className="bg-white">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => router.push(`/blog/${blog.slug || blog._id}`)}>
+                          {/* <DropdownMenuItem onClick={() => router.push(`/blog/${blog.slug || blog._id}`)}>
                             <Eye className="mr-2 h-4 w-4" /> View
-                          </DropdownMenuItem>
+                          </DropdownMenuItem> */}
                           <DropdownMenuItem onClick={() => router.push(`/blogs/edit/${blog._id}`)}>
                             <Pencil className="mr-2 h-4 w-4" /> Edit
                           </DropdownMenuItem>
@@ -309,8 +309,8 @@ export default function BlogsPage() {
         </AlertDialog>
 
         {/* Publish/Unpublish Confirmation Dialog */}
-        <AlertDialog open={publishDialogOpen} onOpenChange={setPublishDialogOpen}>
-          <AlertDialogContent>
+        <AlertDialog open={publishDialogOpen} onOpenChange={setPublishDialogOpen} >
+          <AlertDialogContent className="bg-white">
             <AlertDialogHeader>
               <AlertDialogTitle>{blogToPublish?.published ? "Unpublish Blog?" : "Publish Blog?"}</AlertDialogTitle>
               <AlertDialogDescription>

@@ -87,7 +87,7 @@ const TaskManagement: React.FC = () => {
     text: string;
   } | null>(null);
   const [selectedTaskForUpdate, setSelectedTaskForUpdate] = useState<Task | null>(null);
-  const [filter, setFilter] = useState<string>("all");
+  const [filter, setFilter] = useState<string>("pending");
 
   useEffect(() => {
     const getloggedUser = async () => {
@@ -298,7 +298,6 @@ const TaskManagement: React.FC = () => {
   };
 
   const filteredTasks = tasks.filter(task => {
-    if (filter === "all") return true;
     return task.status === filter;
   });
 

@@ -103,7 +103,7 @@ export default function NewBlogPage() {
       })
       return
     }
-
+   
     if (formData.tags.length === 0) {
       toast({
         title: "Missing Tags",
@@ -160,11 +160,11 @@ export default function NewBlogPage() {
             <Button variant="ghost" size="sm" className="mr-2" onClick={() => router.back()}>
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <h1 className="text-3xl font-bold">New Blog</h1>
+    
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex items-center space-x-2">
-              <Switch id="published" checked={formData.published} onCheckedChange={handleSwitchChange} />
+            <div className="flex items-center   space-x-2">
+              <Switch id="published" checked={formData.published} onCheckedChange={handleSwitchChange} className="border-black border-[1px]" />
               <Label htmlFor="published">{formData.published ? "Published" : "Draft"}</Label>
             </div>
             <Button onClick={handleSubmit} disabled={loading}>
