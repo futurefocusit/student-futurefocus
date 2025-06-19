@@ -56,6 +56,11 @@ export interface TeamMember {
   facebook: string,
   ranking: string,
   contract: string,
+  paymentDate: string,
+  salary: string,
+  currency: string,
+  dateJoined: string,
+  days: "",
 }
 export interface TeamMemberLogin {
 

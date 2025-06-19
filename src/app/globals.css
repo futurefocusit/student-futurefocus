@@ -2,4 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+.cursor-drag {
+  touch-action: none; /* prevent scrolling while dragging */
+  cursor: grab;
+}
+
+.cursor-drag:active {
+  cursor: grabbing;
+}
 
