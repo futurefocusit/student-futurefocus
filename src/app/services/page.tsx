@@ -210,9 +210,9 @@ const ServicesPage: React.FC = () => {
             className="bg-white shadow rounded-lg overflow-hidden"
           >
             <div className="p-4">
-              <div className="text-2xl">
+              <div className="text-2xl overflow-hidden max-h-44">
                 {service.image && (
-                  <img src={service.image} alt="Service" className="h-20 mx-auto object-contain" />
+                  <img src={service.image} alt="Service" className="h-auto mx-auto object-contain" />
                 )}
               </div>
               <h3 className="text-lg font-medium text-gray-900 mt-4">
