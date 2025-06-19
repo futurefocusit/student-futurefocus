@@ -899,18 +899,6 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
                   />
                 </Grid2>
 
-                {/* Ranking */}
-                <Grid2 xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    label="Ranking"
-                    name="ranking"
-                    value={formData.ranking || ""}
-                    onChange={handleChange}
-                    placeholder="e.g., A+, 1st Place, Senior"
-                  />
-                </Grid2>
-
                 {/* NationalId */}
                 <Grid2 xs={12} md={6}>
                   <TextField
