@@ -612,7 +612,7 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
                                   )}
                           
                                   {/* Certificates */}
-                                  {Array.isArray(member.certificate) && member.certificate.length > 0 && (
+                                  {Array.isArray(member.certificate) && member.certificate?.length > 0 && (
                                     <div className="border border-gray-300 p-3 rounded">
                                       <p className="font-medium mb-2">Certificates:</p>
                                       <ul className="list-disc pl-5 space-y-1 text-sm text-blue-700">
@@ -1133,7 +1133,7 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
                       onChange={handleCertificateUpload}
                       disabled={isUploading}
                     />
-                    {formData.certificate.length > 0 && (
+                    {formData.certificate?.length > 0 && (
                       <ul className="list-disc ml-5 mt-1 text-sm text-blue-700">
                         {formData.certificate?.map((cert, i) => (
                           <li key={i}>
