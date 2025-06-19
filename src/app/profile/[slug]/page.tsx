@@ -8,6 +8,8 @@ import API_BASE_URL from "@/config/baseURL"
 import Image from "next/image"
 import BlogList from "./BlogList"
 import axios from "axios"
+import { FaServicestack } from "react-icons/fa"
+import { FaHouse } from "react-icons/fa6"
 
 interface CompanyData {
   name: string
@@ -68,7 +70,12 @@ const TextWithReadMore = ({
 
   return (
     <div className={`space-y-2 ${className}`}>
-      <h3 className=" rounded-t-2xl text-xl font-semibold text-gray-900 bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">{title}</h3>
+<h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                  <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
+                    <MessageCircle className="w-6 h-6 text-blue-800" />
+                  </div>
+        
+        {title}</h3>
       <div className="relative">
         <HTMLContent
           content={displayContent}
@@ -500,8 +507,11 @@ export default function CompanyProfilePage() {
 
             {/* Why Choose Us */}
             <div id="why-choose-us" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-              <div className="bg-white rounded-2xl shadow-xl p-8 ">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">Why Choose Us</h2>
+            <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                  <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
+                    <FaHouse className="w-6 h-6 text-blue-800" />
+                  </div>
+                  Why Choose Us</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {companyData.whyChooseUs.map((reason, index) => (
                     <div key={index} className="p-4 bg-gray-50 rounded-lg">
@@ -714,7 +724,15 @@ export default function CompanyProfilePage() {
         </div>
 
         <section className="my-10 max-w-4xl mx-auto">
-        <h2 className="text-2xl font-bold mb-6 text-blue-800">Our Services</h2>
+
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">
+        <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                  <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
+                    <FaServicestack className="w-6 h-6 text-blue-800" />
+                  </div>
+          
+          Our Services</h3>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {services.map((service) => (
             <div key={service._id} className="bg-white shadow rounded-lg overflow-hidden">
@@ -756,7 +774,7 @@ export default function CompanyProfilePage() {
             </div>
           </div>
         </div>
-      </div>
+      
 
       {/* Popups */}
       {showTextPopup && <TextPopup />}
