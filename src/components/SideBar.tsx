@@ -21,6 +21,7 @@ import {
   FaCalendar,
   FaTeamspeak,
   FaRecycle,
+  FaServicestack,
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import { FaHouseCrack, FaLockOpen, FaMessage, FaPerson, FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
@@ -37,6 +38,7 @@ const SideBar = () => {
     general: [
       { label: "DASHBOARD", icon: FaTachometerAlt, href: "/dashboard", admin: true },
       { label: "PROFILE", icon: FaPerson, href: "/profile", admin: true },
+      { label: "SERVICES", icon: FaServicestack, href: "/services", admin: true },
       {
         label: "TEAM",
         icon: FaTeamspeak,

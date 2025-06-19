@@ -7,6 +7,7 @@ import axiosInstance, { fetchWithCache } from "@/libs/axios"
 import API_BASE_URL from "@/config/baseURL"
 import Image from "next/image"
 import BlogList from "./BlogList"
+import axios from "axios"
 
 interface CompanyData {
   name: string
@@ -32,6 +33,13 @@ interface CompanyData {
   logo: string
   website: string
   isSuperInst: boolean
+}
+
+interface Service {
+  _id: string;
+  image: string;
+  title: string;
+  desc: string;
 }
 
 // Add HTMLContent component for safe HTML rendering
@@ -101,6 +109,8 @@ export default function CompanyProfilePage() {
   const [companyData, setCompanyData] = useState<CompanyData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState("")
+  const [services, setServices] = useState<Service[]>([])
+  const [expandedServiceIds, setExpandedServiceIds] = useState<string[]>([])
 
   useEffect(() => {
     const fetchCompanyData = async () => {
@@ -123,12 +133,27 @@ export default function CompanyProfilePage() {
       }
     }
 
+    // Fetch services
+    const fetchServices = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/service/slug/${slug}`);
+        setServices(response.data);
+      } catch (err) {
+       
+      }
+    };
+
     if (slug) {
       fetchCompanyData()
+      fetchServices()
     }
   }, [slug])
 
-
+  const toggleExpand = (id: string) => {
+    setExpandedServiceIds((prev) =>
+      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+    );
+  };
 
   const sectionItems = [
     { name: "About Us", href: "#about", icon: Building2 },
@@ -683,10 +708,41 @@ export default function CompanyProfilePage() {
             </div>
           </div>
         </div>
-         {/* Add BlogList at the end of the main content section */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <BlogList slug={slug} />
-      </div>
+        {/* Add BlogList at the end of the main content section */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <BlogList slug={slug} />
+        </div>
+
+        <section className="my-10 max-w-4xl mx-auto">
+        <h2 className="text-2xl font-bold mb-6 text-blue-800">Our Services</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {services.map((service) => (
+            <div key={service._id} className="bg-white shadow rounded-lg overflow-hidden">
+              <div className="p-4">
+                <div className="text-2xl">
+                  {service.image && (
+                    <img src={service.image} alt={service.title} className="h-20 mx-auto object-contain" />
+                  )}
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mt-4">{service.title}</h3>
+                <div
+                  className={`mt-2 prose prose-sm max-w-none transition-all duration-300 ${expandedServiceIds.includes(service._id) ? '' : 'max-h-[150px] overflow-hidden relative'}`}
+                  style={{ position: 'relative' }}
+                  dangerouslySetInnerHTML={{ __html: service.desc }}
+                />
+                {service.desc && (
+                  <button
+                    className="text-blue-600 text-xs mt-1 underline focus:outline-none"
+                    onClick={() => toggleExpand(service._id)}
+                  >
+                    {expandedServiceIds.includes(service._id) ? 'View Less' : 'View More'}
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
         <div className="bg-gradient-to-r from-blue-800 to-blue-900 py-12">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
@@ -766,6 +822,7 @@ export default function CompanyProfilePage() {
         }
       `}</style>
 
+      {/* Place this where you want the Services section to appear, e.g. after main company info */}
      
     </>
   )

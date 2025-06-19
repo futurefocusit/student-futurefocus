@@ -10,13 +10,15 @@ import { IUser } from "@/types/types";
 import { Layout } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import Modal from "@/components/Modal";
+import BlogEditor from "@/components/Editor";
+import { toast } from "@/components/ui/use-toast";
 
 
 interface Service {
   _id: string;
-  icon: string; // Icon name
+  image: string;
   title: string;
-  subservices: string[];
+  desc: string;
 }
 
 const ServicesPage: React.FC = () => {
@@ -25,10 +27,13 @@ const ServicesPage: React.FC = () => {
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [iconName, setIconName] = useState<string>("FaStar"); // Default icon
   const [userData, setUserData] = useState<IUser>();
   const { loggedUser, fetchLoggedUser } =
-  useAuth();
+    useAuth();
+  const [image, setImage] = useState<string>("");
+  const [desc, setDesc] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [expandedServiceIds, setExpandedServiceIds] = useState<string[]>([]);
 
   useEffect(() => {
     fetchServices();
@@ -36,9 +41,9 @@ const ServicesPage: React.FC = () => {
 
   const fetchServices = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/service`,{
-        headers:{
-          "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
+      const response = await axios.get(`${API_BASE_URL}/service`, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
         }
       });
       setServices(response.data);
@@ -51,61 +56,100 @@ const ServicesPage: React.FC = () => {
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Invalid file", description: "Please upload an image file." });
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Image size should be less than 2MB." });
+      return;
+    }
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await axios.post(
+        `${API_BASE_URL}/upload/file`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("ffa-admin")}`,
+          },
+        }
+      );
+      setImage(response.data.url);
+      toast({ title: "Success", description: "Image uploaded successfully" });
+    } catch (error) {
+      toast({ title: "Upload failed", description: "Failed to upload image" });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setSuccessMessage(null);
-
+    if (!image) {
+      toast({ title: "Image required", description: "Please upload an image." });
+      return;
+    }
+    if (!desc) {
+      toast({ title: "Description required", description: "Please enter a description." });
+      return;
+    }
     const formData = new FormData(e.currentTarget);
     const serviceData = {
       title: formData.get("title") as string,
-      subservices: (formData.get("subservices") as string)
-        .split(",")
-        .map((s) => s.trim()),
-      icon: iconName, // Use entered icon name
+      image,
+      desc,
     };
-
     try {
       if (editingService) {
         await axios.put(
           `${API_BASE_URL}/service/update/${editingService._id}`,
-          serviceData,{
-            headers:{
-              "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
-            }
+          serviceData, {
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
           }
+        }
         );
         setSuccessMessage("Service updated successfully!");
       } else {
-        await axios.post(`${API_BASE_URL}/service/new`, serviceData);
+        await axios.post(`${API_BASE_URL}/service/new`, serviceData, {
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
+          }
+        });
         setSuccessMessage("Service added successfully!");
       }
       fetchServices();
       setIsModalOpen(false);
       setEditingService(null);
-      setIconName("FaStar"); // Reset icon selection
+      setImage("");
+      setDesc("");
     } catch (error) {
-      console.error("Error saving service", error);
       setError("Failed to save service. Please try again.");
     }
   };
 
-  const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIconName(e.target.value);
-  };
-
   const handleEdit = (service: Service) => {
     setEditingService(service);
-    setIconName(service.icon); // Set the icon name when editing
+    setImage(service.image);
+    setDesc(service.desc);
     setIsModalOpen(true);
   };
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this service?")) {
       try {
-        await axios.delete(`${API_BASE_URL}/service/delete/${id}`,{
-          headers:{
-            "Authorization":`Bearer ${localStorage.getItem('ffa-admin')}`
+        await axios.delete(`${API_BASE_URL}/service/delete/${id}`, {
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem('ffa-admin')}`
           }
         });
         setSuccessMessage("Service deleted successfully!");
@@ -117,6 +161,12 @@ const ServicesPage: React.FC = () => {
     }
   };
 
+  const toggleExpand = (id: string) => {
+    setExpandedServiceIds((prev) =>
+      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+    );
+  };
+
   // Function to render icon based on name
   const renderIcon = (iconName: string) => {
     const IconComponent = FaIcons[iconName as keyof typeof FaIcons]; // Get the icon component by name
@@ -124,7 +174,7 @@ const ServicesPage: React.FC = () => {
       <IconComponent className="text-7xl mx-auto" />
     ) : (
       <FaIcons.FaStar className="text-7xl mx-auto" />
-    ); 
+    );
   };
 
   return (
@@ -135,8 +185,8 @@ const ServicesPage: React.FC = () => {
           disabled={!hasPermission(userData as IUser, "services", "create")}
           onClick={() => setIsModalOpen(true)}
           className={`${!hasPermission(userData as IUser, "courses", "create")
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-500"} text-white px-4 py-2 rounded`}
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-blue-500"} text-white px-4 py-2 rounded`}
         >
           Add New Service
         </button>
@@ -161,25 +211,33 @@ const ServicesPage: React.FC = () => {
           >
             <div className="p-4">
               <div className="text-2xl">
-                {renderIcon(service.icon)} {/* Display icon */}
+                {service.image && (
+                  <img src={service.image} alt="Service" className="h-20 mx-auto object-contain" />
+                )}
               </div>
               <h3 className="text-lg font-medium text-gray-900 mt-4">
                 {service.title}
               </h3>
-              <ul className="mt-2">
-                {service.subservices.map((subservice, index) => (
-                  <li key={index} className="text-sm text-gray-700">
-                    - {subservice}
-                  </li>
-                ))}
-              </ul>
+              <div
+                className={`mt-2 prose prose-sm max-w-none transition-all duration-300 ${expandedServiceIds.includes(service._id) ? '' : 'max-h-[150px] overflow-hidden relative'}`}
+                style={{ position: 'relative' }}
+                dangerouslySetInnerHTML={{ __html: service.desc }}
+              />
+              {service.desc && (
+                <button
+                  className="text-blue-600 text-xs mt-1 underline focus:outline-none"
+                  onClick={() => toggleExpand(service._id)}
+                >
+                  {expandedServiceIds.includes(service._id) ? 'View Less' : 'View More'}
+                </button>
+              )}
               <div className="mt-4 flex justify-between">
                 <button
                   disabled={!hasPermission(userData as IUser, "courses", "update")}
                   onClick={() => handleEdit(service)}
                   className={`inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md ${!hasPermission(userData as IUser, "courses", "update")
-                      ? "bg-gray-400 cursor-not-allowed text-white"
-                      : "text-indigo-700 bg-indigo-100 hover:bg-indigo-200"}`}
+                    ? "bg-gray-400 cursor-not-allowed text-white"
+                    : "text-indigo-700 bg-indigo-100 hover:bg-indigo-200"}`}
                 >
                   Update
                 </button>
@@ -187,8 +245,8 @@ const ServicesPage: React.FC = () => {
                   disabled={!hasPermission(userData as IUser, "courses", "delete")}
                   onClick={() => handleDelete(service._id)}
                   className={`inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md ${!hasPermission(userData as IUser, "courses", "delete")
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "text-red-700 bg-red-100 hover:bg-red-200"}`}
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "text-red-700 bg-red-100 hover:bg-red-200"}`}
                 >
                   Delete
                 </button>
@@ -203,8 +261,9 @@ const ServicesPage: React.FC = () => {
         onClose={() => {
           setIsModalOpen(false);
           setEditingService(null);
-          setIconName("FaStar"); // Reset icon name on modal close
-        } }
+          setImage("");
+          setDesc("");
+        }}
       >
         <h2 className="text-xl font-bold mb-4">
           {editingService ? "Update" : "Add"} Service
@@ -216,25 +275,32 @@ const ServicesPage: React.FC = () => {
             defaultValue={editingService?.title || ""}
             required
             placeholder="Service Title"
-            className="mb-2 w-full px-3 py-2 border rounded" />
-          <textarea
-            name="subservices"
-            defaultValue={editingService?.subservices.join(", ") || ""}
-            required
-            placeholder="Subservices (comma-separated)"
             className="mb-2 w-full px-3 py-2 border rounded"
-            rows={4} />
-          <input
-            type="text"
-            name="icon"
-            value={iconName}
-            onChange={handleIconChange}
-            required
-            placeholder="Icon Name (e.g., FaStar)"
-            className="mb-2 w-full px-3 py-2 border rounded" />
+          />
+          <div className="mb-2">
+            <label className="block mb-1">Service Image</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              disabled={isUploading}
+              className="w-full px-3 py-2 border rounded"
+            />
+            {image && (
+              <img src={image} alt="Service" className="mt-2 h-32 object-contain" />
+            )}
+          </div>
+          <div className="mb-2">
+            <label className="block mb-1">Description</label>
+            <BlogEditor
+              initialContent={desc}
+              onChange={setDesc}
+            />
+          </div>
           <button
             type="submit"
             className="w-full bg-green-500 text-white px-4 py-2 rounded"
+            disabled={isUploading}
           >
             {editingService ? "Update" : "Add"} Service
           </button>
