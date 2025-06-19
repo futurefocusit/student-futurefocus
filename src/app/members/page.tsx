@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { toast } from "react-toastify";
 import withAdminAuth from "@/components/withAdminAuth";
 import axios from "axios";
@@ -36,7 +38,7 @@ import {
   Box,
   InputAdornment,
 } from "@mui/material";
-import { FaFacebook, FaInstagram, FaLinkedin, FaSnapchat } from "react-icons/fa";
+import { SortableMemberCard } from "@/components/TeamInfo";
 
 const MembersPage: React.FC = () => {
   const {
@@ -53,6 +55,7 @@ const MembersPage: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
+  const [moreInfo, setMoreInfo] = useState<string | null>(null);
   const [skillInput, setSkillInput] = useState('');
   const [togglesAdmin, setTogglesAdmin] = useState<{ [key: string]: boolean }>(
     {}
@@ -63,7 +66,6 @@ const MembersPage: React.FC = () => {
   const [togglesActive, setTogglesActive] = useState<{
     [key: string]: boolean;
   }>({});
-  const [moreInfo, setMoreInfo] = useState<string | null>(null);
   const [viewSupporting, setViewSupporting] = useState<string | null>(null)
 
   const [formData, setFormData] = useState({
@@ -588,8 +590,7 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
             handleToggleAdmin={handleToggleAdmin}
             togglesAdmin={togglesAdmin}
             togglesAttedance={togglesAttedance}
-            togglesActive={togglesActive}
-          />
+            togglesActive={togglesActive} moreInfo={moreInfo} setMoreInfo={setMoreInfo}          />
       ))}
   </div>
 </SortableWrapper>
@@ -1139,125 +1140,8 @@ const Modal: React.FC<{
   );
 };
 
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 
-const SortableMemberCard = ({
-  member,
-  handleEdit,
-  handleDelete,
-  handleMoreInfo,
-  handleToggleAttend,
-  handleToggleActive,
-  handleToggleAdmin,
-  togglesAdmin,
-  togglesAttedance,
-  togglesActive,
-}) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: member._id });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
 
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="flex flex-col md:flex-row md:justify-between items-center p-3 md:p-4 border rounded-lg shadow-md bg-white"
-    >
-      <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-        <div
-          {...attributes}
-          {...listeners}
-          className="text-gray-400 hover:text-gray-700 cursor-grab active:cursor-grabbing drag-handle"
-          title="Drag to reorder"
-          style={{ touchAction: 'none' }}
-        >
-          <GripVertical size={20} className="md:size-20" />
-        </div>
-        <img
-          src={member.image}
-          alt={member.name}
-          className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover"
-        />
-        <div className="text-center sm:text-left">
-          <h3 className="text-lg md:text-xl font-bold mb-1">{member.name}</h3>
-          <p className="text-gray-700 mb-1">{member.position}</p>
-          <div
-            onClick={() => handleMoreInfo(member._id)}
-            className="flex items-center gap-2 mb-3 text-blue-700 cursor-pointer hover:text-green-700 hover:underline"
-          >
-            <p className="font-bold text-sm">More Info...</p>
-            <ArrowUpRightFromSquareIcon size={13} />
-          </div>
-        </div>
-      </div>
-      <div className="flex flex-col md:flex-row gap-4 sm:ml-auto">
-        <div className="flex flex-col gap-4 w-full md:w-auto">
-          {[
-            {
-              label: "ATTENDANCE",
-              toggleState: togglesAttedance[member._id],
-              toggleHandler: () => handleToggleAttend(member._id),
-            },
-            {
-              label: "ACTIVE",
-              toggleState: togglesActive[member._id],
-              toggleHandler: () => handleToggleActive(member._id),
-            },
-            {
-              label: "ADMIN",
-              toggleState: togglesAdmin[member._id],
-              toggleHandler: () => handleToggleAdmin(member._id),
-            },
-          ].map((toggle) => (
-            <div
-              key={toggle.label}
-              className="flex items-center justify-between gap-4"
-            >
-              <p className="font-bold text-sm md:text-base">{toggle.label}:</p>
-              <div
-                onClick={toggle.toggleHandler}
-                className={`toggle-container w-12 md:w-16 h-6 md:h-8 rounded-full flex items-center p-1 cursor-pointer ${
-                  toggle.toggleState ? "bg-blue-500" : "bg-gray-300"
-                }`}
-              >
-                <div
-                  className={`toggle-circle w-5 h-5 md:w-6 md:h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                    toggle.toggleState
-                      ? "translate-x-6 md:translate-x-8"
-                      : ""
-                  }`}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="flex flex-row md:flex-col justify-center gap-2 w-full md:w-auto">
-          <button
-            onClick={() => handleEdit(member)}
-            className="flex-1 md:flex-none px-4 py-2 text-sm md:text-base bg-green-600 text-white rounded-md"
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => handleDelete(member._id)}
-            className="flex-1 md:flex-none px-4 py-2 text-sm md:text-base bg-red-600 text-white rounded-md"
-          >
-            Delete
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export default withAdminAuth(MembersPage);
