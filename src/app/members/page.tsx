@@ -638,7 +638,7 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
                           <div className="flex flex-col border border-gray-400 p-3 rounded gap-2">
                             <h1 className="font-bold text-2xl">Skills</h1>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                              {member.skills.map((skill, index) => (
+                              {member.skills?.map((skill, index) => (
                                 <div key={index} className="">
                                   <p className="font-medium">📍 {skill}</p>
                                 </div>
@@ -1135,7 +1135,7 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
                     />
                     {formData.certificate.length > 0 && (
                       <ul className="list-disc ml-5 mt-1 text-sm text-blue-700">
-                        {formData.certificate.map((cert, i) => (
+                        {formData.certificate?.map((cert, i) => (
                           <li key={i}>
                             <a href={cert.url} target="_blank" rel="noopener noreferrer">
                                {cert.name || `Certificate ${i + 1}`}
