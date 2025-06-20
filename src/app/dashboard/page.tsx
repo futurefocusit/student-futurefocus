@@ -201,7 +201,7 @@ const Dashboard = () => {
         backgroundColor: "rgba(75, 192, 192, 0.6)",
       },
       {
-        label: "Dropped Out",
+        label: "Rejected",
         data: summary.shiftStudents.map((ss) => ss.droppedout),
         backgroundColor: "rgba(255, 99, 132, 0.6)",
       },
