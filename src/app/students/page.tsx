@@ -801,9 +801,9 @@ const StudentManagement: React.FC = () => {
                   handleStatusClick(student._id, student.name, "droppedout");
                   setAction("drop student out");
                 }}
-                className="text-red-600 font-extrabold hover:text-green-900 ml-3"
+                className="text-red-400 font-extrabold hover:text-green-900 ml-3"
               >
-                DROPOUT
+                REJECT
               </button>
             ) : (
               ""
@@ -971,7 +971,7 @@ const StudentManagement: React.FC = () => {
                       : status === "accepted"
                         ? "bg-blue-600"
                         : status === "droppedout"
-                          ? "bg-red-600"
+                          ? "bg-red-300"
                           : status === "registered"
                             ? "bg-green-400"
                             : status === "started"
@@ -985,7 +985,7 @@ const StudentManagement: React.FC = () => {
                       : status === "accepted"
                         ? `ADMITTED `
                         : status === "droppedout"
-                          ? `DROPOUT`
+                          ? `REJECTED`
                           : status === "started"
                             ? `ACTIVE `
                             : `${status.toUpperCase()}`}
@@ -996,7 +996,7 @@ const StudentManagement: React.FC = () => {
                       : status === "accepted"
                         ? "text-blue-600"
                         : status === "droppedout"
-                          ? "text-red-600"
+                          ? "text-red-400"
                           : status === "registered"
                             ? "text-green-400"
                             : status === "started"
