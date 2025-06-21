@@ -520,7 +520,7 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
     <>
       <SideBar />
       <div className="p-2 md:px-20 md:ml-20 md:p-4">
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-7">
           <h1 className="text-xl md:text-2xl font-semibold">TEAM MEMBERS</h1>
           <button
             disabled={!hasPermission(loggedUser, "team", "create")}
