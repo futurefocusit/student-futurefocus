@@ -30,7 +30,8 @@ export interface TeamMember {
   role: Role;
   image: string
   position: string;
-  phone: string
+  phone: string;
+  phone2: string;
   attend: boolean;
   active: boolean;
   institution: { logo: string, name: string }

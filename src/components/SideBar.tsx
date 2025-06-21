@@ -16,19 +16,20 @@ import {
   FaTasks,
   FaClipboardList,
   FaToolbox,
-  FaCode,
   FaBookOpen,
   FaCalendar,
   FaTeamspeak,
   FaRecycle,
+  FaBell,
   FaServicestack,
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
-import { FaHouseCrack, FaLockOpen, FaMessage, FaPerson, FaRightFromBracket, FaWebAwesome } from "react-icons/fa6";
+import { FaHouseCrack, FaLockOpen, FaPerson, FaRightFromBracket } from "react-icons/fa6";
 import { MdEventAvailable } from "react-icons/md";
 
 const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0)
   const [isExpanded, setIsExpanded] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const { logout, loggedUser, loading } = useAuth();
@@ -36,6 +37,7 @@ const SideBar = () => {
 
   const menuItems = {
     general: [
+      {label: "NOTIFICATION", icon: FaBell, href: "/notification", admin: true},
       { label: "DASHBOARD", icon: FaTachometerAlt, href: "/dashboard", admin: true },
       { label: "PROFILE", icon: FaPerson, href: "/profile", admin: true },
       { label: "SERVICES", icon: FaServicestack, href: "/services", admin: true },
@@ -229,6 +231,12 @@ const SideBar = () => {
                   onClick={() => setIsOpen(false)}
                 >
                   <item.icon className="w-5 h-5" />
+
+                  {item.label === "NOTIFICATION" && notificationCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                        {notificationCount}
+                    </span>
+                  )}
                   <span
                     className={`mx-4 font-medium   md:${isExpanded ? "" : "hidden"}`}
                   >
