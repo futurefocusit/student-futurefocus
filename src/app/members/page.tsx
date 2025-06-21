@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { toast } from "react-toastify";
 import withAdminAuth from "@/components/withAdminAuth";
 import axios from "axios";
@@ -11,7 +13,8 @@ import Layout from "../layout";
 import { hasPermission } from "@/libs/hasPermission";
 import SideBar from "@/components/SideBar";
 import FormattedDate from "@/components/FormattedDate";
-import { X, ArrowUpRightFromSquareIcon, PhoneIcon, LucideLinkedin, Instagram, FacebookIcon } from "lucide-react";
+import { X, ArrowUpRightFromSquareIcon, PhoneIcon, LucideLinkedin, Instagram, FacebookIcon,GripVertical  } from "lucide-react";
+import SortableWrapper from "@/components/SortableWrapper";
 import {
   CloudUpload,
   Person,
@@ -33,8 +36,9 @@ import {
   FormControlLabel,
   Checkbox,
   Box,
+  InputAdornment,
 } from "@mui/material";
-import { FaFacebook, FaInstagram, FaLinkedin, FaSnapchat } from "react-icons/fa";
+import { SortableMemberCard } from "@/components/TeamInfo";
 
 const MembersPage: React.FC = () => {
   const {
@@ -51,6 +55,7 @@ const MembersPage: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
+  const [moreInfo, setMoreInfo] = useState<string | null>(null);
   const [skillInput, setSkillInput] = useState('');
   const [togglesAdmin, setTogglesAdmin] = useState<{ [key: string]: boolean }>(
     {}
@@ -61,7 +66,6 @@ const MembersPage: React.FC = () => {
   const [togglesActive, setTogglesActive] = useState<{
     [key: string]: boolean;
   }>({});
-  const [moreInfo, setMoreInfo] = useState<string | null>(null);
   const [viewSupporting, setViewSupporting] = useState<string | null>(null)
 
   const [formData, setFormData] = useState({
@@ -102,6 +106,10 @@ const MembersPage: React.FC = () => {
     snapchat: "",
     facebook: "",
     ranking: "",
+    paymentDate: "",
+    salary: "",
+    currency: "RWF",
+    dateJoined: "",
   });
 
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -173,11 +181,53 @@ const MembersPage: React.FC = () => {
   };
 
   const handleEdit = (member: TeamMember) => {
-    setEditingMember(member);
-    //@ts-expect-error errro
-    setFormData(member);
-    setIsUpdateModalOpen(true);
-  };
+  setEditingMember(member);
+
+  const daysString = Array.isArray(member.days)
+    ? member.days.join(", ")
+    : member.days || "";
+
+  setFormData({
+    _id: member._id || "",
+    name: member.name || "",
+    image: member.image || "",
+    position: member.position || "",
+    entry: member.entry || "",
+    exit: member.exit || "",
+    email: member.email || "",
+    days: daysString,
+    phone: member.phone || "",
+    isAdmin: member.isAdmin || false,
+    isSuperAdmin: member.isSuperAdmin || false,
+    attend: member.attend || false,
+    active: member.active || true,
+    institution: member.institution || { logo: "", name: "" },
+    contractType: member.contractType || "",
+    linkedIn: member.linkedIn || "",
+    nationalId: member.nationalId || "",
+    bio: member.bio || "",
+    skills: member.skills || [],
+    leaveDetails: {
+      isOnLeave: member.leaveDetails?.isOnLeave || false,
+      leaveType: member.leaveDetails?.leaveType || "",
+      startDate: member.leaveDetails?.startDate || "",
+      endDate: member.leaveDetails?.endDate || "",
+    },
+    cv: member.cv || "",
+    contract: member.contract || "",
+    certificate: Array.isArray(member.certificate) ? member.certificate : [],
+    instagram: member.instagram || "",
+    snapchat: member.snapchat || "",
+    facebook: member.facebook || "",
+    ranking: member.ranking || "",
+    paymentDate: member.paymentDate || "",
+    salary: member.salary || "",
+    currency: member.currency || "RWF",
+    dateJoined: member.dateJoined || "",
+  });
+
+  setIsUpdateModalOpen(true);
+};
 
   const handleDelete = async (id: string) => {
     try {
@@ -272,6 +322,10 @@ const MembersPage: React.FC = () => {
       snapchat: "",
       facebook: "",
       ranking: "",
+      paymentDate: "",
+      salary:"",
+      currency: "RWF",
+      dateJoined: "",
     });
   };
 
@@ -459,7 +513,10 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
 
   setFormData((prev) => ({
     ...prev,
-    certificate: [...prev.certificate, ...uploadedFiles],
+    certificate: [
+    ...(Array.isArray(prev.certificate) ? prev.certificate : []),
+    ...uploadedFiles,
+    ],
   }));
 
   toast.success("Certificates uploaded successfully");
@@ -490,321 +547,54 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
             <div className="loader">Loading...</div>
           </div>
         ) : (
-          <div className="space-y-4">
-            {members.map((member) => (
-              <div
-                key={member._id}
-                className="flex flex-col  md:flex-row md:justify-between   items-center p-3 md:p-4 border  rounded-lg shadow-md bg-white "
-              >
-                <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover"
-                  />
-                  <div className="text-center sm:text-left">
-                    <h3 className="text-lg md:text-xl font-bold mb-1">
-                      {member.name}
-                    </h3>
-                    <p className="text-gray-700 mb-1">{member.position}</p>
-                    <div
-                      onClick={() => handleMoreInfo(member._id)}
-                      className="flex items-center gap-2 text-blue-700 cursor-pointer hover:text-green-700 hover:underline"
-                    >
-                      <p className="font-bold text-sm ">More Info...</p>
-                      <ArrowUpRightFromSquareIcon size={13} />
-                    </div>
-                  </div>
-                </div>
+          <SortableWrapper
+        items={members}
+        setItems={setMembers}
+        getId={(m) => m._id}
+        onUpdateOrder={async (newOrder) => {
+          try {
+            const rankings = newOrder.map((member, index) => ({
+              _id: member._id,
+              ranking: index + 1,
+            }));
+            await axios.put(`${API_BASE_URL}/member/update-rankings`, {
+              rankings,
+            });
+            toast.success("Ranking updated");
+            // Update local state with new rankings
+            setMembers((prevMembers) =>
+              prevMembers.map((member) => {
+                const found = rankings.find((r) => r._id === member._id);
+                // Ensure ranking is a string to match TeamMember type
+                return found ? { ...member, ranking: String(found.ranking) } : member;
+              })
+            );
+          } catch {
+            toast.error("Failed to update ranking");
+          }
+        }}
+      >
+        <div className="space-y-4">
+          {members
+        .slice()
+        .sort((a, b) => Number(a.ranking || 0) - Number(b.ranking || 0))
+        .map((member) => (
+          <SortableMemberCard
+            key={member._id}
+            member={member}
+            handleEdit={handleEdit}
+            handleDelete={handleDelete}
+            handleMoreInfo={handleMoreInfo}
+            handleToggleAttend={handleToggleAttend}
+            handleToggleActive={handleToggleActive}
+            handleToggleAdmin={handleToggleAdmin}
+            togglesAdmin={togglesAdmin}
+            togglesAttedance={togglesAttedance}
+            togglesActive={togglesActive} moreInfo={moreInfo} setMoreInfo={setMoreInfo}          />
+      ))}
+  </div>
+</SortableWrapper>
 
-                {moreInfo === member._id && (
-                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 py-0 md:py-5">
-                    <div className="bg-white p-3 md:p-5 w-full md:w-1/2 overflow-y-auto h-full rounded">
-                      <div className="flex flex-col gap-10">
-                        <div className="fixed top-0 left-0 right-0 z-50 bg-white flex justify-between items-center p-4 md:static">
-                    <h1 className="font-bold text-2xl text-blue-700">
-                      Member Profile
-                    </h1>
-                    <X
-                      onClick={() => setMoreInfo(null)}
-                      size={25}
-                      className="cursor-pointer hover:bg-red-700 rounded-full p-1 hover:text-white"
-                    />
-                  </div>
-
-                  <div className="flex md:mt-0 mt-16 md:flex-row flex-col items-start md:items-center gap-5">
-                    {/* Image */}
-                    <div className="shrink-0 w-36 h-36 rounded-full bg-black overflow-hidden">
-                      <img
-                        src={member.image}
-                        alt={member.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-
-                    <div className="flex flex-col md:flex-row justify-between items-start w-full gap-4">
-                      <div className="flex-1">
-                        <h1 className="font-bold text-lg">{member.name}</h1>
-                        <p className="font-medium text-gray-500">{member.email}</p>
-                        <p className="font-medium text-gray-500">{member.phone}</p>
-                        <p className="font-medium italic text-blue-700">{member.position}</p>
-                      </div>
-
-                      <div className="flex flex-col gap-1 items-start text-right min-w-[120px]">
-                        <div className="flex gap-2 items-center">
-                          <p className="text-sm font-bold">Contract Type:</p>
-                          <p className=" text-gray-600">{member.contractType}</p>
-                        </div>
-                          <a href={member.contract} className="text-blue-700 italic text-sm hover:underline">View Contract...</a>
-                      <div className="flex gap-2 items-start">
-                        <p className="text-sm font-bold">ID:</p>
-                        <p className=" text-gray-600">{member.nationalId}</p>
-                      </div>
-
-                      <div className="flex gap-2 items-start">
-                        <p className="text-sm font-bold">Leave Status:</p>
-                        <p className=" text-white font-semibold text-[12px]">{member.leaveDetails.isOnLeave === false ? (
-                            <p className="bg-green-600 p-1 min-w-full rounded">Active</p>
-                        ): (
-                            <p className="bg-red-600 p-1 w-full rounded">On Leave</p>
-                        ) }</p>
-                      </div>
-                      </div>
-                    </div>
-                  </div>
-
-                        <div className="flex flex-col gap-4">
-                          <div className="flex flex-col border border-gray-400 p-3 rounded gap-2">
-                            <h1 className="font-bold text-2xl">About Me</h1>
-                            <p>{member.bio}</p>
-
-                            <p onClick={()=>handleSupportDocument(member._id)} className="text-green-700 text-sm font-bold italic hover:underline cursor-pointer">View Supporting Files </p>
-                          </div>
-
-                          {viewSupporting === member._id && (
-                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 py-0 md:py-5">
-                              <div className="bg-white p-4 w-[90%] md:w-1/3 rounded shadow-lg">
-                                {/* Header */}
-                                <div className="flex justify-between items-center mb-4">
-                                  <h1 className="text-lg font-bold">Supporting Files</h1>
-                                  <X
-                                    onClick={() => setViewSupporting(null)}
-                                    size={25}
-                                    className="cursor-pointer hover:bg-red-700 rounded-full p-1 hover:text-white"
-                                  />
-                                </div>
-                                                    
-                                {/* Files Section */}
-                                <div className="flex flex-col gap-4">
-                                  {/* CV */}
-                                  {member.cv && (
-                                    <div className="border border-gray-300 p-3 rounded">
-                                      <p className="font-medium mb-1">CV:</p>
-                                      <a
-                                        href={member.cv}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-blue-700 italic hover:text-blue-500 underline text-sm"
-                                      >
-                                        View CV
-                                      </a>
-                                    </div>
-                                  )}
-                          
-                                  {/* Certificates */}
-                                  {Array.isArray(member.certificate) && member.certificate?.length > 0 && (
-                                    <div className="border border-gray-300 p-3 rounded">
-                                      <p className="font-medium mb-2">Certificates:</p>
-                                      <ul className="list-disc pl-5 space-y-1 text-sm text-blue-700">
-                                        {member.certificate.map((cert, index) => (
-                                          <li key={index}>
-                                            <a
-                                              href={cert.url}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className="italic hover:text-blue-500 underline"
-                                            >
-                                              {cert.name || `Certificate ${index + 1}`}
-                                            </a>
-                                          </li>
-                                        ))}
-                                      </ul>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                          <div className="flex flex-col border border-gray-400 p-3 rounded gap-2">
-                            <h1 className="font-bold text-2xl">Skills</h1>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                              {member.skills?.map((skill, index) => (
-                                <div key={index} className="">
-                                  <p className="font-medium">📍 {skill}</p>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 min-w-full">
-                            <div className="flex flex-col border border-gray-400 p-3 rounded gap-2">
-                              <h1 className="font-bold text-2xl">Phone Number</h1>
-                              <p className="flex gap-2 items-center"><span><PhoneIcon size={15}/></span>{member.phone}</p>
-                             </div>
-
-                             <div className="flex flex-col border border-gray-400 p-3 rounded gap-2">
-                                <h1 className="font-bold text-2xl">Social Profile</h1>
-                                <div className="flex gap-3">
-                                  <a href={member.linkedIn} className="hover:text-blue-700"><span><FaLinkedin/></span></a>
-                                  <a href={member.instagram} className="hover:text-blue-700"><span><FaInstagram/></span></a>
-                                  <a href={member.facebook} className="hover:text-blue-700"><span><FaFacebook/></span></a>
-                                  <a href={member.snapchat} className="hover:text-blue-700"><span><FaSnapchat/></span></a>
-                                </div>
-                             </div>
-                          </div>
-
-                          <div className="flex flex-col">
-                            {member.leaveDetails.isOnLeave === true &&(
-                              <div className="flex flex-col border border-gray-400 p-3 rounded gap-1">
-                                <p className="font-bold text-2xl ">{member.leaveDetails.isOnLeave === true && (
-                                  <div>
-                                    <p>Leave Details</p>
-                                    <p className="font-semibold text-sm">Leave Type: <span className="text-blue-700 font-semibold text-sm">{member.leaveDetails.leaveType}</span></p>
-                                  </div>
-                                )}</p>
-                                <div className="flex gap-2">
-                                  <p>Starting From <span className="font-bold"><FormattedDate date={member.leaveDetails.startDate} /></span></p>
-                                  <p>To <span className="font-bold"><FormattedDate date={member.leaveDetails.endDate}/></span></p>
-                                </div>
-                                <p>{member.leaveDetails.approvedBy}</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex flex-col md:flex-row gap-4  sm:ml-auto">
-                  <div className="flex flex-col gap-4 w-full md:w-auto">
-                    <div className="flex items-center justify-between gap-4">
-                      <p className="font-bold text-sm md:text-base">
-                        ATTENDANCE:
-                      </p>
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id={`attendance-${member._id}`}
-                          className="toggle-checkbox hidden"
-                          checked={togglesAttedance[member._id] || false}
-                          onChange={() => handleToggleAttend(member._id)}
-                        />
-                        <div
-                          onClick={() => handleToggleAttend(member._id)}
-                          className={`toggle-container w-12 md:w-16 h-6 md:h-8 rounded-full flex items-center p-1 cursor-pointer ${
-                            togglesAttedance[member._id]
-                              ? "bg-blue-500"
-                              : "bg-gray-300"
-                          }`}
-                        >
-                          <div
-                            className={`toggle-circle w-5 h-5 md:w-6 md:h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                              togglesAttedance[member._id]
-                                ? "translate-x-6 md:translate-x-8"
-                                : ""
-                            }`}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-4">
-                      <p className="font-bold text-sm md:text-base">ACTIVE:</p>
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id={`active-${member._id}`}
-                          className="toggle-checkbox hidden"
-                          checked={togglesActive[member._id] || false}
-                          onChange={() => handleToggleActive(member._id)}
-                        />
-                        <div
-                          onClick={() => handleToggleActive(member._id)}
-                          className={`toggle-container w-12 md:w-16 h-6 md:h-8 rounded-full flex items-center p-1 cursor-pointer ${
-                            togglesActive[member._id]
-                              ? "bg-blue-500"
-                              : "bg-gray-300"
-                          }`}
-                        >
-                          <div
-                            className={`toggle-circle w-5 h-5 md:w-6 md:h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                              togglesActive[member._id]
-                                ? "translate-x-6 md:translate-x-8"
-                                : ""
-                            }`}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between md:gap-4">
-                      <p className="font-bold text-sm md:text-base">ADMIN:</p>
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id={`admin-${member._id}`}
-                          className="toggle-checkbox hidden"
-                          checked={togglesAdmin[member._id] || false}
-                          onChange={() => handleToggleAdmin(member._id)}
-                        />
-                        <div
-                          onClick={() => handleToggleAdmin(member._id)}
-                          className={`toggle-container w-12 md:w-16 h-6 md:h-8 rounded-full flex items-center p-1 cursor-pointer ${
-                            togglesAdmin[member._id]
-                              ? "bg-blue-500"
-                              : "bg-gray-300"
-                          }`}
-                        >
-                          <div
-                            className={`toggle-circle w-5 h-5 md:w-6 md:h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                              togglesAdmin[member._id]
-                                ? "translate-x-6 md:translate-x-8"
-                                : ""
-                            }`}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-row md:flex-col justify-center gap-2 w-full md:w-auto">
-                    <button
-                      disabled={!hasPermission(loggedUser, "team", "update")}
-                      onClick={() => handleEdit(member)}
-                      className={`flex-1 md:flex-none px-4 py-2 text-sm md:text-base ${
-                        !hasPermission(loggedUser, "team", "update")
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-green-600"
-                      } text-white rounded-md`}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      disabled={!hasPermission(loggedUser, "team", "delete")}
-                      onClick={() => handleDelete(member._id)}
-                      className={`flex-1 md:flex-none px-4 py-2 text-sm md:text-base ${
-                        !hasPermission(loggedUser, "team", "delete")
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-red-600"
-                      } text-white rounded-md`}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
         )}
 
         <Modal
@@ -912,6 +702,65 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
                     label="Position"
                     name="position"
                     value={formData.position}
+                    onChange={handleChange}
+                    required
+                    InputProps={{
+                      startAdornment: <Work className="text-gray-400 mr-2" />,
+                    }}
+                  />
+                </Grid2>
+
+                <Grid2 xs={12} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Salary"
+                    name="salary"
+                    value={formData.salary}
+                    onChange={handleChange}
+                    required
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <TextField
+                            select
+                            name="currency"
+                            value={formData.currency || "USD"}
+                            onChange={(e) =>
+                              setFormData({ ...formData, currency: e.target.value })
+                            }
+                            variant="standard"
+                            sx={{ width: 70 }}
+                          >
+                            <MenuItem value="USD">USD</MenuItem>
+                            <MenuItem value="RWF">RWF</MenuItem>
+                          </TextField>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid2>
+
+                <Grid2 xs={12} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Joined Date"
+                    name="dateJoined"
+                    type="date"
+                    value={formData.dateJoined}
+                    onChange={handleChange}
+                    required
+                    InputProps={{
+                      startAdornment: <Work className="text-gray-400 mr-2" />,
+                    }}
+                  />
+                </Grid2>
+
+                <Grid2 xs={12} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Payment Date"
+                    name="paymentDate"
+                    value={formData.paymentDate}
                     onChange={handleChange}
                     required
                     InputProps={{
@@ -1050,7 +899,6 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
                     placeholder="https://facebook.com/username"
                   />
                 </Grid2>
-                
                 {/* NationalId */}
                 <Grid2 xs={12} md={6}>
                   <TextField
@@ -1126,7 +974,7 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
                         {formData.certificate?.map((cert, i) => (
                           <li key={i}>
                             <a href={cert.url} target="_blank" rel="noopener noreferrer">
-                               {cert.name || `Certificate ${i + 1}`}
+                               {cert.name}
                             </a>
                           </li>
                         ))}
@@ -1192,8 +1040,8 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
                   <>
                     <Grid2 xs={12} md={4}>
                       <FormControl fullWidth>
-                        <InputLabel>Leave Type</InputLabel>
-                        <Select
+                        <TextField
+                          label="Leave Type"
                           value={formData.leaveDetails?.leaveType || ""}
                           onChange={(e) =>
                             setFormData({
@@ -1205,18 +1053,8 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
                             })
                           }
                           name="leaveType"
-                          input={<OutlinedInput label="Leave Type" />}
-                        >
-                          <MenuItem value="Sick Leave">Sick Leave</MenuItem>
-                          <MenuItem value="Annual Leave">Annual Leave</MenuItem>
-                          <MenuItem value="Maternity Leave">
-                            Maternity Leave
-                          </MenuItem>
-                          <MenuItem value="Paternity Leave">
-                            Paternity Leave
-                          </MenuItem>
-                          <MenuItem value="Unpaid Leave">Unpaid Leave</MenuItem>
-                        </Select>
+                          variant="outlined"
+                        />
                       </FormControl>
                     </Grid2>
 
@@ -1300,5 +1138,9 @@ const Modal: React.FC<{
     </div>
   );
 };
+
+
+
+
 
 export default withAdminAuth(MembersPage);

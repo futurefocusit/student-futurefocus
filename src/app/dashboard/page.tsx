@@ -201,7 +201,7 @@ const Dashboard = () => {
         backgroundColor: "rgba(75, 192, 192, 0.6)",
       },
       {
-        label: "Dropped Out",
+        label: "Rejected",
         data: summary.shiftStudents.map((ss) => ss.droppedout),
         backgroundColor: "rgba(255, 99, 132, 0.6)",
       },
@@ -238,7 +238,7 @@ const Dashboard = () => {
         backgroundColor: "rgba(75, 192, 192, 0.6)",
       },
       {
-        label: "Dropped Out",
+        label: "Rejected",
         data: summary.departmentStudents.map((ds) => ds.droppedout),
         backgroundColor: "rgba(255, 99, 132, 0.6)",
       },
@@ -364,10 +364,10 @@ const Dashboard = () => {
           </p>
         </a>
         <a
-          href="/students?filter=droppedOut"
+          href="/students?filter=rejected"
           className="text-white p-6 rounded-lg shadow-md text-center bg-red-900"
         >
-          <h3 className="text-lg font-semibold">DROPOUT </h3>
+          <h3 className="text-lg font-semibold">Rejected </h3>
           <p className="text-2xl font-bold">
             {summary.studentStatusCounts.droppedout || 0}
           </p>
