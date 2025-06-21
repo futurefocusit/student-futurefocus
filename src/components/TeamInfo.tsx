@@ -130,7 +130,7 @@ export const SortableMemberCard = ({
                       View Contract...
                     </a>
                     <div className="flex gap-2 items-start">
-                      <p className="text-sm font-bold">ID:</p>
+                      <p className="text-sm font-bold">ID/PASSPORT:</p>
                       <p className=" text-gray-600">{member.nationalId}</p>
                     </div>
 
