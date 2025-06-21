@@ -362,13 +362,7 @@ export default function CompanyProfilePage() {
                   )
                 })}
               </div>
-              <button
-                onClick={() => router.push(`/profile/${slug}/##contact`)}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-yellow-800 bg-white hover:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
-              >
-                <MessageSquare className="h-5 w-5 mr-2" />
-                Contact Us
-              </button>
+             
             </div>
           </div>
 
@@ -423,7 +417,7 @@ export default function CompanyProfilePage() {
         </div>
       </nav>
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50">
+      <div className="min-h-screen bg-gradient-to-br from-gray-500 via to-gray-500">
         {/* Hero Section */}
         <div id="about" className="relative overflow-hidden">
           {companyData.heroImage && (
@@ -439,7 +433,7 @@ export default function CompanyProfilePage() {
             </div>
           )}
           <div className="relative max-w-6xl mx-auto  mt-5 px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-            <div className="text-center relative top-28">
+            <div className="text-center relative top-14 lg:top-28">
               
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4  leading-tight">
                 {companyData.name}
@@ -468,10 +462,10 @@ export default function CompanyProfilePage() {
 
         {/* Content Section */}
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="space-y-">
+          <div className="">
             {/* About Us */}
-            <div id="about" className="max-w-6xl mx-auto py-1">
-              <div className="bg-white rounded-2xl shadow-xl py-8">
+            <div id="about" className="max-w-6xl mx-auto ">
+              <div className="bg-white rounded-2xl shadow-xl ">
                 <TextWithReadMore
                   content={companyData.aboutUs}
                   title="About Us"
@@ -482,9 +476,9 @@ export default function CompanyProfilePage() {
             </div>
 
             {/* Mission & Vision */}
-            <div id="mission-vision" className="max-w-6xl mx-auto py-1">
+            <div id="mission-vision" className="max-w-6xl mx-auto mt-2 ">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-white rounded-2xl shadow-xl py-1">
+                <div className="bg-white rounded-2xl shadow-xl ">
                   <TextWithReadMore
                     Icon={FaBullseye}
                     content={companyData.mission}
@@ -492,7 +486,7 @@ export default function CompanyProfilePage() {
                     maxLength={200}
                   />
                 </div>
-                <div className="bg-white rounded-2xl shadow-xl py-1">
+                <div className="bg-white rounded-2xl shadow-xl ">
                   <TextWithReadMore
                     Icon={FaGlobeAmericas}
                     content={companyData.vision}
@@ -504,8 +498,8 @@ export default function CompanyProfilePage() {
             </div>
 
             {/* Description */}
-            <div className="max-w-6xl mx-auto py-1">
-              <div className=" rounded-2xl shadow-xl ">
+            <div className="max-w-6xl mx-auto py-2 ">
+              <div className=" rounded-2xl shadow-xl bg-white">
                 <TextWithReadMore
                   Icon={FaRegFileAlt}
                   content={companyData.description}
@@ -516,7 +510,7 @@ export default function CompanyProfilePage() {
             </div>
 
             {/* Why Choose Us */}
-            <div id="why-choose-us" className="max-w-6xl mx-auto   py-1">
+            <div id="why-choose-us" className="max-w-6xl mx-auto  bg-white rounded-t-lg   ">
               <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6 rounded-t-lg">
                 <h3 className="text-2xl font-bold text-white flex items-center gap-3">
                   <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
@@ -538,10 +532,10 @@ export default function CompanyProfilePage() {
           </div>
 
           {/* Core Values & Languages */}
-          <div id="core-values" className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div id="core-values" className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
             {companyData.coreValues.length > 0 && companyData.coreValues[0] && (
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-blue-100">
-                <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">
+              <div className="bg-white rounded-2xl shadow-xl overflow-hidden  mt-2">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6 ">
                   <h3 className="text-2xl font-bold text-white flex items-center gap-3">
                     <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
                       <Star className="w-6 h-6 text-blue-800" />
@@ -563,7 +557,7 @@ export default function CompanyProfilePage() {
             )}
 
             {companyData.languages.length > 0 && companyData.languages[0] && (
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-blue-100">
+              <div className="bg-white rounded-2xl shadow-xl overflow-hidden mt-2">
                 <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">
                   <h3 className="text-2xl font-bold text-white flex items-center gap-3">
                     <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
@@ -729,13 +723,7 @@ export default function CompanyProfilePage() {
             </div>
           </div>
         </div>
-      </div>
-      {/* Add BlogList at the end of the main content section */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 ">
-        <BlogList slug={slug} />
-      </div>
-
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 ">
 
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6 rounded-t-xl">
           <h3 className="text-2xl font-bold text-white flex items-center gap-3">
@@ -745,7 +733,7 @@ export default function CompanyProfilePage() {
 
             Our Services</h3>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 bg-white">
           {services.map((service) => (
             <div key={service._id} className="bg-white shadow rounded-lg overflow-hidden">
               <div className="p-4">
@@ -773,6 +761,13 @@ export default function CompanyProfilePage() {
           ))}
         </div>
       </section>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8  mb-2">
+        <BlogList slug={slug} />
+      </div>
+      {/* Add BlogList at the end of the main content section */}
+     
+
+      
       <div className="bg-gradient-to-r from-blue-800 to-blue-900 py-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -785,6 +780,7 @@ export default function CompanyProfilePage() {
             <div className="mt-4 w-24 h-1 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full mx-auto"></div>
           </div>
         </div>
+      </div>
       </div>
 
 

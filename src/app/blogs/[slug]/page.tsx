@@ -205,13 +205,13 @@ export default function BlogPage() {
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 py-8">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-4 mb-6">
-              <button
-                onClick={() => router.back()}
+              <a
+                href={`/${slug}`}
                 className="inline-flex items-center px-3 py-2 text-sm font-medium text-white hover:text-yellow-200 transition-colors duration-200"
               >
                 <ArrowLeft className="h-5 w-5 mr-2" />
                 Back
-              </button>
+              </a>
             </div>
             <div className="text-center">
               <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4 leading-tight">
