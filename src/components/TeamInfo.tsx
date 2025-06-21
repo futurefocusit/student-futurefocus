@@ -5,6 +5,8 @@ import {
   GripVertical,
   PhoneIcon,
   X,
+  PenBoxIcon,
+  TrashIcon
 } from "lucide-react";
 import { useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
@@ -62,7 +64,7 @@ export const SortableMemberCard = ({
           alt={member.name}
           className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover"
         />
-        <div className="text-center sm:text-left">
+        <div className="flex flex-col md:items-start items-center sm:text-left">
           <h3 className="text-lg md:text-xl font-bold mb-1">{member.name}</h3>
           <p className="text-gray-700 mb-1">{member.position}</p>
           <div
@@ -160,21 +162,61 @@ export const SortableMemberCard = ({
                 <div className="flex flex-col border border-gray-400 p-3 rounded gap-2">
                   <h1 className="font-bold text-2xl">Job Information</h1>
                   <div className="flex flex-col md:flex-row justify-between">
-                    <div className="flex flex-col gap-1">
-                        <p className="text-sm">Names: <span className="font-semibold">{member.name}</span></p>
-                        <p className="text-sm">Job Position: <span className="font-semibold">{member.position}</span></p>
-                        <p className="text-sm">Joined Date: <span className="font-semibold"><FormattedDate date ={member.dateJoined}/></span></p>
-                        <p className="text-sm">Payment Date: <span className="font-semibold">{member.paymentDate} <span className="text-blue-600">Every Month</span></span></p>
-                       <div className="flex gap-1 items-center">
-                         <p className="text-sm">Salary/ Wage: <span className="font-semibold">{Number(member.salary).toLocaleString()}</span></p>
-                         <p className="text-sm font-semibold">{member.currency}</p>
-                       </div>
-                    </div>
+                    <div className="flex flex-row gap-5">
+                      <div className="flex flex-col gap-1 items-start text-sm font-semibold">
+                        <p>Names</p>
+                        <p>Job Position</p>
+                        <p>Joined Date</p>
+                        <p>Payment Date</p>
+                        <p>Salary/ Wage</p>
+                      </div>
 
-                    <div className="flex flex-col gap-1">
-                        <p className="text-sm">Entry Time: <span className="font-semibold">{member.entry}</span></p>
-                        <p className="text-sm">Exit Time: <span className="font-semibold">{member.exit}</span></p>
-                        <p className="text-sm">Working Days: <span className="font-semibold">{member.days}</span></p>
+                      <div className="flex flex-col gap-1 items-start text-sm">
+                        <p>{member.name}</p>
+                        <p>{member.position}</p>
+                        <p>
+                          <FormattedDate date={member.dateJoined} />
+                        </p>
+                        <p>
+                          {member.paymentDate}
+                          <span>
+                            {(() => {
+                              const day = parseInt(member.paymentDate);
+                              if (day === 1 || day === 21 || day === 31)
+                                return "st";
+                              if (day === 2 || day === 22) return "nd";
+                              if (day === 3 || day === 23) return "rd";
+                              return "th";
+                            })()}
+                          </span>
+                          <span className="text-blue-600 ml-2">
+                            Every Month
+                          </span>
+                        </p>
+                        <div className="flex flex-row gap-1">
+                          <p>{Number(member.salary).toLocaleString()}</p>
+                          <p>{member.currency}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-row gap-5">
+                      <div className="flex flex-col gap-1 items-start text-sm font-semibold">
+                        <p>Entry Time</p>
+                        <p>Exit Time</p>
+                        <p>Working Days</p>
+                      </div>
+                      <div className="flex flex-col gap-1 items-start text-sm">
+                        <p>{member.entry}</p>
+                        <p>{member.exit}</p>
+                        <p className="grid grid-cols-3 gap-1">
+                          {member.days.split(",").map((day, index, arr) => (
+                            <span key={index}>
+                              {day.trim()}
+                              {index < arr.length - 1 ? "," : ""}
+                            </span>
+                          ))}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -215,18 +257,20 @@ export const SortableMemberCard = ({
                             <div className="border border-gray-300 p-3 rounded">
                               <p className="font-medium mb-2">Certificates:</p>
                               <ul className="list-disc pl-5 space-y-1 text-sm text-blue-700">
-                                {member.certificate.map((cert, index) => (
-                                  <li key={index}>
-                                    <a
-                                      href={cert.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="italic hover:text-blue-500 underline"
-                                    >
-                                      {cert.name || `Certificate ${index + 1}`}
-                                    </a>
-                                  </li>
-                                ))}
+                                {member.certificate.map(
+                                  (cert: { url: string; name: string }, i) => (
+                                    <li key={i}>
+                                      <a
+                                        href={cert.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="italic hover:text-blue-500 underline"
+                                      >
+                                        {cert.name}
+                                      </a>
+                                    </li>
+                                  )
+                                )}
                               </ul>
                             </div>
                           )}
@@ -254,16 +298,29 @@ export const SortableMemberCard = ({
                       </span>
                       {member.phone}
                     </p>
+
+                    {member.phone2 && (
+                      <p className="flex gap-2 items-center">
+                        <span>
+                          <PhoneIcon size={15} />
+                        </span>
+                        {member.phone2}
+                      </p>
+                    )}
                   </div>
 
                   <div className="flex flex-col border border-gray-400 p-3 rounded gap-2">
                     <h1 className="font-bold text-2xl">Social Profile</h1>
                     <div className="flex gap-3">
+                      {member.linkedIn === "" ? ""
+                      : 
                       <a href={member.linkedIn} className="hover:text-blue-700">
                         <span>
                           <FaLinkedin />
                         </span>
-                      </a>
+                      </a>}
+                      {member.instagram === "" ? ""
+                      :
                       <a
                         href={member.instagram}
                         className="hover:text-blue-700"
@@ -272,16 +329,24 @@ export const SortableMemberCard = ({
                           <FaInstagram />
                         </span>
                       </a>
-                      <a href={member.facebook} className="hover:text-blue-700">
+                      }
+                      {member.facebook === "" ? "" 
+                      
+                      :
+                       <a href={member.facebook} className="hover:text-blue-700">
                         <span>
                           <FaFacebook />
                         </span>
-                      </a>
-                      <a href={member.snapchat} className="hover:text-blue-700">
+                      </a> 
+                      }
+                      {member.snapchat === "" ? "" 
+                      :
+                       <a href={member.snapchat} className="hover:text-blue-700">
                         <span>
                           <FaSnapchat />
                         </span>
-                      </a>
+                      </a> 
+                      }
                     </div>
                   </div>
                 </div>
@@ -322,62 +387,70 @@ export const SortableMemberCard = ({
                     </div>
                   )}
                 </div>
+
+                <div className="flex flex-col border border-gray-400 p-3 rounded gap-1">
+                  <h1 className="font-bold text-2xl">Permissions</h1>
+                  <div className="flex flex-col gap-4 w-full md:w-auto">
+                    {[
+                      {
+                        label: "ATTENDANCE",
+                        toggleState: togglesAttedance[member._id],
+                        toggleHandler: () => handleToggleAttend(member._id),
+                      },
+                      {
+                        label: "ACTIVE",
+                        toggleState: togglesActive[member._id],
+                        toggleHandler: () => handleToggleActive(member._id),
+                      },
+                      {
+                        label: "ADMIN",
+                        toggleState: togglesAdmin[member._id],
+                        toggleHandler: () => handleToggleAdmin(member._id),
+                      },
+                    ].map((toggle) => (
+                      <div
+                        key={toggle.label}
+                        className="flex items-center justify-between gap-4"
+                      >
+                        <p className="font-bold text-sm md:text-base">
+                          {toggle.label}:
+                        </p>
+                        <div
+                          onClick={toggle.toggleHandler}
+                          className={`toggle-container w-12 md:w-16 h-6 md:h-8 rounded-full flex items-center p-1 cursor-pointer ${
+                            toggle.toggleState ? "bg-blue-500" : "bg-gray-300"
+                          }`}
+                        >
+                          <div
+                            className={`toggle-circle w-5 h-5 md:w-6 md:h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                              toggle.toggleState
+                                ? "translate-x-6 md:translate-x-8"
+                                : ""
+                            }`}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       )}
       <div className="flex flex-col md:flex-row gap-4 sm:ml-auto">
-        <div className="flex flex-col gap-4 w-full md:w-auto">
-          {[
-            {
-              label: "ATTENDANCE",
-              toggleState: togglesAttedance[member._id],
-              toggleHandler: () => handleToggleAttend(member._id),
-            },
-            {
-              label: "ACTIVE",
-              toggleState: togglesActive[member._id],
-              toggleHandler: () => handleToggleActive(member._id),
-            },
-            {
-              label: "ADMIN",
-              toggleState: togglesAdmin[member._id],
-              toggleHandler: () => handleToggleAdmin(member._id),
-            },
-          ].map((toggle) => (
-            <div
-              key={toggle.label}
-              className="flex items-center justify-between gap-4"
-            >
-              <p className="font-bold text-sm md:text-base">{toggle.label}:</p>
-              <div
-                onClick={toggle.toggleHandler}
-                className={`toggle-container w-12 md:w-16 h-6 md:h-8 rounded-full flex items-center p-1 cursor-pointer ${
-                  toggle.toggleState ? "bg-blue-500" : "bg-gray-300"
-                }`}
-              >
-                <div
-                  className={`toggle-circle w-5 h-5 md:w-6 md:h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                    toggle.toggleState ? "translate-x-6 md:translate-x-8" : ""
-                  }`}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
         <div className="flex flex-row md:flex-col justify-center gap-2 w-full md:w-auto">
           <button
             onClick={() => handleEdit(member)}
             className="flex-1 md:flex-none px-4 py-2 text-sm md:text-base bg-green-600 text-white rounded-md"
           >
-            Edit
+            <PenBoxIcon />
           </button>
           <button
             onClick={() => handleDelete(member._id)}
             className="flex-1 md:flex-none px-4 py-2 text-sm md:text-base bg-red-600 text-white rounded-md"
           >
-            Delete
+            <TrashIcon/>
           </button>
         </div>
       </div>

@@ -2,18 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { toast } from "react-toastify";
 import withAdminAuth from "@/components/withAdminAuth";
 import axios from "axios";
 import API_BASE_URL from "@/config/baseURL";
 import { TeamMember } from "@/types/types";
-import Layout from "../layout";
 import { hasPermission } from "@/libs/hasPermission";
 import SideBar from "@/components/SideBar";
-import FormattedDate from "@/components/FormattedDate";
-import { X, ArrowUpRightFromSquareIcon, PhoneIcon, LucideLinkedin, Instagram, FacebookIcon,GripVertical  } from "lucide-react";
 import SortableWrapper from "@/components/SortableWrapper";
 import {
   CloudUpload,
@@ -66,7 +61,6 @@ const MembersPage: React.FC = () => {
   const [togglesActive, setTogglesActive] = useState<{
     [key: string]: boolean;
   }>({});
-  const [viewSupporting, setViewSupporting] = useState<string | null>(null)
 
   const [formData, setFormData] = useState({
     _id: "",
@@ -78,6 +72,7 @@ const MembersPage: React.FC = () => {
     email: "",
     days: "",
     phone: "",
+    phone2: "",
     isAdmin: false,
     isSuperAdmin: false,
     attend: false,
@@ -197,6 +192,7 @@ const MembersPage: React.FC = () => {
     email: member.email || "",
     days: daysString,
     phone: member.phone || "",
+    phone2: member.phone2 || "",
     isAdmin: member.isAdmin || false,
     isSuperAdmin: member.isSuperAdmin || false,
     attend: member.attend || false,
@@ -294,6 +290,7 @@ const MembersPage: React.FC = () => {
       email: "",
       days: "",
       phone: "",
+      phone2: "",
       isAdmin: false,
       isSuperAdmin: false,
       attend: false,
@@ -385,11 +382,7 @@ const MembersPage: React.FC = () => {
   const handleMoreInfo = (id: string) => {
     setMoreInfo((prev) => (prev === id ? null : id));
   };
-
-  const handleSupportDocument = (id: string) =>{
-    setViewSupporting((prev)=> prev === id ? null : id)
-  }
-
+  
   const handleSkillKeyDown = (e) => {
     if (e.key === 'Enter' && skillInput.trim()) {
       e.preventDefault();
@@ -680,11 +673,11 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
                   />
                 </Grid2>
 
-                {/* Phone */}
+                {/* Phone 1*/}
                 <Grid2 xs={12} md={6}>
                   <TextField
                     fullWidth
-                    label="Phone Number"
+                    label="Phone Number 1"
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
@@ -695,8 +688,22 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
                   />
                 </Grid2>
 
-                {/* Position */}
+                {/* Phone 2*/}
                 <Grid2 xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Phone Number 2/ Optional"
+                    name="phone2"
+                    value={formData.phone2}
+                    onChange={handleChange}
+                    InputProps={{
+                      startAdornment: <Phone className="text-gray-400 mr-2" />,
+                    }}
+                  />
+                </Grid2>
+
+                {/* Position */}
+                <Grid2 xs={12} md={12}>
                   <TextField
                     fullWidth
                     label="Position"
@@ -901,7 +908,7 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
                 </Grid2>
 
                 {/* NationalId */}
-                <Grid2 xs={12} md={6}>
+                <Grid2 xs={12} md={12}>
                   <TextField
                     fullWidth
                     label="National ID"
