@@ -1138,7 +1138,7 @@ function CompanyProfilePreview({ data, onBack }: { data: CompanyData; onBack: ()
   const [popupContent, setPopupContent] = useState({ title: "", content: "" })
   const [selectedGallery, setSelectedGallery] = useState<Array<{ url: string, caption?: string }>>([])
   const [copied, setCopied] = useState(false);
-  const publicProfileUrl = typeof window !== 'undefined' && data.slug ? `${window.location.origin}/profile/${data.slug}` : '';
+  const publicProfileUrl = typeof window !== 'undefined' && data.slug ? `${window.location.origin}/${data.slug}` : '';
   const [expandedServiceIds, setExpandedServiceIds] = useState<string[]>([])
   const [services, setServices] = useState<Service[]>([])
 
