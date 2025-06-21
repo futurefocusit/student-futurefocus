@@ -6,7 +6,7 @@ import {
   PhoneIcon,
   X,
   PenBoxIcon,
-  TrashIcon
+  TrashIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
@@ -43,6 +43,12 @@ export const SortableMemberCard = ({
   const handleSupportDocument = (id: string) => {
     setViewSupporting((prev) => (prev === id ? null : id));
   };
+  const socialLinks = [
+    { platform: "linkedin", icon: <FaLinkedin />, url: member.linkedIn },
+    { platform: "instagram", icon: <FaInstagram />, url: member.instagram },
+    { platform: "facebook", icon: <FaFacebook />, url: member.facebook },
+    { platform: "snapchat", icon: <FaSnapchat />, url: member.snapchat },
+  ];
   return (
     <div
       ref={setNodeRef}
@@ -124,12 +130,12 @@ export const SortableMemberCard = ({
                       View Contract...
                     </a>
                     <div className="flex gap-2 items-start">
-                      <p className="text-sm font-bold">ID:</p>
+                      <p className="text-sm font-bold">ID/PASSPORT:</p>
                       <p className=" text-gray-600">{member.nationalId}</p>
                     </div>
 
                     <div className="flex gap-2 items-start">
-                      <p className="text-sm font-bold">Leave Status:</p>
+                      <p className="text-sm font-bold">Status:</p>
                       <p className=" text-white font-semibold text-[12px]">
                         {member.leaveDetails.isOnLeave === false ? (
                           <p className="bg-green-600 p-1 min-w-full rounded">
@@ -149,7 +155,7 @@ export const SortableMemberCard = ({
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col border border-gray-400 p-3 rounded gap-2">
                   <h1 className="font-bold text-2xl">About Me</h1>
-                  <p>{member.bio}</p>
+                  <p className="max-w-full">{member.bio}</p>
 
                   <p
                     onClick={() => handleSupportDocument(member._id)}
@@ -164,7 +170,7 @@ export const SortableMemberCard = ({
                   <div className="flex flex-col md:flex-row justify-between">
                     <div className="flex flex-row gap-5">
                       <div className="flex flex-col gap-1 items-start text-sm font-semibold">
-                        <p>Names</p>
+                        <p>Full Name</p>
                         <p>Job Position</p>
                         <p>Joined Date</p>
                         <p>Payment Date</p>
@@ -203,17 +209,14 @@ export const SortableMemberCard = ({
                       <div className="flex flex-col gap-1 items-start text-sm font-semibold">
                         <p>Entry Time</p>
                         <p>Exit Time</p>
-                        <p>Working Days</p>
+                        <p className="text-nowrap">Working Days</p>
                       </div>
                       <div className="flex flex-col gap-1 items-start text-sm">
                         <p>{member.entry}</p>
                         <p>{member.exit}</p>
-                        <p className="grid grid-cols-3 gap-1">
-                          {member.days.split(",").map((day, index, arr) => (
-                            <span key={index}>
-                              {day.trim()}
-                              {index < arr.length - 1 ? "," : ""}
-                            </span>
+                        <p className="grid grid-cols-3">
+                          {member.days.split(",").map((day, index) => (
+                            <span key={index}>{day.trim()}</span>
                           ))}
                         </p>
                       </div>
@@ -312,41 +315,19 @@ export const SortableMemberCard = ({
                   <div className="flex flex-col border border-gray-400 p-3 rounded gap-2">
                     <h1 className="font-bold text-2xl">Social Profile</h1>
                     <div className="flex gap-3">
-                      {member.linkedIn === "" ? ""
-                      : 
-                      <a href={member.linkedIn} className="hover:text-blue-700">
-                        <span>
-                          <FaLinkedin />
-                        </span>
-                      </a>}
-                      {member.instagram === "" ? ""
-                      :
-                      <a
-                        href={member.instagram}
-                        className="hover:text-blue-700"
-                      >
-                        <span>
-                          <FaInstagram />
-                        </span>
-                      </a>
-                      }
-                      {member.facebook === "" ? "" 
-                      
-                      :
-                       <a href={member.facebook} className="hover:text-blue-700">
-                        <span>
-                          <FaFacebook />
-                        </span>
-                      </a> 
-                      }
-                      {member.snapchat === "" ? "" 
-                      :
-                       <a href={member.snapchat} className="hover:text-blue-700">
-                        <span>
-                          <FaSnapchat />
-                        </span>
-                      </a> 
-                      }
+                      {socialLinks
+                        .filter((link) => link.url && link.url.trim() !== "")
+                        .map((link, index) => (
+                          <a
+                            key={index}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-blue-700"
+                          >
+                            <span>{link.icon}</span>
+                          </a>
+                        ))}
                     </div>
                   </div>
                 </div>
@@ -367,21 +348,21 @@ export const SortableMemberCard = ({
                           </div>
                         )}
                       </p>
-                      <div className="flex gap-2">
-                        <p>
-                          Starting From{" "}
+                      <div className="flex flex-row gap-5 mt-3">
+                        <div className="flex flex-col">
+                          <p> Starting From </p>
+                          <p>Ending To</p>
+                        </div>
+                        <div className="flex flex-col items-start">
                           <span className="font-bold">
                             <FormattedDate
                               date={member.leaveDetails.startDate}
                             />
                           </span>
-                        </p>
-                        <p>
-                          To{" "}
                           <span className="font-bold">
                             <FormattedDate date={member.leaveDetails.endDate} />
                           </span>
-                        </p>
+                        </div>
                       </div>
                       <p>{member.leaveDetails.approvedBy}</p>
                     </div>
@@ -450,7 +431,7 @@ export const SortableMemberCard = ({
             onClick={() => handleDelete(member._id)}
             className="flex-1 md:flex-none px-4 py-2 text-sm md:text-base bg-red-600 text-white rounded-md"
           >
-            <TrashIcon/>
+            <TrashIcon />
           </button>
         </div>
       </div>

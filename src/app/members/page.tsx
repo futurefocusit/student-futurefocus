@@ -10,6 +10,7 @@ import { TeamMember } from "@/types/types";
 import { hasPermission } from "@/libs/hasPermission";
 import SideBar from "@/components/SideBar";
 import SortableWrapper from "@/components/SortableWrapper";
+import BlogEditor from "@/components/Editor";
 import {
   CloudUpload,
   Person,
@@ -919,15 +920,15 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
 
                 {/* Bio */}
                 <Grid2 xs={12}>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    label="Bio"
-                    name="bio"
-                    value={formData.bio || ""}
-                    onChange={handleChange}
-                  />
+                  <BlogEditor
+                  initialContent={formData.bio || ""}
+                  onChange={(newContent) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      bio: newContent,
+                    }))
+                  }
+                />
                 </Grid2>
                 
                 <Grid2 xs={12} md={4}>
