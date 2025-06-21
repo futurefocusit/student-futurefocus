@@ -906,7 +906,6 @@ const handleCertificateUpload = async (e: React.ChangeEvent<HTMLInputElement>) =
                     placeholder="https://facebook.com/username"
                   />
                 </Grid2>
-
                 {/* NationalId */}
                 <Grid2 xs={12} md={12}>
                   <TextField

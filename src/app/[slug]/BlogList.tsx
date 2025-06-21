@@ -51,7 +51,7 @@ export default function BlogList({ slug }: { slug: string }) {
             <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
               <BookOpen className="w-6 h-6 text-blue-800" />
             </div>
-            Recent Blog Posts
+            Recent Blog 
           </h3>
         </div>
         <div className="px-6 py-8">
