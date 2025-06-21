@@ -200,7 +200,7 @@ export default function BlogPage() {
 
   return (
     <div className="flex min-h-screen">
-      <div className="flex-1 bg-gradient-to-br from-blue-50 via-white to-yellow-50">
+      <div className="flex-1 bg-gray-500">
         {/* Header Section */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 py-8">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">

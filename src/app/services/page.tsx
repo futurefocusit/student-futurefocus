@@ -178,7 +178,7 @@ const ServicesPage: React.FC = () => {
   };
 
   return (
-    <><SideBar /><div className="max-w-5xl mx-auto py-6 sm:px-6 lg:px-8 ">
+    <><SideBar /><div className="max-w-5xl  mx-auto py-16 sm:px-6 lg:px-8 ">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">Services</h1>
         <button
