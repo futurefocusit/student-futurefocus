@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { Building2, Target, Eye, TrendingUp, MessageCircle, Loader2, ExternalLink, MapPin, Star, Clock, Globe, ImageIcon, Home, User, BookOpen, Calendar, MessageSquare, X } from "lucide-react"
+import { Building2, Target, Eye, TrendingUp, MessageCircle, Loader2, ExternalLink, MapPin, Star, Clock, Globe, ImageIcon, Home, User, BookOpen, Calendar, MessageSquare, X, Phone } from "lucide-react"
 import axiosInstance, { fetchWithCache } from "@/libs/axios"
 import API_BASE_URL from "@/config/baseURL"
 import Image from "next/image"
 import BlogList from "./BlogList"
 import axios from "axios"
-import { FaServicestack } from "react-icons/fa"
+import { FaBullseye, FaGlobeAmericas, FaRegFileAlt, FaServicestack, FaTools, FaUsers } from "react-icons/fa"
 import { FaHouse } from "react-icons/fa6"
+import { IconType } from "react-icons/lib"
 
 interface CompanyData {
   name: string
@@ -47,7 +48,7 @@ interface Service {
 // Add HTMLContent component for safe HTML rendering
 const HTMLContent = ({ content, className = "" }: { content: string; className?: string }) => (
   <div
-    className={`prose prose-blue max-w-none ${className}`}
+    className={`prose prose-blue px-3 max-w-none ${className}`}
     dangerouslySetInnerHTML={{ __html: content || "" }}
   />
 );
@@ -57,12 +58,14 @@ const TextWithReadMore = ({
   content,
   title,
   maxLength = 200,
-  className = ""
+  className = "",
+  Icon
 }: {
   content: string;
   title: string;
   maxLength?: number;
   className?: string;
+  Icon:IconType
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const shouldTruncate = content?.length > maxLength;
@@ -71,12 +74,12 @@ const TextWithReadMore = ({
   return (
     <div className={`space-y-2  ${className}`}>
       <div className="bg-gradient-to-r from-blue-600 rounded-t-xl to-blue-700 px-6 py-6">
-<              h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                  <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
-                    <MessageCircle className="w-6 h-6 text-blue-800" />
-                  </div>
-        {title}</h3>
-        </div>
+        <              h3 className="text-2xl font-bold text-white flex items-center gap-3">
+          <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
+            <Icon className="w-6 h-6 text-blue-800" />
+          </div>
+          {title}</h3>
+      </div>
 
       <div className="relative">
         <HTMLContent
@@ -148,7 +151,7 @@ export default function CompanyProfilePage() {
         const response = await axios.get(`${API_BASE_URL}/service/slug/${slug}`);
         setServices(response.data);
       } catch (err) {
-       
+
       }
     };
 
@@ -201,7 +204,7 @@ export default function CompanyProfilePage() {
                 className="object-cover rounded-lg transition-transform group-hover:scale-105"
               />
               {image.caption && (
-                <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-2 text-sm rounded-b-lg">
+                <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white py-2 text-sm rounded-b-lg">
                   {image.caption}
                 </div>
               )}
@@ -463,31 +466,34 @@ export default function CompanyProfilePage() {
         </div>
 
         {/* Content Section */}
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="space-y-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="space-y-">
             {/* About Us */}
-            <div id="about" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-              <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div id="about" className="max-w-6xl mx-auto py-1">
+              <div className="bg-white rounded-2xl shadow-xl py-8">
                 <TextWithReadMore
                   content={companyData.aboutUs}
                   title="About Us"
                   maxLength={300}
+                  Icon={FaUsers}
                 />
               </div>
             </div>
 
             {/* Mission & Vision */}
-            <div id="mission-vision" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div id="mission-vision" className="max-w-6xl mx-auto py-1">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div className="bg-white rounded-2xl shadow-xl py-1">
                   <TextWithReadMore
+                  Icon={FaBullseye}
                     content={companyData.mission}
                     title="Mission"
                     maxLength={200}
                   />
                 </div>
-                <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div className="bg-white rounded-2xl shadow-xl py-1">
                   <TextWithReadMore
+                  Icon={FaGlobeAmericas}
                     content={companyData.vision}
                     title="Vision"
                     maxLength={200}
@@ -497,9 +503,10 @@ export default function CompanyProfilePage() {
             </div>
 
             {/* Description */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-              <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div className="max-w-6xl mx-auto py-1">
+              <div className=" rounded-2xl shadow-xl ">
                 <TextWithReadMore
+                Icon={FaRegFileAlt}
                   content={companyData.description}
                   title="Description"
                   maxLength={400}
@@ -508,234 +515,234 @@ export default function CompanyProfilePage() {
             </div>
 
             {/* Why Choose Us */}
-            <div id="why-choose-us" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 ">
+            <div id="why-choose-us" className="max-w-6xl mx-auto   py-1">
               <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6 rounded-t-lg">
-            <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                <h3 className="text-2xl font-bold text-white flex items-center gap-3">
                   <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
                     <FaHouse className="w-6 h-6 text-blue-800" />
                   </div>
                   Why Choose Us</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
+                {companyData.whyChooseUs.map((reason, index) => (
+                  <div key={index} className="p-4 bg-gray-50 rounded-lg ">
+                    <HTMLContent
+                      content={reason}
+                      className="text-gray-700"
+                    />
                   </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
-                  {companyData.whyChooseUs.map((reason, index) => (
-                    <div key={index} className="p-4 bg-gray-50 rounded-lg ">
-                      <HTMLContent
-                        content={reason}
-                        className="text-gray-700"
-                      />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Core Values & Languages */}
+          <div id="core-values" className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {companyData.coreValues.length > 0 && companyData.coreValues[0] && (
+              <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-blue-100">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">
+                  <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                    <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
+                      <Star className="w-6 h-6 text-blue-800" />
                     </div>
-                  ))}
+                    Core Values
+                  </h3>
+                </div>
+                <div className="px-6 py-8">
+                  <ul className="space-y-3">
+                    {companyData.coreValues.map((value, index) => (
+                      <li key={index} className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                        <span className="text-gray-700">{value}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* Core Values & Languages */}
-            <div id="core-values" className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {companyData.coreValues.length > 0 && companyData.coreValues[0] && (
-                <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-blue-100">
-                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">
-                    <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                      <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
-                        <Star className="w-6 h-6 text-blue-800" />
-                      </div>
-                      Core Values
-                    </h3>
-                  </div>
-                  <div className="px-6 py-8">
-                    <ul className="space-y-3">
-                      {companyData.coreValues.map((value, index) => (
-                        <li key={index} className="flex items-center gap-3">
-                          <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                          <span className="text-gray-700">{value}</span>
-                        </li>
-                      ))}
-                    </ul>
+            {companyData.languages.length > 0 && companyData.languages[0] && (
+              <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-blue-100">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">
+                  <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                    <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
+                      <Globe className="w-6 h-6 text-blue-800" />
+                    </div>
+                    Languages
+                  </h3>
+                </div>
+                <div className="px-6 py-8">
+                  <div className="flex flex-wrap gap-2">
+                    {companyData.languages.map((language, index) => (
+                      <span
+                        key={index}
+                        className="px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium"
+                      >
+                        {language}
+                      </span>
+                    ))}
                   </div>
                 </div>
-              )}
+              </div>
+            )}
+          </div>
 
-              {companyData.languages.length > 0 && companyData.languages[0] && (
-                <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-blue-100">
-                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">
-                    <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                      <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
-                        <Globe className="w-6 h-6 text-blue-800" />
-                      </div>
-                      Languages
-                    </h3>
-                  </div>
-                  <div className="px-6 py-8">
-                    <div className="flex flex-wrap gap-2">
-                      {companyData.languages.map((language, index) => (
-                        <span
-                          key={index}
-                          className="px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium"
-                        >
-                          {language}
-                        </span>
+          {/* Gallery */}
+          <div id="gallery" className="bg-white rounded-2xl shadow-xl overflow-hidden border my-5 border-blue-100">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">
+              <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
+                  <ImageIcon className="w-6 h-6 text-blue-800" />
+                </div>
+                Gallery
+              </h3>
+            </div>
+            <div className="px-6 py-8">
+              <GallerySection images={companyData.gallery} />
+            </div>
+          </div>
+
+          {/* Contact Information */}
+          <div id="contact-info" className="bg-white rounded-2xl shadow-xl overflow-hidden border border-blue-100">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">
+              <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
+                  <Phone className="w-6 h-6 text-blue-800" />
+                </div>
+                Contacts
+              </h3>
+            </div>
+            <div className="px-6 py-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2">Contact Details</h4>
+                    <div className="space-y-2">
+                      {companyData.email && (
+                        <p className="flex items-center gap-2 text-gray-700">
+                          <span className="font-medium">Email:</span>
+                          <a href={`mailto:${companyData.email}`} className="text-blue-600 hover:text-blue-800">
+                            {companyData.email}
+                          </a>
+                        </p>
+                      )}
+                      {companyData.phone.map((p, index) => (
+                        <p key={index} className="flex items-center gap-2 text-gray-700">
+                          <span className="font-medium">{p.type}:</span>
+                          <a href={`tel:${p.number}`} className="text-blue-600 hover:text-blue-800">
+                            {p.number}
+                          </a>
+                        </p>
                       ))}
+                      {companyData.address && (
+                        <p className="flex items-center gap-2 text-gray-700">
+                          <span className="font-medium">Address:</span>
+                          {companyData.address}
+                        </p>
+                      )}
+                      {companyData.location && (
+                        <p className="flex items-center gap-2 text-gray-700">
+                          <span className="font-medium">Address:</span>
+                          {companyData.location}
+                        </p>
+                      )}
+                      {companyData.website && (
+                        <p className="flex items-center gap-2 text-gray-700">
+                          <span className="font-medium">Website:</span>
+                          <a
+                            href={companyData.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 inline-flex items-center"
+                          >
+                            {companyData.website}
+                            <ExternalLink className="w-4 h-4 ml-1" />
+                          </a>
+                        </p>
+                      )}
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
 
-            {/* Gallery */}
-            <div id="gallery" className="bg-white rounded-2xl shadow-xl overflow-hidden border border-blue-100">
-              <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">
-                <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                  <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
-                    <ImageIcon className="w-6 h-6 text-blue-800" />
-                  </div>
-                  Gallery
-                </h3>
-              </div>
-              <div className="px-6 py-8">
-                <GallerySection images={companyData.gallery} />
-              </div>
-            </div>
-
-            {/* Contact Information */}
-            <div id="contact-info" className="bg-white rounded-2xl shadow-xl overflow-hidden border border-blue-100">
-              <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">
-                <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                  <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
-                    <MessageCircle className="w-6 h-6 text-blue-800" />
-                  </div>
-                  Contacts
-                </h3>
-              </div>
-              <div className="px-6 py-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
+                  {(companyData.days.length > 0 && companyData.days[0].opening && companyData.days[0].closing) && (
                     <div>
-                      <h4 className="text-lg font-semibold text-gray-900 mb-2">Contact Details</h4>
-                      <div className="space-y-2">
-                        {companyData.email && (
-                          <p className="flex items-center gap-2 text-gray-700">
-                            <span className="font-medium">Email:</span>
-                            <a href={`mailto:${companyData.email}`} className="text-blue-600 hover:text-blue-800">
-                              {companyData.email}
-                            </a>
-                          </p>
-                        )}
-                        {companyData.phone.map((p, index) => (
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">Business Hours</h4>
+                      <div className="space-y-1">
+                        {companyData.days.map((day, index) => (
                           <p key={index} className="flex items-center gap-2 text-gray-700">
-                            <span className="font-medium">{p.type}:</span>
-                            <a href={`tel:${p.number}`} className="text-blue-600 hover:text-blue-800">
-                              {p.number}
-                            </a>
+                            <Clock className="w-5 h-5 text-blue-600" />
+                            <span className="font-medium">{day.day}:</span>
+                            <span>{day.opening} - {day.closing}</span>
                           </p>
                         ))}
-                        {companyData.address && (
-                          <p className="flex items-center gap-2 text-gray-700">
-                            <span className="font-medium">Address:</span>
-                            {companyData.address}
-                          </p>
-                        )}
-                        {companyData.location && (
-                          <p className="flex items-center gap-2 text-gray-700">
-                            <span className="font-medium">Address:</span>
-                            {companyData.location}
-                          </p>
-                        )}
-                        {companyData.website && (
-                          <p className="flex items-center gap-2 text-gray-700">
-                            <span className="font-medium">Website:</span>
-                            <a
-                              href={companyData.website}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 inline-flex items-center"
-                            >
-                              {companyData.website}
-                              <ExternalLink className="w-4 h-4 ml-1" />
-                            </a>
-                          </p>
-                        )}
                       </div>
                     </div>
+                  )}
+                </div>
 
-                    {(companyData.days.length > 0 && companyData.days[0].opening && companyData.days[0].closing) && (
-                      <div>
-                        <h4 className="text-lg font-semibold text-gray-900 mb-2">Business Hours</h4>
-                        <div className="space-y-1">
-                          {companyData.days.map((day, index) => (
-                            <p key={index} className="flex items-center gap-2 text-gray-700">
-                              <Clock className="w-5 h-5 text-blue-600" />
-                              <span className="font-medium">{day.day}:</span>
-                              <span>{day.opening} - {day.closing}</span>
-                            </p>
-                          ))}
-                        </div>
-                      </div>
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Social Medias</h4>
+                  <div className="flex flex-wrap gap-3">
+                    {companyData.linkedin && (
+                      <a
+                        href={companyData.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors"
+                      >
+                        LinkedIn
+                      </a>
                     )}
-                  </div>
-
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2">Social Medias</h4>
-                    <div className="flex flex-wrap gap-3">
-                      {companyData.linkedin && (
-                        <a
-                          href={companyData.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors"
-                        >
-                          LinkedIn
-                        </a>
-                      )}
-                      {companyData.instagram && (
-                        <a
-                          href={companyData.instagram}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center px-4 py-2 bg-pink-100 text-pink-700 rounded-full hover:bg-pink-200 transition-colors"
-                        >
-                          Instagram
-                        </a>
-                      )}
-                      {companyData.tiktok && (
-                        <a
-                          href={companyData.tiktok}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
-                        >
-                          TikTok
-                        </a>
-                      )}
-                      {companyData.facebook && (
-                        <a
-                          href={companyData.facebook}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full hover:bg-blue-200 transition-colors"
-                        >
-                          Facebook
-                        </a>
-                      )}
-                    </div>
+                    {companyData.instagram && (
+                      <a
+                        href={companyData.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-4 py-2 bg-pink-100 text-pink-700 rounded-full hover:bg-pink-200 transition-colors"
+                      >
+                        Instagram
+                      </a>
+                    )}
+                    {companyData.tiktok && (
+                      <a
+                        href={companyData.tiktok}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
+                      >
+                        TikTok
+                      </a>
+                    )}
+                    {companyData.facebook && (
+                      <a
+                        href={companyData.facebook}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full hover:bg-blue-200 transition-colors"
+                      >
+                        Facebook
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        {/* Add BlogList at the end of the main content section */}
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <BlogList slug={slug} />
-        </div>
+      </div>
+      {/* Add BlogList at the end of the main content section */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 ">
+        <BlogList slug={slug} />
+      </div>
 
-        <section className="my-10 max-w-4xl mx-auto">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
 
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">
-        <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                  <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
-                    <FaServicestack className="w-6 h-6 text-blue-800" />
-                  </div>
-          
-          Our Services</h3>
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6 rounded-t-xl">
+          <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+            <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
+              <FaTools className="w-6 h-6 text-blue-800" />
+            </div>
+
+            Our Services</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {services.map((service) => (
@@ -765,20 +772,20 @@ export default function CompanyProfilePage() {
           ))}
         </div>
       </section>
-        <div className="bg-gradient-to-r from-blue-800 to-blue-900 py-12">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              {/* <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-400 rounded-2xl mb-6">
+      <div className="bg-gradient-to-r from-blue-800 to-blue-900 py-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            {/* <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-400 rounded-2xl mb-6">
                 <Building2 className="w-8 h-8 text-blue-800" />
               </div> */}
-              <p className="text-blue-100 text-lg">
-                © {new Date().getFullYear()} {companyData.name}. All rights reserved.
-              </p>
-              <div className="mt-4 w-24 h-1 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full mx-auto"></div>
-            </div>
+            <p className="text-blue-100 text-lg">
+              © {new Date().getFullYear()} {companyData.name}. All rights reserved.
+            </p>
+            <div className="mt-4 w-24 h-1 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full mx-auto"></div>
           </div>
         </div>
-      
+      </div>
+
 
       {/* Popups */}
       {showTextPopup && <TextPopup />}
@@ -845,7 +852,7 @@ export default function CompanyProfilePage() {
       `}</style>
 
       {/* Place this where you want the Services section to appear, e.g. after main company info */}
-     
+
     </>
   )
 }
