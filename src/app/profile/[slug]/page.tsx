@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Building2, Target, Eye, TrendingUp, MessageCircle, Loader2, ExternalLink, MapPin, Star, Clock, Globe, ImageIcon, Home, User, BookOpen, Calendar, MessageSquare, X, Phone } from "lucide-react"
-import axiosInstance, { fetchWithCache } from "@/libs/axios"
+import { fetchWithCache } from "@/libs/axios"
 import API_BASE_URL from "@/config/baseURL"
 import Image from "next/image"
 import BlogList from "./BlogList"
@@ -11,6 +11,7 @@ import axios from "axios"
 import { FaBullseye, FaGlobeAmericas, FaRegFileAlt, FaServicestack, FaTools, FaUsers } from "react-icons/fa"
 import { FaHouse } from "react-icons/fa6"
 import { IconType } from "react-icons/lib"
+import ImageSlider from "@/components/imageSlider"
 
 interface CompanyData {
   name: string
@@ -65,7 +66,7 @@ const TextWithReadMore = ({
   title: string;
   maxLength?: number;
   className?: string;
-  Icon:IconType
+  Icon: IconType
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const shouldTruncate = content?.length > maxLength;
@@ -114,7 +115,7 @@ export default function CompanyProfilePage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [showTextPopup, setShowTextPopup] = useState(false)
   const [showGalleryPopup, setShowGalleryPopup] = useState(false)
-  const [showFullImage, setShowFullImage] = useState<string | null>(null)
+  const [showFullImage, setShowFullImage] = useState<{ url: string, caption?: string } | null>(null)
   const [popupContent, setPopupContent] = useState({ title: "", content: "" })
   const [selectedGallery, setSelectedGallery] = useState<Array<{ url: string, caption?: string }>>([])
 
@@ -138,8 +139,8 @@ export default function CompanyProfilePage() {
           setError("Company profile not found")
         }
       } catch (err) {
-        console.error("Error fetching company data:", err)
-        setError("Failed to load company profile. Please try again later.")
+        console.error("Error fetching Institution data:", err)
+        setError("Failed to load Institution profile. Please try again later.")
       } finally {
         setIsLoading(false)
       }
@@ -185,7 +186,7 @@ export default function CompanyProfilePage() {
     }
 
     const handleImageClick = (image: { url: string, caption?: string }) => {
-      setShowFullImage(image.url)
+      setShowFullImage(image)
     }
 
     return (
@@ -250,7 +251,7 @@ export default function CompanyProfilePage() {
             <div
               key={index}
               className="relative aspect-square cursor-pointer group"
-              onClick={() => setShowFullImage(image.url)}
+              onClick={() => setShowFullImage(image)}
             >
               <Image
                 src={image.url}
@@ -279,23 +280,22 @@ export default function CompanyProfilePage() {
   )
 
   const FullImagePopup = () => (
-    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4" onClick={() => setShowFullImage(null)}>
+    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
       {showFullImage && (
-        <div className="relative max-w-6xl w-full max-h-[90vh]">
-          <Image
-            src={showFullImage}
-            alt="Full size image"
-            width={1200}
-            height={800}
-            className="object-contain max-h-[90vh] w-auto mx-auto"
-          />
+        <>
           <button
             onClick={() => setShowFullImage(null)}
-            className="absolute top-4 right-4 p-2 bg-white/20 rounded-full hover:bg-white/30"
+            className="absolute top-6 right-6 z-50 p-2 bg-white/20 rounded-full hover:bg-white/40 transition-colors"
+            aria-label="Close"
           >
-            <X className="w-6 h-6 text-white" />
+            <X className="w-7 h-7 text-white" />
           </button>
-        </div>
+          <ImageSlider
+            key={showFullImage.url}
+            index={companyData.gallery.findIndex(img => img.url === showFullImage.url)}
+            slides={companyData.gallery}
+          />
+        </>
       )}
     </div>
   )
@@ -310,7 +310,7 @@ export default function CompanyProfilePage() {
             </div>
             <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full animate-pulse"></div>
           </div>
-          <p className="text-blue-800 font-medium text-lg">Loading company profile...</p>
+          <p className="text-blue-800 font-medium text-lg">Loading Institution profile...</p>
           <div className="mt-4 w-32 h-1 bg-gradient-to-r from-blue-500 to-yellow-400 rounded-full mx-auto animate-pulse"></div>
         </div>
       </div>
@@ -485,7 +485,7 @@ export default function CompanyProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="bg-white rounded-2xl shadow-xl py-1">
                   <TextWithReadMore
-                  Icon={FaBullseye}
+                    Icon={FaBullseye}
                     content={companyData.mission}
                     title="Mission"
                     maxLength={200}
@@ -493,7 +493,7 @@ export default function CompanyProfilePage() {
                 </div>
                 <div className="bg-white rounded-2xl shadow-xl py-1">
                   <TextWithReadMore
-                  Icon={FaGlobeAmericas}
+                    Icon={FaGlobeAmericas}
                     content={companyData.vision}
                     title="Vision"
                     maxLength={200}
@@ -506,7 +506,7 @@ export default function CompanyProfilePage() {
             <div className="max-w-6xl mx-auto py-1">
               <div className=" rounded-2xl shadow-xl ">
                 <TextWithReadMore
-                Icon={FaRegFileAlt}
+                  Icon={FaRegFileAlt}
                   content={companyData.description}
                   title="Description"
                   maxLength={400}
