@@ -1,13 +1,16 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Building2, Save, Eye, Plus, X, Target, TrendingUp, MessageCircle, Clock, Globe, Image as ImageIcon, Loader2, Star, MapPin, ExternalLink } from "lucide-react"
+import { Building2, Save, Eye, Plus, X, Target, TrendingUp, MessageCircle, Clock, Globe, Image as ImageIcon, Loader2, Star, MapPin, ExternalLink, Copy } from "lucide-react"
 import withAdminAuth from "@/components/withAdminAuth"
 import axiosInstance, { fetchWithCache, fetchWithRetry } from "@/libs/axios"
 import API_BASE_URL from "@/config/baseURL"
 import SideBar from "@/components/SideBar"
 import BlogEditor from "@/components/Editor"
 import Image from "next/image"
+import { FaTools, FaUsers, FaBullseye, FaGlobeAmericas, FaRegFileAlt } from "react-icons/fa"
+import ImageSlider from "@/components/imageSlider"
+import { FaHouse } from "react-icons/fa6"
 
 interface CompanyData {
   name: string
@@ -33,6 +36,13 @@ interface CompanyData {
   logo: string
   website: string
   isSuperInst: boolean
+}
+
+interface Service {
+  _id: string
+  title: string
+  desc: string
+  image?: string
 }
 
 const DAYS_OF_WEEK = [
@@ -151,6 +161,8 @@ const AdminPage = () => {
   const [isSaving, setIsSaving] = useState(false)
   const [saveMessage, setSaveMessage] = useState({ type: "", message: "" })
   const [uploadingImages, setUploadingImages] = useState(false)
+  const [expandedServiceIds, setExpandedServiceIds] = useState<string[]>([])
+  const [services, setServices] = useState<Service[]>([])
 
   const loadSavedData = async () => {
     try {
@@ -175,6 +187,21 @@ const AdminPage = () => {
   useEffect(() => {
     loadSavedData()
   }, [])
+
+  useEffect(() => {
+    // Fetch services for preview (simulate public page fetch)
+    const fetchServices = async () => {
+      if (!companyData.slug) return;
+      try {
+        const response = await fetch(`${API_BASE_URL}/service/slug/${companyData.slug}`);
+        if (response.ok) {
+          const result = await response.json();
+          setServices(result);
+        }
+      } catch { }
+    };
+    fetchServices();
+  }, [companyData.slug]);
 
   const handleInputChange = (field: keyof CompanyData, value: string) => {
     setCompanyData((prev) => ({
@@ -414,6 +441,13 @@ const AdminPage = () => {
     }));
   };
 
+  // Add toggleExpand for services
+  const toggleExpand = (id: string) => {
+    setExpandedServiceIds((prev) =>
+      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+    );
+  };
+
   if (showPreview) {
     return <CompanyProfilePreview data={companyData} onBack={() => setShowPreview(false)} />
   }
@@ -443,7 +477,7 @@ const AdminPage = () => {
                 <Eye className="w-4 h-4 inline mr-1" />
                 Preview
               </button>
-              
+
             </div>
           </div>
 
@@ -1103,6 +1137,10 @@ function CompanyProfilePreview({ data, onBack }: { data: CompanyData; onBack: ()
   const [showFullImage, setShowFullImage] = useState<string | null>(null)
   const [popupContent, setPopupContent] = useState({ title: "", content: "" })
   const [selectedGallery, setSelectedGallery] = useState<Array<{ url: string, caption?: string }>>([])
+  const [copied, setCopied] = useState(false);
+  const publicProfileUrl = typeof window !== 'undefined' && data.slug ? `${window.location.origin}/profile/${data.slug}` : '';
+  const [expandedServiceIds, setExpandedServiceIds] = useState<string[]>([])
+  const [services, setServices] = useState<Service[]>([])
 
   const sectionItems = [
     { name: "About Us", href: "#about", icon: Building2 },
@@ -1125,12 +1163,14 @@ function CompanyProfilePreview({ data, onBack }: { data: CompanyData; onBack: ()
     content,
     title,
     maxLength = 200,
-    className = ""
+    className = "",
+    Icon
   }: {
     content: string;
     title: string;
     maxLength?: number;
     className?: string;
+    Icon: React.ComponentType<{ className?: string }>;
   }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const shouldTruncate = content?.length > maxLength;
@@ -1138,7 +1178,6 @@ function CompanyProfilePreview({ data, onBack }: { data: CompanyData; onBack: ()
 
     return (
       <div className={`space-y-2 ${className}`}>
-        <h3 className=" rounded-t-2xl text-xl font-semibold text-gray-900 bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">{title}</h3>
         <div className="relative">
           <HTMLContent
             content={displayContent}
@@ -1269,26 +1308,33 @@ function CompanyProfilePreview({ data, onBack }: { data: CompanyData; onBack: ()
   )
 
   const FullImagePopup = () => (
-    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4" onClick={() => setShowFullImage(null)}>
+    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
       {showFullImage && (
-        <div className="relative max-w-6xl w-full max-h-[90vh]">
-          <Image
-            src={showFullImage}
-            alt="Full size image"
-            width={1200}
-            height={800}
-            className="object-contain max-h-[90vh] w-auto mx-auto"
-          />
+        <>
           <button
             onClick={() => setShowFullImage(null)}
-            className="absolute top-4 right-4 p-2 bg-white/20 rounded-full hover:bg-white/30"
+            className="absolute top-6 right-6 z-50 p-2 bg-white/20 rounded-full hover:bg-white/40 transition-colors"
+            aria-label="Close"
           >
-            <X className="w-6 h-6 text-white" />
+            <X className="w-7 h-7 text-white" />
           </button>
-        </div>
+          <ImageSlider
+            key={showFullImage}
+            index={data.gallery.findIndex(img => img.url === showFullImage)}
+            slides={data.gallery}
+          />
+        </>
       )}
     </div>
   )
+
+  const handleCopyLink = () => {
+    if (publicProfileUrl) {
+      navigator.clipboard.writeText(publicProfileUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }
+  };
 
   return (
     <>
@@ -1313,13 +1359,24 @@ function CompanyProfilePreview({ data, onBack }: { data: CompanyData; onBack: ()
                   )
                 })}
               </div>
-              <button
-                onClick={onBack}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-yellow-800 bg-white hover:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
-              >
-                <X className="h-5 w-5 mr-2" />
-                Back to Edit
-              </button>
+              <div className="flex gap-2 items-center">
+                {data.slug && (
+                  <button
+                    onClick={handleCopyLink}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-yellow-800 bg-white hover:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
+                  >
+                    <Copy className="h-5 w-5 mr-2" />
+                    {copied ? "Copied!" : "Copy Public Link"}
+                  </button>
+                )}
+                <button
+                  onClick={onBack}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-yellow-800 bg-white hover:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
+                >
+                  <X className="h-5 w-5 mr-2" />
+                  Back to Edit
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1386,7 +1443,7 @@ function CompanyProfilePreview({ data, onBack }: { data: CompanyData; onBack: ()
                 className="object-cover"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-blue-800/80 to-blue-900/90"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-900/30 via-blue-800/30 to-blue-700/30"></div>
             </div>
           )}
           <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
@@ -1420,61 +1477,110 @@ function CompanyProfilePreview({ data, onBack }: { data: CompanyData; onBack: ()
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="space-y-12">
             {/* About Us */}
-            <div id="about" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-              <div className="bg-white rounded-2xl shadow-xl p-8">
-                <TextWithReadMore
-                  content={data.aboutUs}
-                  title="About Us"
-                  maxLength={300}
-                />
+            <div id="about" className="max-w-6xl mx-auto py-1">
+              <div className="bg-white rounded-2xl shadow-xl py-8">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6 rounded-t-xl">
+                  <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                    <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
+                      <FaUsers className="w-6 h-6 text-800" />
+                    </div>
+                    About Us
+                  </h3>
+                </div>
+                <div className="px-6 py-4">
+                  <TextWithReadMore
+                    content={data.aboutUs}
+                    title=""
+                    maxLength={300}
+                    Icon={FaUsers}
+                  />
+                </div>
               </div>
             </div>
 
             {/* Mission & Vision */}
-            <div id="mission-vision" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div id="mission-vision" className="max-w-6xl mx-auto py-1">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-white rounded-2xl shadow-xl p-8">
-                  <TextWithReadMore
-                    content={data.mission}
-                    title="Mission"
-                    maxLength={200}
-                  />
+                <div className="bg-white rounded-2xl shadow-xl py-1">
+                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6 rounded-t-xl">
+                    <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                      <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
+                        <FaBullseye className="w-6 h-6 text-blue-800" />
+                      </div>
+                      Mission
+                    </h3>
+                  </div>
+                  <div className="px-6 py-4">
+                    <TextWithReadMore
+                      content={data.mission}
+                      title=""
+                      maxLength={200}
+                      Icon={FaBullseye}
+                    />
+                  </div>
                 </div>
-                <div className="bg-white rounded-2xl shadow-xl p-8">
-                  <TextWithReadMore
-                    content={data.vision}
-                    title="Vision"
-                    maxLength={200}
-                  />
+                <div className="bg-white rounded-2xl shadow-xl py-1">
+                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6 rounded-t-xl">
+                    <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                      <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
+                        <FaGlobeAmericas className="w-6 h-6 text-blue-800" />
+                      </div>
+                      Vision
+                    </h3>
+                  </div>
+                  <div className="px-6 py-4">
+                    <TextWithReadMore
+                      content={data.vision}
+                      title=""
+                      maxLength={200}
+                      Icon={FaGlobeAmericas}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Description */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-              <div className="bg-white rounded-2xl shadow-xl p-8">
-                <TextWithReadMore
-                  content={data.description}
-                  title="Description"
-                  maxLength={400}
-                />
+            <div className="max-w-6xl mx-auto py-1">
+              <div className="rounded-2xl shadow-xl">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6 rounded-t-xl">
+                  <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                    <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
+                      <FaRegFileAlt className="w-6 h-6 text-blue-800" />
+                    </div>
+                    Description
+                  </h3>
+                </div>
+                <div className="px-6 py-4">
+                  <TextWithReadMore
+                    content={data.description}
+                    title=""
+                    maxLength={400}
+                    Icon={FaRegFileAlt}
+                  />
+                </div>
               </div>
             </div>
 
             {/* Why Choose Us */}
-            <div id="why-choose-us" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-              <div className="bg-white rounded-2xl shadow-xl p-8 ">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6">Why Choose Us</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {data.whyChooseUs.map((reason, index) => (
-                    <div key={index} className="p-4 bg-gray-50 rounded-lg">
-                      <HTMLContent
-                        content={reason}
-                        className="text-gray-700"
-                      />
-                    </div>
-                  ))}
-                </div>
+            <div id="why-choose-us" className="max-w-6xl mx-auto py-1">
+              <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6 rounded-t-lg">
+                <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                  <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center">
+                    <FaHouse className="w-6 h-6 text-blue-800" />
+                  </div>
+                  Why Choose Us
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-6 py-8">
+                {data.whyChooseUs.map((reason, index) => (
+                  <div key={index} className="p-4 bg-gray-50 rounded-lg">
+                    <HTMLContent
+                      content={reason}
+                      className="text-gray-700"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
 

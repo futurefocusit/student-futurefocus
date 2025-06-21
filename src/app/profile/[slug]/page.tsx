@@ -432,26 +432,16 @@ export default function CompanyProfilePage() {
                 src={companyData.heroImage}
                 alt="Hero Background"
                 fill
-                className="object-cover"
+                className="object-cover "
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-blue-800/80 to-blue-900/90"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-900/30 via-blue-800/30 to-blue-700/30"></div>
             </div>
           )}
-          <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-            <div className="text-center">
-              {companyData.logo && (
-                <div className="inline-flex items-center justify-center w-32 h-32 bg-white rounded-2xl shadow-lg mb-8">
-                  <Image
-                    src={companyData.logo}
-                    alt="Company Logo"
-                    width={96}
-                    height={96}
-                    className="object-contain"
-                  />
-                </div>
-              )}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+          <div className="relative max-w-6xl mx-auto  mt-5 px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+            <div className="text-center relative top-28">
+              
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4  leading-tight">
                 {companyData.name}
               </h1>
 
@@ -459,6 +449,17 @@ export default function CompanyProfilePage() {
                 <div className="flex items-center justify-center text-blue-100 text-lg">
                   <MapPin className="w-5 h-5 mr-2" />
                   {companyData.location}
+                </div>
+              )}
+              {companyData.logo && (
+                <div className="inline-flex items-center justify-center w-32 h-32 mt-2 rounded-full bg-white  shadow-lg mb-8">
+                  <Image
+                    src={companyData.logo}
+                    alt="Company Logo"
+                    width={96}
+                    height={96}
+                    className="object-contain"
+                  />
                 </div>
               )}
             </div>
