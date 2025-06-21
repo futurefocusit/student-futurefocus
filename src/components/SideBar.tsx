@@ -332,9 +332,9 @@ const SideBar = () => {
                 Logout
               </p>
             </button>
-            <div className="flex flex-row ">
+            <Link href="/my-profile" className="flex flex-row" >
               <img src={loggedUser?.image} alt={`${loggedUser?.name}'s profile`} className="rounded-full  bg-gray-600 w-10 h-10 " />
-              <span className="flex flex-col  items-center">
+              <span className="flex flex-col  items-start">
                 <p
                   className={`mx-4 text-sm text-white md:${isExpanded ? "" : "hidden"
                     }`}
@@ -348,7 +348,7 @@ const SideBar = () => {
                   {loggedUser?.role?.role || loggedUser?.position}
                 </p>
               </span>
-            </div>
+            </Link>
           </div>
         </nav>
       </div>

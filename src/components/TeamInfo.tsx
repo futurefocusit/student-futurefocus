@@ -63,7 +63,7 @@ export const SortableMemberCard = ({
           title="Drag to reorder"
           style={{ touchAction: "none" }}
         >
-          <GripVertical size={20} className="md:size-20" />
+          <GripVertical size={20} className="md:size-10" />
         </div>
         <img
           src={member.image}

@@ -246,3 +246,28 @@ export interface User {
   isSuperAdmin: boolean;
   __v: number;
 }
+
+export interface User {
+  fullName: string
+  email: string
+  phone: string
+  location: string
+  bio: string
+  avatar: string
+  website: string
+  github: string
+  twitter: string
+  linkedin: string
+  skills: string[]
+  jobPosition: string
+  joinedDate: string
+  paymentDate: string
+  salary: number
+  currency: string
+  entryTime: string
+  exitTime: string
+  workingDays: string[]
+  leaveType: string
+  leaveStartDate: string
+  leaveEndDate: string
+}
